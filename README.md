@@ -5,6 +5,8 @@
 - [Regras para o DDJ](/docs/regras.md)
 - [Conteúdo do DDJ](/docs/conteudo.md)
 
+- [Glossário do projeto](/docs/glossario.md)
+
 
 ## Capítulo 0: O Prelúdio  
 
