@@ -1,5 +1,11 @@
 # 📖 História do Jogo
 
+## Modelos de DDJ:
+- [Template do DDJ](/docs/DDJ.md)
+- [Regras para o DDJ](/docs/regras.md)
+- [Conteúdo do DDJ](/docs/conteudo.md)
+
+
 ## Capítulo 0: O Prelúdio  
 
 Adormecido no gelo, é encontrado um vírus pré-histórico chamado **Kaloris**, por um grupo de pesquisas da **DeltaUmbra Corp.** O chefe desse projeto era o **Dr. Aris Thorne**.  
