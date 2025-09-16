@@ -1,9 +1,10 @@
 import GameScene from './scenes/GameScene.js';
+import SecondScene from './scenes/SecondScene.js';
 
 const config = {
     type: Phaser.AUTO,
-    width: 1920,
-    height: 1080,
+    width: 1000,
+    height: 800,
     pixelArt: true,            // evita borrões e gaps
     backgroundColor: '#000000',
     render: {
@@ -15,7 +16,7 @@ const config = {
         default: 'arcade',
         arcade: { debug: false }
     },
-    scene: [GameScene]
+    scene: [GameScene, SecondScene]
 };
 
 const game = new Phaser.Game(config);

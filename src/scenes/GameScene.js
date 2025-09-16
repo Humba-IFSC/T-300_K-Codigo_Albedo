@@ -2,29 +2,86 @@ import { BaseScene } from './BaseScene.js';
 import { CoordProbe } from '../systems/debug/CoordProbe.js';
 import { UICameraManager } from '../systems/ui/UICameraManager.js';
 import { InteractionPrompt } from '../systems/ui/InteractionPrompt.js';
+import { addItemToInventory, getInventory } from '../systems/items/itemUtils.js';
+import { useCrowbar } from '../systems/items/crowbar.js';
+import { createDoor, setupDoorInteraction } from '../systems/items/doorUtils.js';
+import { useKey } from '../systems/items/key.js';
 
 export default class GameScene extends BaseScene {
     constructor() {
         super('GameScene');
     }
 
+    openKeyChest() {
+        this.keyChest.setFrame(1);
+        this.keyChestOpened = true;
+        window._keyChestOpened = true;
+        // Adiciona chave ao inventário
+        const inventory = getInventory();
+        addItemToInventory(inventory, 'key');
+        if (this.hotbar) {
+            const nextSlot = this.hotbar.items.findIndex(i => i === null);
+            this.hotbar.setItem(nextSlot !== -1 ? nextSlot : 1, 'key'); // 'key' corresponde ao nome do sprite key.png
+            this.hotbar.showAnimated();
+        }
+    this.chestPrompt.hide();
+    }
+
     preload() {
         super.preload();
         this.load.image('tiles', 'assets/tilesets/tileset.png');
         this.load.tilemapTiledJSON('map_generated', 'assets/maps/map_generated.json');
+        this.load.tilemapTiledJSON('map', 'assets/maps/map.json');
         this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('npc', 'assets/sprites/npc.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('chest', 'assets/tilesets/chest2.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.image('door', 'assets/sprites/Basic_Door_Pixel.png');
         // Itens
-        this.load.image('crowbar', 'assets/sprites/blackcrowbar.png');
-        this.load.image('blackcrowbar', 'assets/sprites/blackcrowbar.png');
-        this.load.image('box', 'assets/sprites/wooden_box1.png');
+    this.load.image('crowbar', 'assets/sprites/blackcrowbar.png');
+    this.load.image('blackcrowbar', 'assets/sprites/blackcrowbar.png');
+    this.load.image('box', 'assets/sprites/wooden_box1.png');
+    this.load.image('key', 'assets/sprites/key.png');
     }
 
     create() {
+        // Restaura ponte aberta
+        this.bridgeOpened = window._bridgeOpened || false;
+        if (this.bridgeOpened) {
+            this.openBridge();
+        }
         // Mapa (tolerante a mapas com 1 ou 2 camadas)
+        const tileSize = 32;
         const map = this.make.tilemap({ key: 'map_generated' });
         this.map = map;
+            // Restaura tiles modificados, se existirem
+            let layer = map.getLayer('Camada de Blocos 1')?.tilemapLayer;
+            if (window._tileChanges && typeof window._tileChanges === 'object' && layer) {
+                for (const key in window._tileChanges) {
+                    const [x, y] = key.split(',').map(Number);
+                    layer.putTileAt(window._tileChanges[key], x, y);
+                }
+            }
+            // Ponte: sempre desenha diretamente na camada se marcada como aberta
+            if (window._bridgeOpened && layer) {
+                const x1 = 13, x2 = 16, y1 = 3, y2 = 5;
+                const leftBorderX = 12;
+                const rightBorderX = 17;
+                for (let x = x1; x <= x2; x++) {
+                    for (let y = y1; y <= y2; y++) {
+                        layer.putTileAt(15, x, y);
+                    }
+                }
+                if (leftBorderX >= 0) {
+                    for (let y = y1; y <= y2; y++) {
+                        layer.putTileAt(14, leftBorderX, y);
+                    }
+                }
+                if (rightBorderX < map.width) {
+                    for (let y = y1; y <= y2; y++) {
+                        layer.putTileAt(16, rightBorderX, y);
+                    }
+                }
+            }
         const tileset = map.addTilesetImage('tiles', 'tiles');
         let floor = null;
         let walls = null;
@@ -43,38 +100,78 @@ export default class GameScene extends BaseScene {
         }
         this.physics.world.bounds.setTo(0, 0, map.widthInPixels, map.heightInPixels);
 
-        // Player
-        this.createCommonPlayer(481, 350);
-        if (walls) this.physics.add.collider(this.player, walls);
+    // Player
+    // Se existe posição salva, usa ela; senão, usa padrão
+    const entryPos = window._playerEntryPos;
+    const px = entryPos?.x ?? 481;
+    const py = entryPos?.y ?? 350;
+    this.createCommonPlayer(px, py);
+    if (walls) this.physics.add.collider(this.player, walls);
 
         // NPC
         this.npc = this.physics.add.sprite(400, 290, 'npc', 1).setImmovable(true);
         this.physics.add.collider(this.player, this.npc);
 
-    // UI de interação
-    this.interactionPrompt = new InteractionPrompt(this, { suffix: ' para falar' });
-    this.boxPrompt = new InteractionPrompt(this, { suffix: ' para quebrar' });
-    this.chestPrompt = new InteractionPrompt(this, { suffix: ' para abrir' });
-    // Alinha todos os prompts na mesma altura
+    // Porta teleportadora (tile 22, 11)
+    const doorTileX = 22, doorTileY = 11; // Tile escolhido conforme probe
+    const doorX = doorTileX * tileSize + tileSize/2;
+    const doorY = doorTileY * tileSize + tileSize/2;
+    this.teleportDoor = createDoor(this, doorX, doorY);
+    this.teleportDoor.setData('unlocked', false); // Porta começa trancada
+    this.physics.add.collider(this.player, this.teleportDoor);
+    // Não usa mais overlap para teleporte
+
+        // UI de interação
+        this.interactionPrompt = new InteractionPrompt(this, { suffix: ' para falar' });
+        this.boxPrompt = new InteractionPrompt(this, { suffix: ' para quebrar' });
+    this.chestPrompt = new InteractionPrompt(this, { prefix: 'Pressione ', keyLabel: '"ESPAÇO"', suffix: ' para abrir', fontSize: 26 });
+    this.keyChestPrompt = new InteractionPrompt(this, { prefix: 'Pressione ', keyLabel: '"ESPAÇO"', suffix: ' para abrir', fontSize: 26 });
+        this.doorPrompt = new InteractionPrompt(this, { suffix: ' para entrar' });
+        // Alinha todos os prompts na mesma altura
     this.chestPrompt.container.y = this.interactionPrompt.container.y;
+    this.keyChestPrompt.container.y = this.interactionPrompt.container.y;
     this.boxPrompt.container.y = this.interactionPrompt.container.y;
+    this.doorPrompt.container.y = this.interactionPrompt.container.y;
 
         // Sistemas compartilhados
         this.createDialogueSystem();
+        // Hotbar persistente entre cenas
         this.createHotbar();
+        if (window._hotbarItems) {
+            window._hotbarItems.forEach((item, idx) => {
+                if (item) this.hotbar.setItem(idx, item);
+            });
+        }
         this.hasCrowbar = false;
 
         // Probe de coordenadas
         this.coordProbe = new CoordProbe(this, map);
 
-        // Baú
-        const tileSize = 32;
-        const chestTileX = 14, chestTileY = 2;
-        const chestX = chestTileX * tileSize + tileSize/2;
-        const chestY = chestTileY * tileSize + tileSize/2;
-        this.chest = this.physics.add.sprite(chestX, chestY, 'chest', 0).setImmovable(true);
-        this.physics.add.collider(this.player, this.chest);
-        this.chestOpened = false;
+    // Baú da crowbar
+    const chestTileX = 14, chestTileY = 2;
+    const chestX = chestTileX * tileSize + tileSize/2;
+    const chestY = chestTileY * tileSize + tileSize/2;
+    this.chest = this.physics.add.sprite(chestX, chestY, 'chest', 0).setImmovable(true);
+    this.physics.add.collider(this.player, this.chest);
+    // Persistência do baú da crowbar
+    this.chestOpened = window._chestOpened || false;
+    if (this.chestOpened) {
+        this.chest.setFrame(1);
+        this.chestPrompt?.hide();
+    }
+
+    // Baú da chave
+    const keyChestTileX = 16, keyChestTileY = 15;
+    const keyChestX = keyChestTileX * tileSize + tileSize/2;
+    const keyChestY = keyChestTileY * tileSize + tileSize/2;
+    this.keyChest = this.physics.add.sprite(keyChestX, keyChestY, 'chest', 0)
+        .setImmovable(true)
+        .setScale(1); // Garante tamanho normal
+    this.physics.add.collider(this.player, this.keyChest);
+    this.keyChestOpened = window._keyChestOpened || false;
+    if (this.keyChestOpened) {
+        this.keyChest.setFrame(1);
+    }
 
         // Caixas quebráveis
         this.boxes = this.physics.add.staticGroup();
@@ -83,9 +180,14 @@ export default class GameScene extends BaseScene {
             { x: 592, y: 350 },
             { x: 624, y: 350 }
         ];
-        boxPositions.forEach(p => {
-            const b = this.boxes.create(p.x, p.y, 'box');
-            b.setData('breakable', true);
+        // Persistência das caixas quebradas (por posição)
+        const brokenBoxes = window._brokenBoxes || [];
+        boxPositions.forEach((p) => {
+            const key = `${p.x},${p.y}`;
+            if (!brokenBoxes.includes(key)) {
+                const b = this.boxes.create(p.x, p.y, 'box');
+                b.setData('breakable', true);
+            }
         });
         this.physics.add.collider(this.player, this.boxes);
 
@@ -99,7 +201,7 @@ export default class GameScene extends BaseScene {
         // Gerenciador de câmera de UI
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
-        const worldObjects = [this.player, this.npc, this.chest, ...this.boxes.getChildren(), floor, walls].filter(Boolean);
+    const worldObjects = [this.player, this.npc, this.chest, this.keyChest, this.teleportDoor, ...this.boxes.getChildren(), floor, walls].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
@@ -138,7 +240,7 @@ export default class GameScene extends BaseScene {
         }
         if (!npcPromptVisible) this.interactionPrompt.hide();
 
-        // Interação com Baú (se ainda não aberto)
+        // Interação com Baú da crowbar
         if (!this.chestOpened) {
             const distChest = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.chest.x, this.chest.y);
             if (distChest < 40) {
@@ -153,28 +255,80 @@ export default class GameScene extends BaseScene {
             this.chestPrompt.hide();
         }
 
+        // Interação com Baú da chave
+        if (!this.keyChestOpened) {
+            const distKeyChest = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.keyChest.x, this.keyChest.y);
+            if (distKeyChest < 40) {
+                this.keyChestPrompt.show();
+                if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+                    this.openKeyChest();
+                }
+            } else {
+                this.keyChestPrompt.hide();
+            }
+        } else {
+            this.keyChestPrompt.hide();
+        }
+
         // Interação com caixas: só se tiver crowbar e ela estiver selecionada
         let boxPromptVisible = false;
         if (this.hasCrowbar && this.boxes) {
-            // Verifica se a crowbar está no slot selecionado
             const selectedItem = this.hotbar.getSelectedItem();
             if (selectedItem === 'crowbar') {
+                const boxesArr = this.boxes.getChildren();
                 let nearest = null;
-                let nearestDist = 9999;
-                this.boxes.getChildren().forEach(box => {
-                    const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, box.x, box.y);
-                    if (d < nearestDist) { nearestDist = d; nearest = box; }
-                });
-                if (nearest && nearestDist < 50) {
+                let nearestDistSq = Infinity;
+                const px = this.player.x, py = this.player.y;
+                for (let i = 0; i < boxesArr.length; i++) {
+                    const box = boxesArr[i];
+                    const dx = box.x - px;
+                    const dy = box.y - py;
+                    const distSq = dx*dx + dy*dy;
+                    if (distSq < nearestDistSq) {
+                        nearestDistSq = distSq;
+                        nearest = box;
+                    }
+                }
+                if (nearest && nearestDistSq < 50*50) {
                     this.boxPrompt.show();
                     boxPromptVisible = true;
                     if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-                        this.breakBox(nearest);
+                        useCrowbar(nearest);
+                        // Salva caixa quebrada por posição
+                        const key = `${nearest.x},${nearest.y}`;
+                        window._brokenBoxes = window._brokenBoxes || [];
+                        if (!window._brokenBoxes.includes(key)) window._brokenBoxes.push(key);
                     }
                 }
             }
         }
         if (!boxPromptVisible) this.boxPrompt.hide();
+
+        // Interação com porta teleportadora (apenas com ESPAÇO e chave)
+        const distanceToDoor = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.teleportDoor.x, this.teleportDoor.y);
+        if (distanceToDoor < 50) {
+            if (!this.teleportDoor.getData('unlocked')) {
+                this.doorPrompt.show();
+                if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+                    // Tenta usar chave
+                    const inventory = getInventory();
+                    if (useKey(this.teleportDoor, inventory)) {
+                        this.doorPrompt.hide();
+                        this.handleDoorTeleport();
+                    } else {
+                        this.doorPrompt.hide();
+                        this.dialogue.show('Você precisa de uma chave para abrir esta porta!');
+                    }
+                }
+            } else {
+                this.doorPrompt.show();
+                if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+                    this.handleDoorTeleport();
+                }
+            }
+        } else {
+            this.doorPrompt.hide();
+        }
     }
 
     toggleCoordProbe(forceState) { this.coordProbe.toggle(forceState); }
@@ -213,7 +367,7 @@ export default class GameScene extends BaseScene {
     }
 
     openBridge() {
-        if (this.bridgeOpened || !this.map) return;
+        if (!this.map) return;
         const layer = this.map.getLayer('Camada de Blocos 1')?.tilemapLayer;
         if (!layer) return;
         // Região fixa solicitada: (13,3) até (16,5) inclusive (4x3 tiles)
@@ -225,17 +379,28 @@ export default class GameScene extends BaseScene {
         for (let x = x1; x <= x2; x++) {
             for (let y = y1; y <= y2; y++) {
                 layer.putTileAt(15, x, y);
+                window._tileChanges = window._tileChanges || {};
+                window._tileChanges[`${x},${y}`] = 15;
             }
         }
         // 2. Coloca coluna de borda esquerda (tile 14) se dentro dos limites
         if (leftBorderX >= 0) {
-            for (let y = y1; y <= y2; y++) layer.putTileAt(14, leftBorderX, y);
+            for (let y = y1; y <= y2; y++) {
+                layer.putTileAt(14, leftBorderX, y);
+                window._tileChanges = window._tileChanges || {};
+                window._tileChanges[`${leftBorderX},${y}`] = 14;
+            }
         }
         // 3. Coloca coluna de borda direita (tile 16)
         if (rightBorderX < this.map.width) {
-            for (let y = y1; y <= y2; y++) layer.putTileAt(16, rightBorderX, y);
+            for (let y = y1; y <= y2; y++) {
+                layer.putTileAt(16, rightBorderX, y);
+                window._tileChanges = window._tileChanges || {};
+                window._tileChanges[`${rightBorderX},${y}`] = 16;
+            }
         }
         this.bridgeOpened = true;
+        window._bridgeOpened = true;
     }
 
     _buildBridge() { /* método antigo não usado */ }
@@ -250,27 +415,37 @@ export default class GameScene extends BaseScene {
         this.chest.setFrame(1); // frame aberto
         this.chestOpened = true;
         this.chestPrompt.hide();
-        
-        // TESTE DIRETO: Adicionar item imediatamente para testar
-        console.log('[GameScene] TESTE: Adicionando crowbar direto à hotbar');
+        window._chestOpened = true;
+
+        // Adiciona crowbar ao inventário global na ordem
+        const inventory = getInventory();
+        addItemToInventory(inventory, 'crowbar');
         if (this.hotbar) {
-            this.hotbar.setItem(0, 'crowbar');
+            const nextSlot = this.hotbar.items.findIndex(i => i === null);
+            this.hotbar.setItem(nextSlot !== -1 ? nextSlot : 0, 'crowbar');
             this.hotbar.showAnimated();
         }
-        
         // Animação Zelda ao pegar crowbar
         this.playCrowbarPickupAnimation(() => {
             this.hasCrowbar = true;
-            console.log('[GameScene] Crowbar obtida! Adicionando à hotbar...');
-            
-            // Adiciona crowbar ao slot 0 da hotbar (novamente para garantir)
-            if (this.hotbar) {
-                this.hotbar.setItem(0, 'crowbar');
-                console.log('[GameScene] ✓ Crowbar adicionada com sucesso!');
-            } else {
-                console.error('[GameScene] ✗ Hotbar não encontrada');
-            }
+            console.log('[GameScene] Crowbar obtida! Inventário:', getInventory());
         });
+    }
+
+    openKeyChest() {
+        this.keyChest.setFrame(1);
+        this.keyChestOpened = true;
+        window._keyChestOpened = true;
+        // Adiciona chave ao inventário
+        const inventory = getInventory();
+        addItemToInventory(inventory, 'key');
+        if (this.hotbar) {
+            const nextSlot = this.hotbar.items.findIndex(i => i === null);
+            this.hotbar.setItem(nextSlot !== -1 ? nextSlot : 1, 'key');
+            this.hotbar.showAnimated();
+        }
+        this.chestPrompt.hide();
+        this.dialogue.show('Você encontrou uma chave!');
     }
     playCrowbarPickupAnimation(onComplete) {
         console.log('[Crowbar Zelda] INICIANDO animação pickup');
@@ -296,7 +471,12 @@ export default class GameScene extends BaseScene {
             console.log('[Crowbar Zelda] Sprite criado:', { x: temp.x, y: temp.y, visible: temp.visible });
             
             // Adicionar aos world objects para que seja ignorado pela câmera UI
-            this.worldObjects.push(temp);
+            if (!this.worldObjects.includes(temp)) {
+                this.worldObjects.push(temp);
+                if (this.uiCamManager) {
+                    this.uiCamManager.applyIgnores(this.cameras.main, this.getUIElements(), this.worldObjects);
+                }
+            }
             
             this.tweens.add({
                 targets: temp,
@@ -322,10 +502,13 @@ export default class GameScene extends BaseScene {
                                 ease: 'Quad.easeIn',
                                 onComplete: () => {
                                     console.log('[Crowbar Zelda] Destruindo sprite temporário');
-                                    // Remove dos world objects
+                                    // Remove dos world objects e atualiza ignores
                                     const index = this.worldObjects.indexOf(temp);
                                     if (index !== -1) {
                                         this.worldObjects.splice(index, 1);
+                                        if (this.uiCamManager) {
+                                            this.uiCamManager.applyIgnores(this.cameras.main, this.getUIElements(), this.worldObjects);
+                                        }
                                     }
                                     temp.destroy();
                                     finish();
@@ -340,8 +523,23 @@ export default class GameScene extends BaseScene {
             finish();
         }
     }
+    handleDoorTeleport() {
+    // Salva posição do player antes de trocar de cena
+    window._playerEntryPos = { x: this.player.x, y: this.player.y };
+    // Salva hotbar antes de trocar de cena
+    if (this.hotbar) {
+        window._hotbarItems = [...this.hotbar.items];
+    }
+    // Transição para SecondScene
+    this.scene.start('SecondScene');
+    }
+
     breakBox(box) {
         if (!box || !box.active) return;
+    // Salva caixa quebrada por posição
+    const key = `${box.x},${box.y}`;
+    window._brokenBoxes = window._brokenBoxes || [];
+    if (!window._brokenBoxes.includes(key)) window._brokenBoxes.push(key);
         this.tweens.add({
             targets: box,
             alpha: 0,
@@ -354,7 +552,7 @@ export default class GameScene extends BaseScene {
 
     // Ordena depth de sprites principais por coordenada Y para simular perspectiva top-down
     sortDepths() {
-        const sprites = [this.player, this.npc, this.chest].filter(Boolean);
+        const sprites = [this.player, this.npc, this.chest, this.teleportDoor].filter(Boolean);
         sprites.forEach(s => s.setDepth(s.y));
     }
 
