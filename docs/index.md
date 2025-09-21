@@ -68,3 +68,11 @@ Estes são todos os locais (`passagens`) onde pode inserir conteúdo no seu jogo
 *   `Escolha Final`
 
 ---
+
+### 🚀 Jogar Agora!
+
+**Clique no link abaixo para iniciar a aventura:**
+
+#### [▶ Iniciar o Jogo](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/Projeto_T-300_K_Codigo_Albedo.html)
+
+---
