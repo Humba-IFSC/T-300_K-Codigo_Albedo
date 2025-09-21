@@ -4,9 +4,8 @@
 - [Template do DDJ](/docs/DDJ.md)
 - [Regras para o DDJ](/docs/regras.md)
 - [Conteúdo do DDJ](/docs/conteudo.md)
-
 - [Glossário do projeto](/docs/glossario.md)
-
+- [Jogo - T-300 K: Código Albedo](Projeto_T-300_K_Codigo_Albedo.html)
 
 ## Capítulo 0: O Prelúdio  
 
