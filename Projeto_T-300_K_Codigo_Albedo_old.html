@@ -9,7 +9,7 @@
 </head>
 <body>
 <tw-story><noscript><tw-noscript>JavaScript needs to be enabled to play Projeto T-300 K: Código Albedo - V. Otimizada.</tw-noscript></noscript></tw-story>
-<tw-storydata name="Projeto T-300 K: Código Albedo - V. Otimizada" startnode="19" creator="Twine" creator-version="2.10.0" format="Harlowe" format-version="3.3.9" ifid="CE2AD6DE-E4C7-4784-9AC8-D7C9DC8C76AD" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Orbitron:wght@400;500;700&display=swap');
+<tw-storydata name="Projeto T-300 K: Código Albedo - V. Otimizada" startnode="18" creator="Twine" creator-version="2.10.0" format="Harlowe" format-version="3.3.9" ifid="CE2AD6DE-E4C7-4784-9AC8-D7C9DC8C76AD" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Orbitron:wght@400;500;700&display=swap');
 @import url('https://cdn.tailwindcss.com');
 
 body {
@@ -98,6 +98,8 @@ button:hover {
 ]
 
 &lt;h3 class=&quot;chapter-title&quot;&gt;A Teia de Thorne&lt;/h3&gt;
+&lt;img src=&quot;img/As_Missoes.jpeg&quot; alt=&quot;As três missões&quot;&gt;
+
 
 O tablet se desbloqueia, revelando não um plano, mas uma rede de dados criptografados. O mapa aponta para três locais na cidade. Vocês precisam seguir as pistas para, eventualmente, construir a Máquina de Entropia.
 
@@ -141,28 +143,14 @@ Dica: Os estudos sobre a refletividade de uma superfície, deram início a toda 
 
 Você está diante do &#39;&#39;Tablet do Dr. Thorne&#39;&#39;.
 
+  &lt;img src=&quot;img/Tablet_Thorne.jpeg&quot; alt=&quot;O Tablet do Dr. Thorne&quot;&gt;
+
 Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
 
 (link: &quot;Tentar digitar a senha&quot;)[
     (set: $senha_digitada to (trimmed: (lowercase: (prompt: &quot;Digite a senha:&quot;, &quot;&quot;))))
     (goto: &quot;Fase 1: Laboratório do Dr. Thorne&quot;)
-]</tw-passagedata><tw-passagedata pid="3" name="Backup Escolha Final" tags="" position="875,25" size="100,100">:: Escolha Final
-
-&lt;h3 class=&quot;chapter-title&quot;&gt;A Escolha Final&lt;/h3&gt;
-
-&lt;p class=&quot;feedback-correto&quot;&gt;TORRE ATIVADA. Máquina de Entropia conectada.&lt;/p&gt;
-
-&lt;div class=&quot;enigma&quot;&gt;
-As forças da &amp;Delta;Umbra estão neutralizadas. Com o controle da entropia planetária em suas mãos, e com as dúvidas sobre as verdadeiras intenções de Thorne ainda na sua mente, vocês precisam decidir.
-&lt;/div&gt;
-
-(if: $maquina_regulada is true)[
-	&lt;p&gt;[[Usar a máquina regulada (Final Bom)-&gt;Final Bom]]&lt;/p&gt;
-](else:)[
-	&lt;p&gt;[[Usar a máquina instável (Final Neutro)-&gt;Final Neutro]]&lt;/p&gt;
-]
-&lt;p&gt;[[Quebrar a máquina (Final Ruim)-&gt;Final Ruim]]&lt;/p&gt;
-</tw-passagedata><tw-passagedata pid="4" name="Fase 1: Laboratório do Dr. Thorne" tags="" position="50,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 1: Laboratório do Dr. Thorne&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="3" name="Fase 1: Laboratório do Dr. Thorne" tags="" position="50,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 1: Laboratório do Dr. Thorne&lt;/h3&gt;
 
 &lt;div class=&quot;enigma&quot;&gt;
 Vocês encontram refúgio no laboratório secreto do Dr. Thorne. Aqui, vocês recebem um briefing sobre a situação do mundo e descobrem pistas enigmáticas sobre o projeto em que ele estava trabalhando. O tablet pessoal de Thorne está bloqueado por uma única pergunta de segurança:
@@ -181,7 +169,8 @@ Vocês encontram refúgio no laboratório secreto do Dr. Thorne. Aqui, vocês re
 &lt;/div&gt;      
         [[Voltar ao Início-&gt;Projeto T-300 K - Início do Jogo]]
     ]
-]</tw-passagedata><tw-passagedata pid="5" name="Fase 2: Cidade Infectada" tags="" position="175,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 2: Cidade Infectada&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="4" name="Fase 2: Cidade Infectada" tags="" position="175,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 2: Cidade Infectada&lt;/h3&gt;
+&lt;img src=&quot;img/Fase2_Febre_Urbana.jpeg&quot; alt=&quot;A Cidade Infectada&quot;&gt;
 
 Quebra a segunda senha, decifrando o seu segundo &#39;&#39;Enigma&#39;&#39;
 
@@ -205,7 +194,7 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
     (set: $senha_digitada to (trimmed: (lowercase: (prompt: &quot;Digite a senha:&quot;, &quot;&quot;))))
     (set: $fase2_completa to true)
     (goto: &quot;Fase 2: Concluída&quot;)
-]</tw-passagedata><tw-passagedata pid="6" name="Fase 2: Concluída" tags="" position="175,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 2: Concluída&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="5" name="Fase 2: Concluída" tags="" position="175,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 2: Concluída&lt;/h3&gt;
 
 (if: $senha_digitada is $senha_correta2)[
     Parabéns! Você acertou a senha secreta!
@@ -221,7 +210,7 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
         
         [[Voltar ao Início-&gt;Projeto T-300 K - Início do Jogo]]
     ]
-]</tw-passagedata><tw-passagedata pid="7" name="Fase 3: Concluída" tags="" position="300,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 3: Concluída&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="6" name="Fase 3: Concluída" tags="" position="300,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 3: Concluída&lt;/h3&gt;
 
 &lt;p class=&quot;feedback-correto&quot;&gt;REGISTROS ADQUIRIDOS.&lt;/p&gt;
 &lt;p&gt;Vocês encontram registros de áudio do Dr. Thorne trabalhando para a &amp;Delta;Umbra, o que aumenta o mistério sobre suas intenções. Vocês também descobrem a localização de uma vila de sobreviventes no gelo.&lt;/p&gt;
@@ -240,7 +229,8 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
         
         [[Voltar ao Início-&gt;Projeto T-300 K - Início do Jogo]]
     ]
-]</tw-passagedata><tw-passagedata pid="8" name="Fase 3: Zepelim da DeltaUmbra" tags="" position="300,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 3: Zepelim da DeltaUmbra&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="7" name="Fase 3: Zepelim da DeltaUmbra" tags="" position="300,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 3: Zepelim da DeltaUmbra&lt;/h3&gt;
+&lt;img src=&quot;img/Fase3_Zepelim.jpeg&quot; alt=&quot;Os planos da ΔUmbra e o verdadeiro papel do Dr. Thorne&quot;&gt;
 
 &quot;Para entender os planos da ΔUmbra e o verdadeiro papel do Dr. Thorne, vocês precisam se infiltrar no Zepelim que patrulha a cidade.&quot;
 
@@ -254,7 +244,7 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
     (set: $senha_digitada to (trimmed: (lowercase: (prompt: &quot;Digite a senha:&quot;, &quot;&quot;))))
     (set: $fase3_completa to true)
     (goto: &quot;Fase 3: Concluída&quot;)
-]</tw-passagedata><tw-passagedata pid="9" name="Fase 4: Concluída" tags="" position="425,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 4: Concluída&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="8" name="Fase 4: Concluída" tags="" position="425,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 4: Concluída&lt;/h3&gt;
 
 &lt;p class=&quot;feedback-correto&quot;&gt;MÁQUINA CONSTRUÍDA.&lt;/p&gt;
 &lt;p&gt;A Máquina de Entropia ganha vida, mas um último registro de áudio de Thorne avisa: &quot;Não consegui terminar... ela está instável! Encontrem... outros...&quot;. A mensagem se corta.&lt;/p&gt;
@@ -273,7 +263,8 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
         
         [[Voltar ao Início-&gt;Projeto T-300 K - Início do Jogo]]
     ]
-]</tw-passagedata><tw-passagedata pid="10" name="Fase 4: Indústria da Máquina" tags="" position="425,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 4: Indústria da Máquina&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="9" name="Fase 4: Indústria da Máquina" tags="" position="425,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 4: Indústria da Máquina&lt;/h3&gt;
+&lt;img src=&quot;img/Fase4_Maquina_Entropia.jpeg&quot; alt=&quot;A contrução do reator principal precisa de uma senha. A dica é: &#39;ΔU = Q - W&#39;.&quot;&gt;
 
 &quot;Os dados coletados revelam a localização de uma indústria abandonada onde Thorne montou seu projeto. É hora de construir a máquina.&quot;
 
@@ -287,7 +278,7 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
     (set: $senha_digitada to (trimmed: (lowercase: (prompt: &quot;Digite a senha:&quot;, &quot;&quot;))))
     (set: $fase4_completa to true)
     (goto: &quot;Fase 4: Concluída&quot;)
-]</tw-passagedata><tw-passagedata pid="11" name="Fase 5: Concluída" tags="" position="550,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 5: Concluída&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="10" name="Fase 5: Concluída" tags="" position="550,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 5: Concluída&lt;/h3&gt;
 
 &lt;p class=&quot;feedback-correto&quot;&gt;ACESSO CONCEDIDO.&lt;/p&gt;
 &lt;p&gt;Os sobreviventes da vila, um grupo de cientistas, explicam o que é necessário para finalizar a máquina: conectá-la a uma torre de transmissão para ampliar seu efeito e encontrar componentes de calibração para controlar seu poder.&lt;/p&gt;
@@ -306,7 +297,8 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
         
         [[Voltar ao Início-&gt;Projeto T-300 K - Início do Jogo]]
     ]
-]</tw-passagedata><tw-passagedata pid="12" name="Fase 5: Vila de Sobreviventes" tags="" position="550,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 5: Vila de Sobreviventes&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="11" name="Fase 5: Vila de Sobreviventes" tags="" position="550,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 5: Vila de Sobreviventes&lt;/h3&gt;
+&lt;img src=&quot;img/Fase5_A_vila_Soberviventes.jpeg&quot; alt=&quot;A vila - Sociedade tecnológica isolada,&quot;&gt;
 
 &quot;Os registros do Zepelim revelaram a localização de uma sociedade tecnológica isolada, protegida por uma barreira de gelo. Eles são sua única esperança para estabilizar a máquina.&quot;
 
@@ -320,7 +312,9 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
     (set: $senha_digitada to (trimmed: (lowercase: (prompt: &quot;Digite a senha:&quot;, &quot;&quot;))))
     (set: $fase5_completa to true)
     (goto: &quot;Fase 5: Concluída&quot;)
-]</tw-passagedata><tw-passagedata pid="13" name="Fase 6: A Torre Celeste" tags="" position="675,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 6: A Torre Celeste&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="12" name="Fase 6: A Torre Celeste" tags="" position="675,200" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 6: A Torre Celeste&lt;/h3&gt;
+&lt;img src=&quot;img/Fase6_A_Torre_Celeste.jpeg&quot; alt=&quot;A Torre Celeste&quot;&gt;
+
 
 &quot;Os cientistas da vila ajudaram a estabilizar a máquina, mas para que ela tenha um alcance global, precisa ser conectada a uma antiga torre de transmissão. A ΔUmbra já sabe da sua localização e está a caminho.&quot;
 
@@ -342,7 +336,7 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
     (set: $senha_digitada to (trimmed: (lowercase: (prompt: &quot;Digite a senha:&quot;, &quot;&quot;))))
     (set: $fase6_completa to true)
     (goto: &quot;Fase 6: Concluída&quot;)
-]</tw-passagedata><tw-passagedata pid="14" name="Fase 6: Concluída" tags="" position="700,400" size="100,100">(if: $senha_digitada is $senha_correta6)[
+]</tw-passagedata><tw-passagedata pid="13" name="Fase 6: Concluída" tags="" position="700,400" size="100,100">(if: $senha_digitada is $senha_correta6)[
     Parabéns! Você acertou a senha secreta!
     (go-to: &quot;Escolha Final&quot;)
     (set: $tentativas to $max_tentativas)
@@ -356,28 +350,34 @@ Você tem &#39;$tentativas&#39; tentativa(s) restante(s).
         
         [[Voltar ao Início-&gt;Projeto T-300 K - Início do Jogo]]
     ]
-]</tw-passagedata><tw-passagedata pid="15" name="Final Bom" tags="" position="800,225" size="100,100">&lt;h1&gt;FIM: Equilíbrio&lt;/h1&gt;
+]</tw-passagedata><tw-passagedata pid="14" name="Final Bom" tags="" position="800,225" size="100,100">&lt;h1&gt;FIM: Equilíbrio&lt;/h1&gt;
+ &lt;img src=&quot;img/O_Crisol_Fogo.jpeg&quot; alt=&quot;Final bom. Boa escolha, O Crisol de Fogo.&quot;&gt;
 
 &lt;div class=&quot;enigma&quot;&gt;
 Com os componentes de calibração, vocês ativam a máquina com precisão cirúrgica. Um pulso de energia resfria o planeta na medida certa, fazendo com que o vírus KALORIS entre em hibernação em escala global. A humanidade ganha tempo para estudar o vírus e encontrar uma cura definitiva. Vocês não apenas salvaram o mundo, mas deram a ele um futuro.
 &lt;/div&gt;
+ &lt;img src=&quot;img/Final_Bom_Um_novo_amanhecer.jpeg&quot; alt=&quot;Um novo amanhecer para a humanidade.&quot;&gt;
 
-[[Jogar Novamente-&gt;Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="16" name="Final Neutro" tags="" position="925,225" size="100,100">&lt;h1&gt;FIM: Recomeço&lt;/h1&gt;
+
+[[Jogar Novamente-&gt;Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="15" name="Final Neutro" tags="" position="925,225" size="100,100">&lt;h1&gt;FIM: Recomeço&lt;/h1&gt;
+ &lt;img src=&quot;img/O_Inverno_Artificial.jpeg&quot; alt=&quot;A humanidade está salva, mas jogada nas trevas ...&quot;&gt;
 
 &lt;div class=&quot;enigma&quot;&gt;
 Vocês ativam a máquina instável. Um pulso de energia pura varre o planeta, erradicando o KALORIS. Mas, como os cientistas temiam, a onda de choque também destrói toda a tecnologia avançada da Terra. A humanidade está salva do vírus, mas é jogada de volta a uma nova idade das trevas, forçada a reconstruir a civilização do zero.
 &lt;/div&gt;
+ &lt;img src=&quot;img/O_Recomeço_Final_neutro.jpeg&quot; alt=&quot;Um novo recomeço para o planeta sem tecnologia ...&quot;&gt;
 
-[[Jogar Novamente-&gt;Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="17" name="Final Ruim" tags="" position="1050,225" size="100,100">&lt;h1&gt;FIM: Desconfiança&lt;/h1&gt;
+[[Jogar Novamente-&gt;Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="16" name="Final Ruim" tags="" position="1050,225" size="100,100">&lt;h1&gt;FIM: Desconfiança&lt;/h1&gt;
+  &lt;img src=&quot;img/Desconfianca_Final_ruim.jpeg&quot; alt=&quot;Desconfiança - Final com desolação!&quot;&gt;
 
 &lt;div class=&quot;enigma&quot;&gt;
 Dominados pela desconfiança no Dr. Thorne, vocês destroem a máquina. A única esperança da humanidade se desfaz. A &amp;Delta;Umbra Corp, mesmo enfraquecida, eventualmente se recupera e, sem oposição, seu plano de vender a salvação para a elite se concretiza. O mundo que vocês conheciam está perdido.
 &lt;/div&gt;
 
-[[Jogar Novamente-&gt;Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="18" name="Projeto T-300 K - Início do Jogo" tags="" position="375,0" size="100,100">&lt;div class=&quot;header-image&quot;&gt;&lt;/div&gt;
+[[Jogar Novamente-&gt;Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="17" name="Projeto T-300 K - Início do Jogo" tags="" position="375,0" size="100,100">&lt;div class=&quot;header-image&quot;&gt;&lt;/div&gt;
 &lt;h2 class=&quot;story-title&quot;&gt;Projeto T-300 K: Código Albedo&lt;/h2&gt;
 &lt;h3 class=&quot;chapter-title&quot;&gt;Capítulo 0: O Prelúdio&lt;/h3&gt;
-&lt;img src=&quot;https://drive.google.com/uc?export=view&amp;id=1csALW26WtfRazo1Bcuu30W5DYHwjwV3R&quot; class=&quot;passage-image&quot;&gt;
+  &lt;img src=&quot;img/Pre_Fase1_O_virus_KALORIS.jpeg&quot; alt=&quot;Descoberta do KALORIS&quot;&gt;
 
 Adormecido no gelo da Antártida, um vírus pré-histórico é encontrado por uma equipe de pesquisas da ΔUmbra Corp. O nome do achado: KALORIS. O chefe do projeto: o brilhante Engenheiro e Climatologista, Dr. Aris Thorne.
 
@@ -389,8 +389,12 @@ Sua única esperança são os alunos do IFSC/São José, que tiveram contato com
 
 Que o GAME comece, jovens investigadores!!!
 
+
+  &lt;img src=&quot;img/O_Legado_Mentor.jpeg&quot; alt=&quot;Que os jogos comecem!&quot;&gt;
+
+
 [[Começar a investigação-&gt;Acesso a Fase 1]]
-</tw-passagedata><tw-passagedata pid="19" name="Variaveis Iniciais\" tags="Startup] [Startup\" position="100,0" size="100,100">(set: $fase2_completa to false)
+</tw-passagedata><tw-passagedata pid="18" name="Variaveis Iniciais\" tags="Startup] [Startup\" position="100,0" size="100,100">(set: $fase2_completa to false)
 (set: $fase3_completa to false)
 (set: $fase4_completa to false)
 (set: $maquina_regulada to false)
@@ -405,9 +409,11 @@ Que o GAME comece, jovens investigadores!!!
 (set: $senha_correta4 to &quot;energia interna&quot;)
 (set: $senha_correta5 to &quot;latente&quot;)
 (set: $senha_correta6 to &quot;irradiação&quot;)
+ 
+ &lt;img src=&quot;img/Episodio_I.jpeg&quot; alt=&quot;Descrição da imagem de abertura&quot;&gt;
 
 &lt;!--  Iniciando o Jogo --&gt;
-[[Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="20" name="Fase 6: A Torre Celeste II" tags="" position="825,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 6: A Torre Celeste&lt;/h3&gt;
+[[Projeto T-300 K - Início do Jogo]]</tw-passagedata><tw-passagedata pid="19" name="Fase 6: A Torre Celeste II" tags="" position="825,400" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;Fase 6: A Torre Celeste&lt;/h3&gt;
 
 &quot;Os cientistas da vila ajudaram a estabilizar a máquina, mas para que ela tenha um alcance global, precisa ser conectada a uma antiga torre de transmissão. A ΔUmbra já sabe da sua localização e está a caminho.&quot;
 
@@ -439,13 +445,16 @@ Você tem $tentativas tentativa(s) restante(s).
 			(goto: &quot;Game Over&quot;)
 		]
 	]
-]</tw-passagedata><tw-passagedata pid="21" name="Escolha Final" tags="" position="1050,50" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;A Escolha Final&lt;/h3&gt;
+]</tw-passagedata><tw-passagedata pid="20" name="Escolha Final" tags="" position="925,50" size="100,100">&lt;h3 class=&quot;chapter-title&quot;&gt;A Escolha Final&lt;/h3&gt;
 
 &lt;p class=&quot;feedback-correto&quot;&gt;TORRE ATIVADA. Máquina de Entropia conectada.&lt;/p&gt;
+&lt;img src=&quot;img/A_escolha_final.jpeg&quot; alt=&quot;Os três possíveis finais&quot;&gt;
 
 &lt;div class=&quot;enigma&quot;&gt;
 As forças da &amp;Delta;Umbra estão neutralizadas. Com o controle da entropia planetária em suas mãos, e com as dúvidas sobre as verdadeiras intenções de Thorne ainda na sua mente, vocês precisam decidir.
 &lt;/div&gt;
+&lt;img src=&quot;img/A_Escolha_do_destino_Final.jpeg&quot; alt=&quot;O destino em suas mãos e a um click ...&quot;&gt;
+
 
 (if: $maquina_regulada is true)[
 	&lt;p&gt;[[Usar a máquina regulada (Final Bom)-&gt;Final Bom]]&lt;/p&gt;

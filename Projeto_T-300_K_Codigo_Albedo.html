@@ -93,6 +93,18 @@ button {
 
 button:hover {
     background-color: #3b82f6; /* blue-500 */
+}
+
+/* --- ESTILO PARA IMAGENS (RESPONSIVO) --- */
+/* Adicionado para controlar o tamanho e a apresentação das imagens */
+tw-passage img {
+    width: 65%;          /* A imagem ocupa 65% da largura do contentor */
+    height: auto;         /* A altura ajusta-se automaticamente para manter a proporção */
+    display: block;       /* Permite centrar a imagem com margens automáticas */
+    margin: 1.5rem auto;  /* 1.5rem de margem em cima/baixo e centrado horizontalmente */
+    border-radius: 8px;   /* Cantos arredondados para um visual mais suave */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra subtil para dar profundidade */
+    max-width: 100%;      /* Garantia extra: a imagem nunca ultrapassará o seu contentor */
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="A Teia de Thorne" tags="" position="575,25" size="100,100">(if: (history:) contains &quot;Fase 1: Laboratório do Dr. Thorne&quot;)[
 &lt;p class=&quot;feedback-correto&quot;&gt;ACESSO PERMITIDO!&lt;/p&gt;
 ]
@@ -463,7 +475,91 @@ As forças da &amp;Delta;Umbra estão neutralizadas. Com o controle da entropia 
 	&lt;p&gt;[[Usar a máquina instável (Final Neutro)-&gt;Final Neutro]]&lt;/p&gt;
 ]
 
-&lt;p&gt;[[Quebrar a máquina (Final Ruim)-&gt;Final Ruim]]&lt;/p&gt;</tw-passagedata></tw-storydata>
+&lt;p&gt;[[Quebrar a máquina (Final Ruim)-&gt;Final Ruim]]&lt;/p&gt;</tw-passagedata><tw-passagedata pid="21" name="VelhoEstilo" tags="" position="1000,400" size="100,100">@import url(&#39;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Orbitron:wght@400;500;700&amp;display=swap&#39;);
+@import url(&#39;https://cdn.tailwindcss.com&#39;);
+
+body {
+    font-family: &#39;Inter&#39;, sans-serif;
+    background-color: #0f172a; /* slate-900 */
+    color: #cbd5e1; /* slate-300 */
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+tw-story {
+    padding: 2rem;
+}
+
+h1, h2, h3, .font-orbitron {
+    font-family: &#39;Orbitron&#39;, sans-serif;
+}
+
+p.enigma {
+    background-color: #1e293b; /* slate-800 */
+    border-left: 4px solid #3b82f6; /* blue-500 */
+    padding: 1rem;
+    font-style: italic;
+    color: #94a3b8; /* slate-400 */
+}
+
+a {
+    color: #60a5fa; /* blue-400 */
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #93c5fd; /* blue-300 */
+    text-decoration: underline;
+}
+
+/* Estilizando os links para parecerem com os cards */
+a .phase-card {
+    transition: all 0.2s ease-in-out;
+}
+
+a:hover .phase-card {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+}
+
+.phase-card {
+    z-index: 10;
+}
+
+.glow-effect {
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+}
+
+/* Estilo para o campo de input */
+input[type=&quot;text&quot;] {
+    background-color: #334155; /* slate-700 */
+    border: 1px solid #475569; /* slate-600 */
+    color: #e2e8f0; /* slate-200 */
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+/* Estilo para o botão */
+button {
+    background-color: #2563eb; /* blue-600 */
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #3b82f6; /* blue-500 */
+}</tw-passagedata></tw-storydata>
 <script title="Twine engine code" data-main="harlowe">(function(){"use strict";
 var require,define;!function(){var e={},r={};require=function(i){var n=e[i];return n&&(r[i]=n[1].apply(void 0,n[0].map(require)),e[i]=void 0),r[i]},(define=function(r,i,n){if("function"==typeof r)return r();e[r]=[i,n]}).amd=!0}();/*!
  * https://github.com/paulmillr/es6-shim
