@@ -76,3 +76,7 @@ Estes são todos os locais (`passagens`) onde pode inserir conteúdo no seu jogo
 #### [▶ Iniciar o Jogo](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/Projeto_T-300_K_Codigo_Albedo.html)
 
 ---
+
+### Estrutura no Twine da Estória-Jogo
+
+[Mapa da Estória do Jogo no Twine](/img/Mapa_Game_Twine.png)
