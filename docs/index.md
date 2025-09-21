@@ -79,4 +79,4 @@ Estes são todos os locais (`passagens`) onde pode inserir conteúdo no seu jogo
 
 ### Estrutura no Twine da Estória-Jogo
 
-[Mapa da Estória do Jogo no Twine](/img/Mapa_Game_Twine.png)
+![Mapa da Estória do Jogo no Twine](/img/Mapa_Game_Twine.png)
