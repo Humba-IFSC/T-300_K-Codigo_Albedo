@@ -69,6 +69,7 @@ Estes são todos os locais (`passagens`) onde pode inserir conteúdo no seu jogo
 
 ---
 
+<<<<<<< HEAD
 ### 🚀 Jogar Agora!
 
 **Clique no link abaixo para iniciar a aventura:**
