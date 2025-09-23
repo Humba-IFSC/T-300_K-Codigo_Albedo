@@ -10,43 +10,54 @@ export default class SecondScene extends BaseScene {
 
     preload() {
         super.preload();
-        this.load.image('tiles', 'assets/tilesets/tileset.png');
-        this.load.tilemapTiledJSON('map', 'assets/maps/map.json');
+    // Tilesets do mapa floresta
+    this.load.image('terrain_tiles_v2', 'assets/tilesets/terrain_tiles_v2.png');
+    this.load.image('props', 'assets/tilesets/props.png');
+    this.load.tilemapTiledJSON('forest', 'assets/maps/floresta.json');
         this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 32, frameHeight: 32 });
         this.load.image('door', 'assets/sprites/Basic_Door_Pixel.png');
     }
 
     create() {
-        // Mapa
-        const map = this.make.tilemap({ key: 'map' });
+        // Mapa floresta
+        const map = this.make.tilemap({ key: 'forest' });
         this.map = map;
-        const tileset = map.addTilesetImage('tiles', 'tiles');
-        
+        // Adiciona tilesets conforme especificado no JSON
+        const terrainTiles = map.addTilesetImage('terrain_tiles_v2', 'terrain_tiles_v2');
+        const propsTiles = map.addTilesetImage('props', 'props');
+
+        // Camadas do mapa
+        // Chão (sempre visível)
         let floor = null;
-        let walls = null;
-        
-        if (map.getLayerIndex('Camada de Blocos 2') !== -1) {
-            floor = map.createLayer('Camada de Blocos 2', tileset, 0, 0);
-        }
         if (map.getLayerIndex('Camada de Blocos 1') !== -1) {
-            walls = map.createLayer('Camada de Blocos 1', tileset, 0, 0);
+            floor = map.createLayer('Camada de Blocos 1', terrainTiles, 0, 0);
+            floor.setDepth(0); // Garante que fique abaixo dos objetos
         }
-        
-        if (!floor && !walls && map.layers?.length) {
-            floor = map.createLayer(map.layers[0].name, tileset, 0, 0);
+        // Objetos (árvores, pedras, etc) - apenas esta camada tem colisão
+        let propsLayer = null;
+        if (map.getLayerIndex('props') !== -1) {
+            propsLayer = map.createLayer('props', propsTiles, 0, 0);
+            propsLayer.setCollisionByExclusion([-1]);
+            propsLayer.setDepth(10);
         }
-        
-        // Configurar colisões com bordas (tile 119)
-        if (walls) {
-            const borderIndices = [119];
-            walls.setCollision(borderIndices);
+        // Casa (se existir) - sem colisão
+        let casaLayer = null;
+        if (map.getLayerIndex('casa') !== -1) {
+            casaLayer = map.createLayer('casa', propsTiles, 0, 0);
+            casaLayer.setDepth(20);
         }
-        
+        // Frente das árvores (deve ficar acima do jogador, sem colisão)
+        let frenteLayer = null;
+        if (map.getLayerIndex('props frente') !== -1) {
+            frenteLayer = map.createLayer('props frente', propsTiles, 0, 0);
+            frenteLayer.setDepth(1000); // Garante que fique acima do jogador
+        }
+
         this.physics.world.bounds.setTo(0, 0, map.widthInPixels, map.heightInPixels);
 
-        // Player (começar próximo à porta de retorno)
-        this.createCommonPlayer(96, 320); // Posição próxima à borda esquerda
-        if (walls) this.physics.add.collider(this.player, walls);
+        // Player (posição inicial próxima à borda esquerda)
+        this.createCommonPlayer(96, 320);
+        if (propsLayer) this.physics.add.collider(this.player, propsLayer);
 
         // Porta de retorno para GameScene (na borda esquerda)
         this.returnDoor = this.physics.add.sprite(64, 320, 'door').setImmovable(true);
@@ -72,7 +83,7 @@ export default class SecondScene extends BaseScene {
         // Gerenciador de câmera de UI
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
-        const worldObjects = [this.player, this.returnDoor, floor, walls].filter(Boolean);
+        const worldObjects = [this.player, this.returnDoor, floor, propsLayer, casaLayer, frenteLayer].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
