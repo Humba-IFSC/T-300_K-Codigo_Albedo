@@ -7,8 +7,10 @@
 - [Glossário do projeto](/docs/glossario.md)
 
 ## Documentação no Formato HTML
-- [Proposta de Atualização do DDJ](/html/Proposta_DDJ.html)
-- [Jogo - T-300 K: Código Albedo](/html/Projeto_T-300_K_Codigo_Albedo.html)
+|**Formato HTML** | **Visualização Web** |
+|:---------------:|:--------------------:|
+|[Proposta de Atualização do DDJ](/html/Proposta_DDJ.html)|[▶ Novo DDJ???](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Proposta_DDJ.html)| 
+|[Jogo - T-300 K: Código Albedo](/html/Projeto_T-300_K_Codigo_Albedo.html)|[▶ Iniciar o Jogo](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Projeto_T-300_K_Codigo_Albedo.html)|
 
 ## Capítulo 0: O Prelúdio  
 
