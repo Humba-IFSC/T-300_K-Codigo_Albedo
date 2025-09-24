@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto T-300 K: Guia do Jogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.css">
+    <style>
+        body {
+            background-color: #f0f4f8; /* Um cinza-azulado claro */
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #00573c; /* Verde escuro IFSC */
+            color: white;
+            padding: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .card-header i {
+            margin-right: 0.75rem;
+            font-size: 1.8rem;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        code {
+            background-color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .quote {
+            border-left: 4px solid #008442; /* Verde IFSC */
+            padding-left: 1rem;
+            margin-top: 1.5rem;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-extrabold text-[#00573c] tracking-tight">🚀 PROJETO T-300 K: DDJ MESTRE</h1>
+            <p class="text-xl text-gray-600 mt-2">Painel de Controle da Equipe de Criação e Pesquisa Avançada (ECPA)</p>
+        </header>
+        
+        <p class="text-lg text-center mb-10">Este documento serve como o núcleo central de gestão e documentação, o "Tablet de Thorne", que orientará os 'Game-Builders' a trabalharem como uma unidade coesa. A arquitetura é sólida, fornecendo a planta precisa para que a faísca da vida seja fornecida pelas equipes.</p>
+
+        <!-- Seção 1: Visão Geral -->
+        <div id="visao-geral" class="card">
+            <div class="card-header">
+                <i class="ri-compass-3-line"></i>
+                <h2>1. Visão Geral do Projeto e Navegação Principal</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-6">O DDJ (Documento de Design de Jogo) não é apenas um documento; é um cofre onde cada especificação técnica, diretriz de estilo e protocolo de colaboração moldará o resultado final.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="w-1/4">Secção do DDJ</th>
+                                <th class="w-2/4">Propósito</th>
+                                <th class="w-1/4">Link de Navegação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold">Hub das Fases</td>
+                                <td>Acesso aos QGs (Quartéis-Generais) dos seis grupos e seus módulos.</td>
+                                <td>[[Arquivos de Fase → Hub das Fases]]</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Biblioteca Científica</td>
+                                <td>Material de estudo alinhado com os conceitos de física térmica.</td>
+                                <td>[[Biblioteca Científica → Hub de Física]]</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Arsenal Criativo</td>
+                                <td>Inventário centralizado de todos os assets (arte, som, código).</td>
+                                <td><a href="https://github.com/Humba-IFSC/T-300_K-Codigo_Albedo/tree/main/assets" target="_blank" class="text-blue-600 hover:underline">Banco de Recursos</a></td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Protocolos</td>
+                                <td>Guia de estilo e padrões de código para garantir coesão do jogo.</td>
+                                <td>[[Diretrizes Técnicas e de Estilo → Diretrizes]]</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Cronograma</td>
+                                <td>Datas de entrega, objetivos e avaliações do plano de ensino.</td>
+                                <td>[[Registro de Missão → Cronograma]]</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção 2: Estrutura das Fases -->
+        <div id="estrutura-fases" class="card">
+            <div class="card-header">
+                <i class="ri-team-line"></i>
+                <h2>2. Estrutura das Fases e Times de Game-Builders</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-6">O projeto "Código Albedo" é composto por seis fases cruciais. O sucesso reside na sinergia da equipa, onde cada membro conhece a sua função, a sua alavanca, o seu manómetro.</p>
+                <h3 class="border-b pb-2 mb-4">Tabela de Fases, Conceitos e Equipes</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th>Fase (Módulo)</th>
+                                <th>Título Narrativo</th>
+                                <th>Conceito Físico Central</th>
+                                <th>Equipe Responsável (Grupo)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Fase 1</strong></td><td>O Legado do Mentor</td><td>Albedo e Balanço de Radiação</td><td>Arthur, Bruno, Matheus, Miguel e Vinicius</td></tr>
+                            <tr><td><strong>Fase 2</strong></td><td>A Febre Urbana</td><td>Calor Sensível e Capacidade Térmica</td><td>Caio, Davi, João A., Marcus D., Miguel K.</td></tr>
+                            <tr><td><strong>Fase 3</strong></td><td>O Sopro do Fantasma</td><td>Leis dos Gases Ideais (Lei de Boyle)</td><td>Aghata, Ana Clara, Ana Júlia, Mª Eduardo, Léo</td></tr>
+                            <tr><td><strong>Fase 4</strong></td><td>A Máquina de Entropia</td><td>Primeira Lei da Termodinâmica (ΔU = Q - W)</td><td>Ariel, Gabriel A, Gabriel C, João C. Marcos V.</td></tr>
+                            <tr><td><strong>Fase 5</strong></td><td>A Vila dos Sobreviventes</td><td>Mudanças de Estado e Calor Latente</td><td>Ketlin, João V., Mª Alice, Nicole, Izadora</td></tr>
+                            <tr><td><strong>Fase 6</strong></td><td>A Torre Celeste</td><td>Mecanismos de Transferência de Calor (Irradiação)</td><td>Antonio, Lucas, Ruan, Vinícius G., Vitor H.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3 class="mt-8 border-b pb-2 mb-4">Estrutura Padrão de um QG de Fase (Exemplo: Hub_Fase4)</h3>
+                <p>Cada fase possui um Quartel-General (QG) de grupo, que contém a documentação específica para o seu módulo:</p>
+                <ul class="list-disc mt-4 space-y-2">
+                    <li><code>[[GDD - [Nome da Fase]]]</code>: Onde o design encontra a especificação técnica.</li>
+                    <li><code>[[Pesquisa Científica - [Conceito Físico]]]</code>: A física por trás do puzzle.</li>
+                    <li><code>[[Diário de Bordo - Grupo [Nome]]]</code>: O log de progresso e decisões.</li>
+                    <li><code>[[Scripts e Código - Fase [Número]]]</code>: Boilerplates e snippets de código Phaser.</li>
+                    <li><code>[[Link para o Protótipo Jogável]]</code>: Link externo para o HTML da fase.</li>
+                    <li><code>[[Relatório de Bugs - Grupo [Nome]]]</code>: Criado e mantido pelo QA Lead.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Seção 3: Estrutura de Funções -->
+        <div id="funcoes" class="card">
+            <div class="card-header">
+                <i class="ri-user-settings-line"></i>
+                <h2>3. Estrutura de Funções (Os 5 Papéis Essenciais de um Game-Builder)</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-6">Para evitar a "anarquia da responsabilidade difusa", cada time de cinco alunos deve operar com funções claras, mas flexíveis. Cada função é uma "peça do mistério da criação" e um guardião de uma secção específica do DDJ.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th>Função Principal (Cargo)</th>
+                                <th>Identidade Narrativa</th>
+                                <th>Responsabilidades Chave</th>
+                                <th>Seção DDJ "Guardada"</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1. Project Lead</td>
+                                <td class="font-semibold">O Coordenador da Missão</td>
+                                <td>Facilita reuniões, define metas de sprint, modera discussões e é o ponto de contacto com o professor.</td>
+                                <td><strong>[Cronograma]</strong> e <strong>[Diário de Bordo]</strong></td>
+                            </tr>
+                            <tr>
+                                <td>2. Lead Architect</td>
+                                <td class="font-semibold">O Arquiteto do Labirinto</td>
+                                <td>Traduz o GDD em código, define a estrutura da cena no Phaser e escreve a lógica principal.</td>
+                                <td><strong>[Scripts e Código]</strong></td>
+                            </tr>
+                            <tr>
+                                <td>3. Creative Director</td>
+                                <td class="font-semibold">O Guardião dos Símbolos</td>
+                                <td>Define a direção de arte/som, cria ou integra assets e implementa no Phaser.</td>
+                                <td><strong>[Arsenal Criativo]</strong></td>
+                            </tr>
+                            <tr>
+                                <td>4. Narrative Designer</td>
+                                <td class="font-semibold">O Guardião da Trama</td>
+                                <td>Desenvolve a micro-narrativa, projeta o puzzle de termodinâmica e escreve todos os textos.</td>
+                                <td><strong>[GDD]</strong> e <strong>[Pesquisa Científica]</strong></td>
+                            </tr>
+                            <tr>
+                                <td>5. QA Lead</td>
+                                <td class="font-semibold">O Analista de Sistemas</td>
+                                <td>Testador principal do protótipo, busca bugs e problemas de usabilidade, e verifica conformidade com o GDD.</td>
+                                <td><strong>[Relatório de Bugs]</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="quote"><strong>Regra de Ouro:</strong> As funções criam responsabilidade e um ponto de partida, não silos. A equipa deve trocar de "chapéu" quando necessário, pois todos são responsáveis pela qualidade final. Por exemplo, o Guardião da Trama deve testar a implementação do puzzle feita pelo Arquiteto.</p>
+            </div>
+        </div>
+
+        <!-- Seção 4: Guia de Documentação -->
+        <div id="documentacao" class="card">
+            <div class="card-header">
+                <i class="ri-book-2-line"></i>
+                <h2>4. Guia de Documentação (A Lógica do DDJ)</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">O <strong>Game Design Document (GDD)</strong> de cada fase é o mapa da aventura. O Template Mestre fornece a estrutura (DDJ Checkpoints).</p>
+                <ul class="list-disc mb-6">
+                    <li>O <strong>Guardião da Trama</strong> preenche principalmente a Visão Geral Narrativa e o Design do Puzzle.</li>
+                    <li>O <strong>Arquiteto do Labirinto</strong> preenche a Secção de Especificações Técnicas (Phaser) e o Boilerplate da Cena.</li>
+                </ul>
+                <h4 class="font-semibold text-lg mb-2">Padrões Técnicos Definidos:</h4>
+                <ul class="list-disc mb-6">
+                    <li><strong>Scene Key:</strong> Exemplo: <code>Fase4Scene</code></li>
+                    <li><strong>Nomenclatura Padrão:</strong> Uso de <code>camelCase</code> e <code>PascalCase</code> para variáveis e classes, conforme as <strong>[Diretrizes Técnicas]</strong>.</li>
+                    <li><strong>Física de Colisão:</strong> Exemplo: <code>this.physics.add.collider(player, wallsLayer);</code></li>
+                </ul>
+                
+                <h4 class="font-semibold text-lg mb-2">Exemplo de Propriedades do GDD (Para o Hub da Fase 4)</h4>
+                <p>Este bloco de propriedades seria adicionado ao topo do arquivo <code>GDD - Máquina de Entropia.md</code> dentro do QG da Fase 4.</p>
+                <pre class="bg-gray-100 p-4 rounded-md mt-2 text-sm text-gray-700"><code>---
+Fase_Numero: 4
+Equipe_Grupo: Delta
+Coordenador_Missao: [Nome do Project Lead]
+Arquiteto_Labirinto: [Nome do Arquiteto]
+Conceito_Fisico: Primeira Lei da Termodinâmica
+Palavra_Passe_Puzzle: ENERGIA INTERNA
+Status_Desenvolvimento: Design Completo
+---</code></pre>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
