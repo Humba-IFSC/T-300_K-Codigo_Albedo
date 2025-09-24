@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto T-300 K: Ilhas de Calor e Game Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Lighter gray background */
+        }
+        .ifsc-green { color: #008442; }
+        .bg-ifsc-green { background-color: #008442; }
+        .border-ifsc-green { border-color: #008442; }
+        .hover\:bg-ifsc-green-dark:hover { background-color: #006a35; }
+        .card {
+            @apply bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg;
+        }
+        .card-header {
+            @apply bg-ifsc-green text-white p-4 text-2xl font-bold flex items-center;
+        }
+        .card-header i {
+            @apply mr-3 text-3xl;
+        }
+        .card-body {
+            @apply p-6;
+        }
+        h3 {
+            @apply text-xl font-semibold text-gray-800 mb-3;
+        }
+        ul, ol {
+            @apply pl-5 space-y-2;
+        }
+        li {
+            @apply text-gray-700;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Projeto: <span class="text-green-700">T-300 K - Código Albedo</span></h1>
+            <p class="text-xl text-gray-600 mt-2">Uma investigação científica sobre Ilhas de Calor Urbanas e Game Design</p>
+        </header>
+
+        <main class="space-y-12">
+
+            <!-- INTRODUÇÃO GERAL -->
+            <section id="intro" class="card">
+                <div class="card-header">
+                    <i class="ri-lightbulb-flash-line"></i>
+                    <h2>Olá, Cientistas e Game-Builders!</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">Já notaram como, em um dia de sol, o asfalto fica muito mais quente que uma calçada de cimento claro? Ou como é mais fresco ficar debaixo de uma árvore em um parque do que no meio de uma praça de concreto?</p>
+                    <p class="mb-4">Essas diferenças de temperatura não são por acaso. Elas são causadas por um fenômeno chamado <strong>Ilha de Calor Urbana</strong>, que faz com que nossas cidades sejam bem mais quentes que as áreas rurais ao redor.</p>
+                    <p>Nesta jornada, vamos investigar uma das principais causas desse fenômeno: o <strong>albedo</strong>, que é a capacidade das superfícies de refletir a luz solar. Utilizaremos o <strong>Diagrama V de Gowin</strong> para guiar nossa pesquisa e, ao final, aplicaremos nosso conhecimento no desenvolvimento do jogo "T-300 K".</p>
+                </div>
+            </section>
+            
+            <!-- ENCONTRO 1 -->
+            <section id="encontro1" class="card">
+                <div class="card-header">
+                    <i class="ri-brain-line"></i>
+                    <h2>Encontro 1: A Teoria por Trás do Calor</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-lg mb-6 text-gray-600"><strong>Objetivo:</strong> Construir a base de conhecimento que nos permitirá realizar nosso experimento. Vamos preencher o lado esquerdo do nosso Diagrama V!</p>
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mb-6">
+                        <h3 class="font-bold text-blue-800">Atividade 1: O Que Já Sabemos? (15 min)</h3>
+                        <p class="mb-2 text-blue-700">Discuta com seu grupo:</p>
+                        <ul class="list-disc pl-5 text-blue-900">
+                            <li>Por que você acha que o centro da cidade fica mais quente que um parque?</li>
+                            <li>Em um dia de sol, qual camiseta é mais fresca: a preta ou a branca? Por quê?</li>
+                            <li>Como a cor de uma superfície influencia o quanto ela esquenta?</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="mt-8">Conceitos-Chave: As Ferramentas para nossa Investigação</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg border"><strong>Energia:</strong> A capacidade de realizar trabalho ou gerar calor. O Sol nos envia energia na forma de radiação.</div>
+                        <div class="p-4 bg-gray-50 rounded-lg border"><strong>Calor:</strong> A energia térmica em trânsito, que flui de um corpo mais quente para um mais frio.</div>
+                        <div class="p-4 bg-gray-50 rounded-lg border"><strong>Temperatura:</strong> A medida da agitação das partículas de um corpo.</div>
+                        <div class="p-4 bg-gray-50 rounded-lg border"><strong>Absorção:</strong> Quando a energia da luz é "sugada" por uma superfície, aquecendo-a. Superfícies escuras são boas absorvedoras.</div>
+                        <div class="p-4 bg-gray-50 rounded-lg border"><strong>Reflexão:</strong> Quando a luz "bate e volta" de uma superfície. Superfícies claras e brilhantes são boas refletoras.</div>
+                        <div class="p-4 bg-gray-50 rounded-lg border"><strong>Albedo:</strong> Uma medida (de 0 a 1) do poder de reflexão de uma superfície.</div>
+                        <div class="p-4 bg-green-50 rounded-lg border border-green-200 md:col-span-2"><strong>Ilha de Calor Urbana (ICU):</strong> Fenômeno em que áreas urbanas (asfalto, concreto) se tornam mais quentes que as áreas rurais ao redor, principalmente por terem um baixo albedo.</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ENCONTRO 2 -->
+            <section id="encontro2" class="card">
+                <div class="card-header">
+                    <i class="ri-flask-line"></i>
+                    <h2>Encontro 2: Mão na Massa! O Experimento</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-lg mb-6 text-gray-600"><strong>Objetivo:</strong> Realizar um experimento para testar nossas ideias, coletar dados e tirar conclusões para responder à nossa pergunta principal.</p>
+
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded-r-lg" role="alert">
+                      <p class="font-bold">Questão Focal:</p>
+                      <p>Como as propriedades de superfície dos materiais (cor/albedo) influenciam o aquecimento urbano e como podemos medir e modelar esse efeito em laboratório?</p>
+                    </div>
+
+                    <h3 class="mt-8">Atividade 3: O Experimento do Albedo</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Materiais por Grupo:</h4>
+                            <ul class="list-disc">
+                                <li>Kit de Irradiação de Corpo Negro (Azeheb).</li>
+                                <li>Dois blocos metálicos pintados de tinta preta e tinta branca.</li>
+                                <li>Dois termômetros.</li>
+                                <li>Uma lâmpada forte (aprox. 50 W) com suporte.</li>
+                                <li>Cronômetro e régua.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Procedimento:</h4>
+                            <ol class="list-decimal">
+                                <li>Insira os termômetros no orifício dos blocos.</li>
+                                <li>Posicione os blocos contendo os termômetros e a lâmpada a uma distância fixa de ambos.</li>
+                                <li>Anote a temperatura inicial de cada um.</li>
+                                <li>Ligue a lâmpada e inicie o cronômetro.</li>
+                                <li>A cada 2 minutos, anote a temperatura de cada bloco por 14 minutos.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto mt-6">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Tempo (min)</th>
+                                    <th scope="col" class="px-6 py-3">Temp. Bloco Preto (°C)</th>
+                                    <th scope="col" class="px-6 py-3">Temp. Bloco Branco (°C)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b"><td class="px-6 py-4">0</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-gray-50 border-b"><td class="px-6 py-4">2</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-white border-b"><td class="px-6 py-4">4</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-gray-50 border-b"><td class="px-6 py-4">6</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-white border-b"><td class="px-6 py-4">8</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-gray-50 border-b"><td class="px-6 py-4">10</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-white border-b"><td class="px-6 py-4">12</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                                <tr class="bg-gray-50 border-b"><td class="px-6 py-4">14</td><td class="px-6 py-4"></td><td class="px-6 py-4"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAREFA DE CASA -->
+            <section id="tarefa" class="card border-2 border-amber-400">
+                <div class="card-header bg-amber-400">
+                    <i class="ri-code-s-slash-line"></i>
+                    <h2>Próximos Passos: Construindo o Mundo do Jogo!</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">Na última aula, começamos a usar o editor de mapas <a href="https://www.mapeditor.org/" target="_blank" class="font-semibold text-blue-600 hover:underline">Tiled</a> para criar o cenário do nosso jogo T-300 K. Aprendemos sobre importação de assets, uso de camadas e salvamento de projetos.</p>
+                    <p class="mb-4">Os assets (imagens de terrenos, árvores, etc.) estão disponíveis em nosso repositório no GitHub. Cliquem no link para acessar:</p>
+                    <a href="https://github.com/Humba-IFSC/T-300_K-Codigo_Albedo/tree/main/assets" target="_blank" class="inline-block bg-gray-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="ri-github-fill mr-2"></i> Acessar Repositório de Assets
+                    </a>
+
+                    <div class="mt-6 p-4 border-t border-gray-200">
+                        <h4 class="font-bold text-lg mb-2">Tarefa para a Próxima Aula:</h4>
+                        <ol class="list-decimal list-inside space-y-2 mb-4">
+                            <li><strong>Criar uma nova cena (mapa)</strong> no Tiled.</li>
+                            <li>Utilizar no mínimo <strong>3 assets diferentes</strong> (ex: uma árvore, um banco, um tipo de piso).</li>
+                            <li>Aplicar o <strong>efeito 3D</strong> usando pelo menos duas camadas.</li>
+                            <li>Salvar o arquivo do mapa (formato .tmx ou .json).</li>
+                        </ol>
+
+                        <div class="mt-4 p-4 border-l-4 border-red-500 bg-red-50">
+                            <p class="font-bold">Instruções para Entrega:</p>
+                            <p class="mt-2">Deposite o seu mapa no repositório do SIGAA.</p>
+                            <p class="mt-4"><strong>Prazo Final:</strong> <span class="font-semibold text-red-700">30/09/2025 - 13:30h</span></p>
+                            <p class="mt-2 italic"><strong>Atenção:</strong> Sem prorrogações, o sistema fechará e não será reaberto.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- REFLEXÃO FINAL -->
+            <section class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold mb-4 text-green-400">Reflexão Final</h3>
+                <p>Se você fosse o prefeito ou a prefeita da sua cidade, que medidas você tomaria, com base no que aprendeu hoje, para tornar a cidade um lugar mais agradável no verão?</p>
+            </section>
+
+        </main>
+    </div>
+
+</body>
+</html>
+
+
