@@ -11,7 +11,7 @@ export default class SecondScene extends BaseScene {
     preload() {
         super.preload();
     // Tilesets do mapa floresta
-    this.load.image('terrain_tiles_v2', 'assets/tilesets/terrain_tiles_v2.png');
+    this.load.image('terrain', 'assets/tilesets/terrain.png');
     this.load.image('props', 'assets/tilesets/props.png');
     this.load.tilemapTiledJSON('forest', 'assets/maps/floresta.json');
         this.load.spritesheet('player', 'assets/sprites/player.png', { frameWidth: 32, frameHeight: 32 });
@@ -23,14 +23,15 @@ export default class SecondScene extends BaseScene {
         const map = this.make.tilemap({ key: 'forest' });
         this.map = map;
         // Adiciona tilesets conforme especificado no JSON
-        const terrainTiles = map.addTilesetImage('terrain_tiles_v2', 'terrain_tiles_v2');
+    // Use o nome do tileset conforme está no Tiled/floresta.json
+    const terrainTiles = map.addTilesetImage('terrain', 'terrain');
         const propsTiles = map.addTilesetImage('props', 'props');
 
         // Camadas do mapa
         // Chão (sempre visível)
         let floor = null;
-        if (map.getLayerIndex('Camada de Blocos 1') !== -1) {
-            floor = map.createLayer('Camada de Blocos 1', terrainTiles, 0, 0);
+        if (map.getLayerIndex('chao') !== -1) {
+            floor = map.createLayer('chao', terrainTiles, 0, 0);
             floor.setDepth(0); // Garante que fique abaixo dos objetos
         }
         // Objetos (árvores, pedras, etc) - apenas esta camada tem colisão
