@@ -11,8 +11,8 @@
 |:---------------:|:--------------------:|
 |[Proposta de Atualização do DDJ](/html/Proposta_DDJ.html)|[▶ Novo DDJ???](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Proposta_DDJ.html)| 
 |[Jogo - T-300 K: Código Albedo](/html/Projeto_T-300_K_Codigo_Albedo.html)|[▶ Iniciar o Jogo](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Projeto_T-300_K_Codigo_Albedo.html)|
-|[Aula 30/09 - Continuação](html/Conexao_Albedo.html) |[- Diagrama V - Lado Direito](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Conexao_Albedo.html)|
-|[Aula 30/09 - Atividade](html/Plataforma_de_Coleta-Experimento_Albedo_V2.html) |[- Diagrama V - Atividade Prática](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Plataforma_de_Coleta-Experimento_Albedo_V2.html)|
+|[Aula 30/09 - Continuação](html/Conexao_Albedo.html)|[- Diagrama V - Lado Direito](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Conexao_Albedo.html)|
+|[Aula 30/09 - Atividade](html/Experimento_Albedo.html)|[- Diagrama V - Atividade Prática](https://humba-ifsc.github.io/T-300_K-Codigo_Albedo/html/Experimento_Albedo.html)|
 
 ## Capítulo 0: O Prelúdio  
 
