@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Coleta por Fases - Experimento Albedo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .ifsc-green { color: #008442; }
+        .bg-ifsc-green { background-color: #008442; }
+        .card {
+            @apply bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg;
+        }
+        .card-header {
+            @apply bg-gray-800 text-white p-4 text-2xl font-bold flex items-center;
+        }
+        .card-header i {
+            @apply mr-3 text-3xl;
+        }
+        .card-body {
+            @apply p-6;
+        }
+        input[type="number"] {
+            @apply w-full p-2 border rounded-md text-center text-black font-medium;
+            background-color: #6dcd6e; /* Verde Clarinho */
+            border-color: #19c11b; /* Verde */
+        }
+        input[type="number"]:focus {
+            @apply ring-2;
+            --tw-ring-color: #19c11b; /* Verde */
+        }
+        .chart-container {
+            position: relative;
+            height: 60vh;
+            width: 100%;
+        }
+        .tab-button {
+            @apply px-4 py-2 font-semibold text-gray-600 rounded-t-lg transition-colors duration-200;
+        }
+        .tab-button.active {
+            @apply bg-white text-green-700 border-gray-200 border-t border-l border-r -mb-px;
+        }
+        .tab-panel {
+            @apply hidden;
+        }
+        .tab-panel.active {
+            @apply block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Plataforma Colaborativa de Dados</h1>
+            <p class="text-xl text-green-700 font-semibold mt-2">Experimento de Albedo e Radiação</p>
+        </header>
+
+        <main class="space-y-12">
+            
+            <section id="experimento" class="card">
+                <div class="card-header">
+                    <i class="ri-flask-line"></i>
+                    <h2>Coleta de Dados por Fases</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-lg mb-4 text-gray-600"><strong>Objetivo:</strong> Cada equipe (Fase) deve inserir os dados de temperatura coletados em sua respectiva aba. O gráfico será atualizado em tempo real.</p>
+                    
+                    <!-- Abas de Navegação -->
+                    <div class="border-b border-gray-200 mb-4">
+                        <nav class="-mb-px flex space-x-2" id="tab-buttons">
+                            <!-- Botões das abas serão gerados pelo JS -->
+                        </nav>
+                    </div>
+
+                    <!-- Painéis com as Tabelas -->
+                    <div id="tab-panels">
+                        <!-- Painéis das abas serão gerados pelo JS -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="analise" class="card">
+                <div class="card-header">
+                    <i class="ri-bar-chart-2-line"></i>
+                    <h2>Análise Comparativa dos Resultados</h2>
+                </div>
+                <div class="card-body">
+                     <p class="mb-6">O gráfico abaixo plota os dados de todas as fases simultaneamente. Cada cor representa uma fase, com a linha sólida para o bloco preto e a linha tracejada para o bloco branco.</p>
+                    <div class="chart-container">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="debate" class="card">
+                <div class="card-header">
+                    <i class="ri-discuss-line"></i>
+                    <h2>Pontos para Debate e Conclusão</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">Com base no gráfico comparativo, discutam em grupo:</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Todas as fases obtiveram um resultado semelhante? O aquecimento do bloco preto foi consistentemente maior que o do branco em todos os experimentos?</li>
+                        <li>Existem curvas (fases) que se destacam por estarem muito acima ou abaixo da média? Quais poderiam ser as causas para essa divergência (fontes de erro experimental)?</li>
+                        <li>Qual é a conclusão geral que podemos tirar sobre a relação entre a cor de uma superfície (albedo) e sua absorção de energia por irradiação?</li>
+                        <li>Como essa conclusão se aplica diretamente ao fenômeno das Ilhas de Calor Urbanas e à estratégia para vencer a Fase 2 do jogo T-300 K?</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section id="export" class="card">
+                <div class="card-header">
+                    <i class="ri-file-excel-2-line"></i>
+                    <h2>Exportar Dados para Análise</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">Para a análise estatística dos dados, todos os valores inseridos pelas fases podem ser exportados para um único arquivo no formato CSV, compatível com Excel, Google Sheets e outras ferramentas de análise.</p>
+                    <button id="export-csv" class="bg-green-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-800 transition-colors">
+                        <i class="ri-download-2-line mr-2"></i>Exportar para CSV
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const numGroups = 6;
+        const timeIntervals = [0, 2, 4, 6, 8, 10, 12, 14];
+        let chart;
+
+        const tabButtonsContainer = document.getElementById('tab-buttons');
+        const tabPanelsContainer = document.getElementById('tab-panels');
+        
+        const groupColors = [
+            { black: '#000000', white: '#A9A9A9' }, // Fase 1: Black, DarkGray
+            { black: '#4B0082', white: '#9370DB' }, // Fase 2: Indigo, MediumPurple
+            { black: '#8B0000', white: '#F08080' }, // Fase 3: DarkRed, LightCoral
+            { black: '#006400', white: '#90EE90' }, // Fase 4: DarkGreen, LightGreen
+            { black: '#00008B', white: '#87CEFA' }, // Fase 5: DarkBlue, LightSkyBlue
+            { black: '#FF8C00', white: '#FFD700' }, // Fase 6: DarkOrange, Gold
+        ];
+
+        function createTabsAndTables() {
+            for (let i = 1; i <= numGroups; i++) {
+                // Create Tab Button
+                const button = document.createElement('button');
+                button.className = `tab-button ${i === 1 ? 'active' : ''}`;
+                button.textContent = `Fase ${i}`;
+                button.dataset.target = `panel-${i}`;
+                tabButtonsContainer.appendChild(button);
+
+                // Create Tab Panel
+                const panel = document.createElement('div');
+                panel.id = `panel-${i}`;
+                panel.className = `tab-panel border border-gray-200 p-4 rounded-b-lg rounded-r-lg ${i === 1 ? 'active' : ''}`;
+                
+                const table = document.createElement('table');
+                table.className = 'w-full text-sm text-left text-gray-500';
+                table.innerHTML = `
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Tempo (min)</th>
+                            <th scope="col" class="px-6 py-3">Temp. Bloco Preto (°C)</th>
+                            <th scope="col" class="px-6 py-3">Temp. Bloco Branco (°C)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${timeIntervals.map((time, index) => `
+                            <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b">
+                                <td class="px-6 py-4 font-medium text-gray-900">${time}</td>
+                                <td class="px-6 py-4"><input type="number" data-group="${i}" data-block="preto" data-time="${time}" class="temp-input"></td>
+                                <td class="px-6 py-4"><input type="number" data-group="${i}" data-block="branco" data-time="${time}" class="temp-input"></td>
+                            </tr>`).join('')}
+                    </tbody>
+                `;
+                panel.appendChild(table);
+                tabPanelsContainer.appendChild(panel);
+            }
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            const datasets = [];
+            for (let i = 1; i <= numGroups; i++) {
+                datasets.push({
+                    label: `Fase ${i} - Bloco Preto`,
+                    data: Array(timeIntervals.length).fill(null),
+                    borderColor: groupColors[i-1].black,
+                    backgroundColor: groupColors[i-1].black,
+                    tension: 0.1,
+                    borderWidth: 2.5
+                });
+                datasets.push({
+                    label: `Fase ${i} - Bloco Branco`,
+                    data: Array(timeIntervals.length).fill(null),
+                    borderColor: groupColors[i-1].white,
+                    backgroundColor: groupColors[i-1].white,
+                    tension: 0.1,
+                    borderWidth: 2.5,
+                    borderDash: [5, 5]
+                });
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: timeIntervals, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false, title: { display: true, text: 'Temperatura (°C)', font: { size: 14 }}},
+                        x: { title: { display: true, text: 'Tempo (minutos)', font: { size: 14 }}}
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 15, padding: 15 }},
+                        title: { display: true, text: 'Aquecimento Comparativo dos Blocos', font: { size: 18 }}
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            const allInputs = document.querySelectorAll('.temp-input');
+            const groupData = {};
+
+            allInputs.forEach(input => {
+                const group = input.dataset.group;
+                const block = input.dataset.block;
+                const time = parseInt(input.dataset.time);
+                const value = input.value !== '' ? parseFloat(input.value) : null;
+                const index = timeIntervals.indexOf(time);
+
+                if (!groupData[group]) {
+                    groupData[group] = { preto: Array(timeIntervals.length).fill(null), branco: Array(timeIntervals.length).fill(null) };
+                }
+                if (index !== -1) {
+                    groupData[group][block][index] = value;
+                }
+            });
+
+            for (let i = 1; i <= numGroups; i++) {
+                const datasetIndexBlack = (i - 1) * 2;
+                const datasetIndexWhite = datasetIndexBlack + 1;
+                if (groupData[i]) {
+                    chart.data.datasets[datasetIndexBlack].data = groupData[i].preto;
+                    chart.data.datasets[datasetIndexWhite].data = groupData[i].branco;
+                }
+            }
+            chart.update();
+        }
+
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Fase,Tempo (min),Temp. Bloco Preto (°C),Temp. Bloco Branco (°C)\n";
+            
+            for (let i = 1; i <= numGroups; i++) {
+                timeIntervals.forEach(time => {
+                    const inputPreto = document.querySelector(`.temp-input[data-group="${i}"][data-block="preto"][data-time="${time}"]`);
+                    const inputBranco = document.querySelector(`.temp-input[data-group="${i}"][data-block="branco"][data-time="${time}"]`);
+                    const tempPreto = inputPreto ? inputPreto.value : "";
+                    const tempBranco = inputBranco ? inputBranco.value : "";
+                    
+                    csvContent += `${i},${time},${tempPreto},${tempBranco}\n`;
+                });
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "dados_experimento_albedo.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        createTabsAndTables();
+        initializeChart();
+        
+        tabButtonsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('tab-button')) {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById(e.target.dataset.target).classList.add('active');
+            }
+        });
+
+        tabPanelsContainer.addEventListener('input', updateChart);
+        document.getElementById('export-csv').addEventListener('click', exportToCSV);
+    });
+</script>
+
+</body>
+</html>
+
+
