@@ -41,14 +41,45 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 *(Inspirado em "Estrutura do Código" e "Configuração Inicial do Jogo". É o esqueleto do seu projeto.)*
 
 *   **Estrutura de Pastas:** Como você organizará seus arquivos?
-    *   *Exemplo:*
+    *   *Estrutura atual do projeto:*
         ```
-        /projeto-jogo
-          - index.html
-          - main.js
-          /assets
-            - /images
-            - /sounds
+        /T-300_K-Codigo_Albedo
+          ├── index.html
+          ├── LICENSE
+          ├── README.md
+          ├── PUSHABLE_OBJECTS_GUIDE.md
+          ├── PUSHABLE_EXAMPLES.js
+          ├── PUSHABLE_IMPROVEMENTS.md
+          ├── assets/
+          │   ├── maps/
+          │   │   ├── floresta.json
+          │   │   ├── map_generated.json
+          │   │   └── map.json
+          │   ├── sounds/
+          │   ├── sprites/
+          │   └── tilesets/
+          └── src/
+              ├── main.js
+              ├── scenes/
+              │   ├── BaseScene.js
+              │   ├── GameScene.js
+              │   └── SecondScene.js
+              └── systems/
+                  ├── debug/
+                  │   └── CoordProbe.js
+                  ├── input/
+                  │   └── MovementController.js
+                  ├── items/
+                  │   ├── PushableObject.js
+                  │   ├── crowbar.js
+                  │   ├── doorUtils.js
+                  │   ├── itemUtils.js
+                  │   └── key.js
+                  └── ui/
+                      ├── DialogueSystem.js
+                      ├── Hotbar.js
+                      ├── InteractionPrompt.js
+                      └── UICameraManager.js
         ```
 *   **Configuração Inicial (Objeto `config` do Phaser):** Quais são as definições básicas do seu jogo?
     *   **Dimensões da Tela:** Largura (width) e Altura (height).
@@ -62,13 +93,28 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 *(O que o jogo precisa carregar antes de começar a diversão? Liste tudo aqui.)*
 
-| Apelido (Key) | Tipo de Asset | Caminho do Arquivo (`path`) |
-| :--- | :--- | :--- |
-| `sky` | Image | `assets/images/sky.png` |
-| `ground` | Image | `assets/images/platform.png` |
-| `coin` | Image | `assets/images/coin.png` |
-| `player` | Spritesheet | `assets/images/dude.png` |
-| `jumpSound` | Audio | `assets/sounds/jump.wav` |
+| Apelido (Key) | Tipo de Asset | Caminho do Arquivo (`path`) | Descrição |
+| :--- | :--- | :--- | :--- |
+| `tiles` | Image | `assets/tilesets/[nome_do_tileset].png` | Tileset principal do jogo |
+| `floresta` | Tilemap | `assets/maps/floresta.json` | Mapa da área floresta |
+| `map` | Tilemap | `assets/maps/map.json` | Mapa principal |
+| `map_generated` | Tilemap | `assets/maps/map_generated.json` | Mapa gerado |
+| `player` | Spritesheet | `assets/sprites/[player].png` | Sprites do personagem jogável |
+| `box` | Image | `assets/sprites/[box].png` | Caixa empurrável (sistema push/pull) |
+| `key` | Image | `assets/sprites/[key].png` | Chave para interação com portas |
+| `crowbar` | Image | `assets/sprites/[crowbar].png` | Pé de cabra para quebrar objetos |
+| `door` | Image | `assets/sprites/[door].png` | Portas interativas |
+| `jumpSound` | Audio | `assets/sounds/[jump].wav` | Som de pulo (exemplo) |
+
+**Sistemas Implementados:**
+- **MovementController**: Sistema de movimentação com WASD/Setas
+- **PushableObject**: Sistema completo de empurrar/puxar objetos (estilo Zelda)
+- **DialogueSystem**: Sistema de diálogos e narrativa
+- **Hotbar**: Barra de itens/inventário
+- **InteractionPrompt**: Prompts de interação ("Pressione Z para...")
+- **UICameraManager**: Gerenciamento de câmera e UI
+- **CoordProbe**: Debug de coordenadas
+- **Item Systems**: Chaves, portas, pé de cabra e utilitários
 
 ---
 
