@@ -4,9 +4,9 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 ### Template de Documento de Design de Jogo (DDJ)
 
-**Nome do Projeto (Fase do Jogo):** `[Insira o nome provisório da Fase do Jogo]`
-**Autor(a/e)s/Desenvolvedor(a/)s:** `[Seu(s) Nome(s)]`
-**Data de Início:** `[DD/MM/AAAA]`
+**Nome do Projeto Fase do Jogo):** `[Máquina de Entropia]`
+**Autor(a/e)s/Desenvolvedor(a/)s:** `[Gabriel de Sousa Conforto, Gabriel Corrêa Abreu de Oliveira, Marcos Vinícios Faustino, João Campos Neto]`
+**Data de Início:** `[19/08/2025]`
 
 ---
 
