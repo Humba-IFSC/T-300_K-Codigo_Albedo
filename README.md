@@ -4,22 +4,27 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 ### Template de Documento de Design de Jogo (DDJ)
 
-**Nome do Projeto (Fase do Jogo):** `[Insira o nome provisório da Fase do Jogo]`
-**Autor(a/e)s/Desenvolvedor(a/)s:** `[Seu(s) Nome(s)]`
-**Data de Início:** `[DD/MM/AAAA]`
+**Nome do Projeto (Fase do Jogo):** `[Máquina de Entropia]`
 
----
+### **Autores/Desenvolvedores:** 
+- Gabriel de Sousa Conforto `Coordenador, roteiro, história, trama e narrativa
+- Marcos Vinícius Faustino `Progamação`
+- Ariel da Silva Coutinho `Arte, som e progamação`
+- Gabriel Corrêa Abreu de Oliveira `Arte, som, testador e relator de bugs`
+- João Campos Neto`Testador e relator de bugs e auxiliar em documentaçao e escrita` 
+ ---
+
+ ### **Data de Início:** `[19/08/2025]`
+--- 
 
 ### Checkpoint 1: A Grande Ideia (Introdução ao Projeto)
 
-*(Esta seção define a alma do seu jogo. É o seu "pitch" de elevador.)*
 
-*   **Conceito Central:** Descreva seu jogo em uma ou duas frases.
-    *   *Exemplo:* "Um jogo de plataforma 2D onde um robô perdido precisa coletar peças de energia para reativar seu portal e voltar para casa."
-*   **Gênero:** Plataforma, Puzzle, Ação, Aventura, etc.
-*   **Público-Alvo:** Para quem é este jogo? (Crianças, jogadores casuais, fãs de desafios, etc.)
-*   **Objetivo do Jogador:** O que o jogador precisa fazer para vencer ou progredir?
-    *   *Exemplo:* "Coletar todas as 10 moedas do nível para destravar a saída."
+*   **Conceito Central:** Em uma fábrica abandonada, o jogador investiga os experimentos do Dr. Aris Thorne, um cientista que tentou controlar a entropia e acabou desencadeando forças que desafiam as leis da física.
+   
+*   **Gênero:** Puzzle, Aventura, Educativo.
+*   **Público-Alvo:** Estudantes, jogadores casuais, Fans de quebra-cabeça
+*   **Objetivo do Jogador:** O objetivo da fase é explorar a fábrica, resolver enigmas baseados nas leis da termodinâmica e estabilizar o reator para completar a criação da Máquina de Entropia.
 
 ---
 
@@ -41,14 +46,45 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 *(Inspirado em "Estrutura do Código" e "Configuração Inicial do Jogo". É o esqueleto do seu projeto.)*
 
 *   **Estrutura de Pastas:** Como você organizará seus arquivos?
-    *   *Exemplo:*
+    *   *Estrutura atual do projeto:*
         ```
-        /projeto-jogo
-          - index.html
-          - main.js
-          /assets
-            - /images
-            - /sounds
+        /T-300_K-Codigo_Albedo
+          ├── index.html
+          ├── LICENSE
+          ├── README.md
+          ├── PUSHABLE_OBJECTS_GUIDE.md
+          ├── PUSHABLE_EXAMPLES.js
+          ├── PUSHABLE_IMPROVEMENTS.md
+          ├── assets/
+          │   ├── maps/
+          │   │   ├── floresta.json
+          │   │   ├── map_generated.json
+          │   │   └── map.json
+          │   ├── sounds/
+          │   ├── sprites/
+          │   └── tilesets/
+          └── src/
+              ├── main.js
+              ├── scenes/
+              │   ├── BaseScene.js
+              │   ├── GameScene.js
+              │   └── SecondScene.js
+              └── systems/
+                  ├── debug/
+                  │   └── CoordProbe.js
+                  ├── input/
+                  │   └── MovementController.js
+                  ├── items/
+                  │   ├── PushableObject.js
+                  │   ├── crowbar.js
+                  │   ├── doorUtils.js
+                  │   ├── itemUtils.js
+                  │   └── key.js
+                  └── ui/
+                      ├── DialogueSystem.js
+                      ├── Hotbar.js
+                      ├── InteractionPrompt.js
+                      └── UICameraManager.js
         ```
 *   **Configuração Inicial (Objeto `config` do Phaser):** Quais são as definições básicas do seu jogo?
     *   **Dimensões da Tela:** Largura (width) e Altura (height).
@@ -62,13 +98,28 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 *(O que o jogo precisa carregar antes de começar a diversão? Liste tudo aqui.)*
 
-| Apelido (Key) | Tipo de Asset | Caminho do Arquivo (`path`) |
-| :--- | :--- | :--- |
-| `sky` | Image | `assets/images/sky.png` |
-| `ground` | Image | `assets/images/platform.png` |
-| `coin` | Image | `assets/images/coin.png` |
-| `player` | Spritesheet | `assets/images/dude.png` |
-| `jumpSound` | Audio | `assets/sounds/jump.wav` |
+| Apelido (Key) | Tipo de Asset | Caminho do Arquivo (`path`) | Descrição |
+| :--- | :--- | :--- | :--- |
+| `tiles` | Image | `assets/tilesets/[nome_do_tileset].png` | Tileset principal do jogo |
+| `floresta` | Tilemap | `assets/maps/floresta.json` | Mapa da área floresta |
+| `map` | Tilemap | `assets/maps/map.json` | Mapa principal |
+| `map_generated` | Tilemap | `assets/maps/map_generated.json` | Mapa gerado |
+| `player` | Spritesheet | `assets/sprites/[player].png` | Sprites do personagem jogável |
+| `box` | Image | `assets/sprites/[box].png` | Caixa empurrável (sistema push/pull) |
+| `key` | Image | `assets/sprites/[key].png` | Chave para interação com portas |
+| `crowbar` | Image | `assets/sprites/[crowbar].png` | Pé de cabra para quebrar objetos |
+| `door` | Image | `assets/sprites/[door].png` | Portas interativas |
+| `jumpSound` | Audio | `assets/sounds/[jump].wav` | Som de pulo (exemplo) |
+
+**Sistemas Implementados:**
+- **MovementController**: Sistema de movimentação com WASD/Setas
+- **PushableObject**: Sistema completo de empurrar/puxar objetos (estilo Zelda)
+- **DialogueSystem**: Sistema de diálogos e narrativa
+- **Hotbar**: Barra de itens/inventário
+- **InteractionPrompt**: Prompts de interação ("Pressione Z para...")
+- **UICameraManager**: Gerenciamento de câmera e UI
+- **CoordProbe**: Debug de coordenadas
+- **Item Systems**: Chaves, portas, pé de cabra e utilitários
 
 ---
 
@@ -109,21 +160,11 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 ### Checkpoint Final: Tesouro Encontrado! (Resultado Final)
 
-   **Descrição de gameplay atual:**
+*(Qual é a aparência e a sensação do jogo finalizado, com base nos checkpoints acima?)*
 
-* Disponibilidade de movimentação livre pelo mapa dentro dos limites configurados pelo código;
-* É possível interagir com um primeiro NPC, tendo caixa de diálogos e mudança no mapa após o contato;
-* Mecânica de mover caixa pelo mapa segurando as teclas "Z" ou "F";
-* Interação com caixas apenas com item de CrowBar equipado, podendo quebrá-las;
-* Interação com baús para pegar o conteúdo dentro deles;
-* Utilização de chaves para abrir portas anteriormente trancadas.
+*   **Descrição da Experiência:** Descreva como é jogar a versão finalizada do seu projeto.
+    *   *Exemplo:* "O jogador controla o personagem em um cenário azul, pulando em plataformas marrons para coletar moedas douradas que giram. Ao coletar todas, uma mensagem de 'Você Venceu!' aparece na tela."
+*   **Próximos Passos (Missões Futuras):** O que você poderia adicionar depois?
+    *   *Exemplo:* "Adicionar inimigos, criar mais fases, implementar um sistema de vidas."
 
-**Próximos Passos (Missões Futuras):** O que você poderia adicionar depois?
-
-* Adicionar tilesets para dar personalidade para a fase;
-* Estruturar o mapa deifinitivo da fase no Tiled, passando-o para nossa fase posteriormente;
-* Desenvolver mecânicas para os minigames/puzzles que temos interesse em adicionar na fase;
-* Adicionar mais NPC's e/ou inimigos;
-* Adicionar itens e pistas;
-* Implementação dos conceitos de físicas apresentados em aula nos puzzles, documentos e corpo do game.
 ---
