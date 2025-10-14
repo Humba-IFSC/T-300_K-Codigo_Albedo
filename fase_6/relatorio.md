@@ -110,12 +110,12 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 ### 🔴 BACKLOG
 
 #### 📚 APRENDIZADO DO CONTEÚDO (Prioridade Máxima - Sprint 1-3)
-- [ ] **Estudo: Transmissão de Calor - Conceitos Básicos** (P0)
-- [ ] **Estudo: Irradiação Térmica e Ondas Eletromagnéticas** (P0)
-- [ ] **Estudo: Lei de Stefan-Boltzmann** (P0)
-- [ ] **Estudo: Corpo Negro e Emissividade** (P1)
-- [ ] **Estudo: Efeito Estufa e Albedo** (P1)
-- [ ] **Pesquisa: Torres de Transmissão e Amplificação** (P1)
+- [ x ] **Estudo: Transmissão de Calor - Conceitos Básicos** (P0)
+- [ x ] **Estudo: Irradiação Térmica e Ondas Eletromagnéticas** (P0)
+- [ x ] **Estudo: Lei de Stefan-Boltzmann** (P0)
+- [ x ] **Estudo: Corpo Negro e Emissividade** (P1)
+- [ x ] **Estudo: Efeito Estufa e Albedo** (P1)
+- [ x ] **Pesquisa: Torres de Transmissão e Amplificação** (P1)
 - [ ] **Quiz 1: Fundamentos de Irradiação** (P0)
 - [ ] **Workshop: Como criar enigmas educativos** (P1)
 - [ ] **Validação: Todos dominam o conteúdo mínimo** (P0)
@@ -186,10 +186,22 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - Priorizar conclusão antes de pegar novas tarefas
 - Atualizar status no Daily
 
+- [ ] Definir escopo detalhado da Fase 6 (P0)
+- [ ] Mapear todos os desafios/enigmas sobre irradiação (P0)
+- [ ] Documentar os 3 finais (Ruim/Neutro/Bom) (P0)
+- [ ] Criar roteiro narrativo completo da Torre (P0)
+- [ ] Definir mecânicas de gameplay da fase (P0)
+- [ ] GDD (Game Design Document) da Fase 6 (P1)
+- [ ] Fluxograma de decisões dos finais (P1)
+
 ---
 
 ### 🔵 EM REVISÃO
 *Aguardando validação do líder ou da equipe*
+
+- [ ] **Quiz 1: Fundamentos de Irradiação** (P0)
+- [ ] **Workshop: Como criar enigmas educativos** (P1)
+- [ ] **Validação: Todos dominam o conteúdo mínimo** (P0)
 
 **Critérios de Revisão:**
 - ✅ Funcionalidade completa
@@ -201,6 +213,13 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 
 ### ✅ CONCLUÍDO
 *Tarefas validadas e integradas*
+
+- [ x ] **Estudo: Transmissão de Calor - Conceitos Básicos** (P0)
+- [ x ] **Estudo: Irradiação Térmica e Ondas Eletromagnéticas** (P0)
+- [ x ] **Estudo: Lei de Stefan-Boltzmann** (P0)
+- [ x ] **Estudo: Corpo Negro e Emissividade** (P1)
+- [ x ] **Estudo: Efeito Estufa e Albedo** (P1)
+- [ x ] **Pesquisa: Torres de Transmissão e Amplificação** (P1)
 
 ---
 
