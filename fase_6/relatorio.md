@@ -8,7 +8,8 @@ Desenvolver a fase final do jogo "T-300 K: Código Albedo", focando na Torre Cel
 ## 📊 Visão Geral
 
 **Prazo de Entrega:** 30 de Novembro de 2025  
-**Duração:** 7 semanas (14/10 - 30/11)  
+**Data de Início:** 16 de Setembro de 2025  
+**Duração:** ~10,5 semanas (16/09 - 30/11)  
 **Metodologia:** Kanban + Daily Reports  
 **Foco Educacional:** Física Térmica - Irradiação e Transferência de Calor
 
@@ -16,7 +17,7 @@ Desenvolver a fase final do jogo "T-300 K: Código Albedo", focando na Torre Cel
 
 ## 🎓 Estratégia de Aprendizado do Conteúdo
 
-### Fase 1: Fundamentação Teórica (Sprint 1-2)
+### Fase 1: Fundamentação Teórica (Sprint 1-3)
 **Objetivo:** Toda a equipe deve dominar o conteúdo de irradiação térmica antes de desenvolver
 
 #### 📚 Conteúdos a Aprender:
@@ -108,7 +109,7 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 
 ### 🔴 BACKLOG
 
-#### 📚 APRENDIZADO DO CONTEÚDO (Prioridade Máxima)
+#### 📚 APRENDIZADO DO CONTEÚDO (Prioridade Máxima - Sprint 1-3)
 - [ ] **Estudo: Transmissão de Calor - Conceitos Básicos** (P0)
 - [ ] **Estudo: Irradiação Térmica e Ondas Eletromagnéticas** (P0)
 - [ ] **Estudo: Lei de Stefan-Boltzmann** (P0)
@@ -119,7 +120,7 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - [ ] **Workshop: Como criar enigmas educativos** (P1)
 - [ ] **Validação: Todos dominam o conteúdo mínimo** (P0)
 
-#### 📝 PLANEJAMENTO & DOCUMENTAÇÃO
+#### 📝 PLANEJAMENTO & DOCUMENTAÇÃO (Sprint 2-4)
 - [ ] Definir escopo detalhado da Fase 6 (P0)
 - [ ] Mapear todos os desafios/enigmas sobre irradiação (P0)
 - [ ] Documentar os 3 finais (Ruim/Neutro/Bom) (P0)
@@ -128,7 +129,7 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - [ ] GDD (Game Design Document) da Fase 6 (P1)
 - [ ] Fluxograma de decisões dos finais (P1)
 
-#### 🎨 DESIGN & ARTE
+#### 🎨 DESIGN & ARTE (Sprint 3-6)
 - [ ] Conceito visual da Torre Celeste (P0)
 - [ ] Design dos ambientes (exterior/interior) (P0)
 - [ ] Sprites/modelos dos componentes secretos (P1)
@@ -138,7 +139,7 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - [ ] Paleta de cores (frio vs. calor) (P2)
 - [ ] Animações de transição (P2)
 
-#### 💻 DESENVOLVIMENTO
+#### 💻 DESENVOLVIMENTO (Sprint 4-8)
 - [ ] Sistema de puzzles de irradiação térmica (P0)
 - [ ] Mecânica de coleta de componentes secretos (P0)
 - [ ] Sistema de decisões (escolha de finais) (P0)
@@ -149,7 +150,7 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - [ ] Salvar progresso do jogador (P1)
 - [ ] Integração com fases anteriores (P1)
 
-#### 🎓 CONTEÚDO EDUCACIONAL (Enigmas e Desafios)
+#### 🎓 CONTEÚDO EDUCACIONAL - Enigmas e Desafios (Sprint 3-7)
 - [ ] **Enigma 1:** Diferença entre condução/convecção/irradiação (P0)
 - [ ] **Enigma 2:** Ondas eletromagnéticas e frequência (P0)
 - [ ] **Enigma 3:** Aplicação da Lei de Stefan-Boltzmann (P0)
@@ -160,14 +161,14 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - [ ] Dicas progressivas para jogadores (P2)
 - [ ] Glossário in-game de termos técnicos (P2)
 
-#### 🔊 ÁUDIO
+#### 🔊 ÁUDIO (Sprint 6-8)
 - [ ] Música ambiente da Torre (P1)
 - [ ] Efeitos sonoros dos puzzles (P1)
 - [ ] Trilha sonora de cada final (P1)
 - [ ] Áudio final do Dr. Thorne (se houver) (P2)
 - [ ] Som de ambiente (vento, eletricidade) (P2)
 
-#### 🧪 TESTES & QUALIDADE
+#### 🧪 TESTES & QUALIDADE (Sprint 8-10)
 - [ ] Playtest interno - Fase 6 completa (P0)
 - [ ] Teste de dificuldade dos enigmas (P0)
 - [ ] Validação educacional (conteúdo correto?) (P0)
@@ -205,107 +206,170 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 
 ## 📅 Cronograma Detalhado
 
-### **Sprint 1 (14-20/10)** - Aprendizado & Planejamento
-**Foco:** Dominar o conteúdo antes de começar
-- 🎓 Estudar toda a base teórica de irradiação
-- 🎓 Quiz 1 de validação
-- 📝 Definir escopo e GDD
-- 📝 Mapear todos os enigmas
-- 🎨 Conceito visual inicial
+### **Sprint 1 (16-22/09)** - Kickoff & Fundamentos Teóricos I
+**Foco:** Iniciar o projeto e começar estudos base
+- 🎓 Estudar transmissão de calor (conceitos básicos)
+- 🎓 Estudar irradiação térmica e ondas eletromagnéticas
+- 📝 Definir escopo inicial do projeto
+- 📝 Estruturar cronograma detalhado
+- 🤝 Alinhar expectativas da equipe
 
 **Entregáveis:**
-- Toda equipe aprovada no Quiz 1 (70%+)
-- GDD completo
+- Cronograma aprovado
+- Primeiros estudos concluídos
+- Daily reports configurados
+
+---
+
+### **Sprint 2 (23-29/09)** - Fundamentos Teóricos II & Planejamento
+**Foco:** Continuar aprendizado e iniciar documentação
+- 🎓 Estudar Lei de Stefan-Boltzmann
+- 🎓 Estudar Corpo Negro e Emissividade
+- 🎓 Quiz 1 de validação
+- 📝 Criar GDD completo
+- 📝 Mapear todos os enigmas
+
+**Entregáveis:**
+- Equipe aprovada no Quiz 1 (70%+)
+- GDD documentado
 - Lista de enigmas mapeada
 
 ---
 
-### **Sprint 2 (21-27/10)** - Design & Protótipo Educacional
-**Foco:** Criar a estrutura dos desafios educativos
-- 🎓 Criar os 6 enigmas principais
-- 🎓 Validar conteúdo com professor/consultor
-- 🎨 Design de ambientes
-- 💻 Protótipo dos puzzles
+### **Sprint 3 (30/09-06/10)** - Aprofundamento & Design Conceitual
+**Foco:** Finalizar estudos e começar design
+- 🎓 Estudar Efeito Estufa e Albedo
+- 🎓 Pesquisar Torres de Transmissão
+- 🎓 Workshop de criação de enigmas
+- 🎨 Conceito visual da Torre Celeste
 - 📝 Roteiro narrativo completo
 
 **Entregáveis:**
-- 6 enigmas educativos prontos
-- Protótipo jogável dos puzzles
-- Design visual aprovado
+- Todos dominam o conteúdo (validação final)
+- Conceito visual aprovado
+- Roteiro narrativo completo
 
 ---
 
-### **Sprint 3 (28/10-03/11)** - Desenvolvimento Core
+### **Sprint 4 (07-13/10)** - Design & Protótipo Educacional
+**Foco:** Criar estrutura dos desafios educativos
+- 🎓 Criar os 6 enigmas principais
+- 🎓 Validar conteúdo com professor/consultor
+- 🎨 Design de ambientes (exterior/interior)
+- 💻 Protótipo básico dos puzzles
+- 📝 Fluxograma de decisões dos finais
+
+**Entregáveis:**
+- 6 enigmas educativos prontos
+- Protótipo inicial jogável
+- Design visual refinado
+
+---
+
+### **Sprint 5 (14-20/10)** - Desenvolvimento Core I
 **Foco:** Implementar mecânicas principais
 - 💻 Sistema de puzzles funcionando
-- 💻 Coleta de componentes
-- 💻 Sistema de decisões
-- 🎓 Integrar enigmas ao gameplay
+- 💻 Mecânica de coleta de componentes
+- 💻 Sistema de decisões base
+- 🎨 Interface dos puzzles
+- 🎓 Integrar enigmas 1-3 ao gameplay
 
 **Entregáveis:**
 - Torre navegável
-- Puzzles integrados
-- Sistema de componentes secretos funcionando
+- Primeiros puzzles integrados
+- Sistema de componentes funcionando
 
 ---
 
-### **Sprint 4 (04-10/11)** - Implementação de Finais
+### **Sprint 6 (21-27/10)** - Desenvolvimento Core II
+**Foco:** Expandir funcionalidades
+- 💻 Sistema de transmissão da máquina
+- 💻 Salvar/carregar progresso
+- 🎓 Integrar enigmas 4-6 ao gameplay
+- 🎨 Cutscenes iniciais
+- 🔊 Música ambiente da Torre
+
+**Entregáveis:**
+- Todos os puzzles integrados
+- Sistema de save funcionando
+- Ambiente sonoro básico
+
+---
+
+### **Sprint 7 (28/10-03/11)** - Implementação de Finais
 **Foco:** Desenvolver as três conclusões
 - 💻 Final Ruim completo
 - 💻 Final Neutro completo
 - 💻 Final Bom completo
-- 🎨 Cutscenes dos finais
-- 🔊 Trilhas sonoras
+- 🎨 Cutscenes dos 3 finais
+- 🔊 Trilhas sonoras dos finais
 
 **Entregáveis:**
 - 3 finais jogáveis
 - Cinematics implementadas
-- Áudio integrado
+- Áudio dos finais integrado
 
 ---
 
-### **Sprint 5 (11-17/11)** - Conteúdo & Polish
-**Foco:** Refinamento e conteúdo educacional
-- 🎓 Feedback educativo completo
+### **Sprint 8 (04-10/11)** - Integração & Conteúdo Educacional
+**Foco:** Refinamento educacional e integração
+- 🎓 Feedback educativo completo em todos puzzles
 - 🎓 Glossário in-game
-- 🎨 Arte finalizada
-- 🔊 Áudio implementado
 - 💻 Integração com fases anteriores
+- 🎨 Arte finalizada
+- 🔊 Efeitos sonoros completos
 
 **Entregáveis:**
-- Fase 6 visualmente completa
-- Todo conteúdo educativo integrado
-- Transições entre fases funcionando
+- Fase 6 integrada ao jogo completo
+- Todo conteúdo educativo refinado
+- Polimento visual/sonoro
 
 ---
 
-### **Sprint 6 (18-24/11)** - Testes & Ajustes
+### **Sprint 9 (11-17/11)** - Testes & Validação
 **Foco:** Garantir qualidade e aprendizado
-- 🧪 Playtest completo (equipe + externos)
-- 🧪 Validação educacional
-- 🧪 Teste de dificuldade
-- 🐛 Correção de bugs
-- ⚖️ Balanceamento
+- 🧪 Playtest completo (equipe)
+- 🧪 Playtest externo (público-alvo)
+- 🧪 Validação educacional com especialista
+- 🧪 Teste de dificuldade dos enigmas
+- 🐛 Correção de bugs identificados
 
 **Entregáveis:**
-- Lista de bugs corrigidos
 - Relatório de playtest
-- Validação de que o jogo ensina corretamente
+- Lista de bugs corrigidos
+- Validação educacional aprovada
+- Dificuldade balanceada
 
 ---
 
-### **Sprint 7 (25-30/11)** - Finalização & Entrega
-**Foco:** Polimento final e documentação
+### **Sprint 10 (18-24/11)** - Polimento & Ajustes Finais
+**Foco:** Refinamento final baseado em feedback
 - ✨ Polimento visual/sonoro
-- 📄 Documentação final
-- 📦 Build final
-- 🎓 Material de apoio para professores
+- 🐛 Correção de bugs restantes
+- ⚖️ Ajustes de balanceamento
+- 🎓 Refinar dicas e feedback in-game
+- 📄 Documentação inicial
+
+**Entregáveis:**
+- Jogo polido e estável
+- Todos os bugs corrigidos
+- Feedback aprimorado
+
+---
+
+### **Sprint 11 (25-30/11)** - Entrega Final
+**Foco:** Finalização e documentação
+- 📄 Documentação completa (jogador + educador)
+- 📦 Build final otimizado
 - 🎬 Trailer/apresentação
+- 🎓 Material de apoio para professores
+- ✅ Checklist final validado
 
 **Entregáveis:**
 - Jogo completo e funcional
-- Documentação para jogadores e educadores
-- Apresentação final preparada
+- Documentação final
+- Apresentação preparada
+- **ENTREGA: 30/11/2025**
 
 ---
 
@@ -334,11 +398,12 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 
 | Risco | Probabilidade | Impacto | Mitigação |
 |-------|---------------|---------|-----------|
-| Equipe não domina o conteúdo | Média | Alto | Sprint 1-2 focada em aprendizado + Quiz obrigatório |
-| Enigmas muito difíceis/fáceis | Alta | Médio | Playtest contínuo + ajuste de dificuldade |
+| Equipe não domina o conteúdo | Média | Alto | Sprint 1-3 focada em aprendizado + Quiz obrigatório |
+| Enigmas muito difíceis/fáceis | Alta | Médio | Playtest contínuo (Sprint 9) + ajuste de dificuldade |
 | Atraso no desenvolvimento | Média | Alto | Priorização clara (P0>P1>P2) + Daily para identificar bloqueios |
-| Bugs críticos no final | Média | Alto | Sprint 6 dedicada a testes + Buffer na Sprint 7 |
-| Falta de validação educacional | Baixa | Alto | Consultar professor/especialista em Sprint 2 e 6 |
+| Bugs críticos no final | Média | Alto | Sprint 9-10 dedicadas a testes + Buffer na Sprint 11 |
+| Falta de validação educacional | Baixa | Alto | Consultar professor/especialista em Sprint 4 e 9 |
+| Escopo muito grande | Alta | Alto | 10,5 semanas com buffer + priorização rigorosa |
 
 ---
 
@@ -372,6 +437,26 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 
 ---
 
+## 📊 Linha do Tempo Visual
+
+```
+16/09 ─────────────────────────────────────────────── 30/11
+  │                                                      │
+  ├─ Sprint 1-3: APRENDIZADO (3 semanas)
+  │   └─ Quiz de Validação
+  │
+  ├─ Sprint 4-6: DESENVOLVIMENTO CORE (3 semanas)
+  │   └─ Protótipos + Puzzles
+  │
+  ├─ Sprint 7-8: FINAIS & INTEGRAÇÃO (2 semanas)
+  │   └─ 3 Finais Implementados
+  │
+  └─ Sprint 9-11: TESTES & ENTREGA (2,5 semanas)
+      └─ Playtest + Polimento + ENTREGA
+```
+
+---
+
 ## ✅ Checklist Final (30/11)
 
 ### Técnico:
@@ -386,12 +471,13 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - [ ] Feedback educativo claro
 - [ ] Glossário completo
 - [ ] Material de apoio para professores
+- [ ] Taxa de resolução adequada (60-80%)
 
 ### Qualidade:
 - [ ] Playtest com público-alvo realizado
-- [ ] Taxa de resolução de enigmas adequada
 - [ ] Arte e áudio polidos
 - [ ] Performance otimizada
+- [ ] 0 bugs críticos
 
 ### Documentação:
 - [ ] README atualizado
@@ -408,9 +494,10 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 - Desbloquear impedimentos
 - Validar entregas
 - Comunicação com stakeholders
+- Garantir que estudos sejam concluídos
 
 **Todos os Membros:**
-- Participar dos estudos de conteúdo
+- Participar dos estudos de conteúdo (Sprint 1-3)
 - Preencher daily reports
 - Pegar tarefas do Kanban
 - Colaborar com a equipe
@@ -420,15 +507,18 @@ Não haverá divisão rígida por funções (programador, designer, etc.). Todos
 
 ## 🎊 Conclusão
 
-Este relatório estabelece uma metodologia clara e flexível para o desenvolvimento da Fase 6, equilibrando:
-- 📚 **Aprendizado profundo** do conteúdo educacional
-- 🎮 **Desenvolvimento técnico** de qualidade
+Este relatório estabelece uma metodologia clara e flexível para o desenvolvimento da Fase 6 em **10,5 semanas**, equilibrando:
+- 📚 **Aprendizado profundo** (3 semanas iniciais)
+- 🎮 **Desenvolvimento técnico** (5 semanas)
+- 🧪 **Testes rigorosos** (2,5 semanas)
 - 🤝 **Colaboração horizontal** sem silos
 - 📊 **Transparência** via dailys e kanban
-- ⏱️ **Entrega no prazo** com gestão de riscos
+- ⏱️ **Entrega no prazo** (30/11/2025)
 
 **Sucesso = Jogo divertido + Educacional + No prazo**
 
 ---
 
+**Data de Início:** 16/09/2025  
+**Data de Entrega:** 30/11/2025  
 *Última atualização: 14/10/2025*
