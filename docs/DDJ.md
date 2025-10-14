@@ -33,6 +33,6 @@ O circuito responsável pela iluminação do laboratório está congelado, com a
 
 No final colocamos todos os dígitos na ordem e ativamos o laboratório, nos dando acesso ao laboratório, além do computador que explica toda a questão do porque a *DeltaUmbra* estava trabalhando com o vírus.
 
-É aqui que o jogador descobre elementos essenciais sobre a história do jogo, como o envolvimento da DeltaUmbra com o Dr. Thorne, os métodos da solução do problema, a origem do vírus Kaloris, o seu funcionamento, etc.
+É aqui que o jogador descobre elementos essenciais sobre a história do jogo, como o envolvimento da DeltaUmbra com o Dr. Thorne, os métodos da solução do problema, a origem do vírus Kaloris, o seu funcionamento, etc. Além disso, essa fase serve como ponto de saída para as outras fases do jogo, usando o barco ***Borealis***.
 
 
