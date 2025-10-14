@@ -43,12 +43,33 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 *   **Estrutura de Pastas:** Como você organizará seus arquivos?
     *   *Exemplo:*
         ```
-        /projeto-jogo
-          - index.html
-          - main.js
-          /assets
-            - /images
-            - /sounds
+        /.vscode
+          - settings.json
+        /assets
+            /maps
+              - floresta.json
+              - map.json
+              - map_generated.json
+            /sounds
+              - Fala-rolando.mp3
+            /sprites
+              - Basic_Door_Pixel.png
+              - blackcrowbar.png
+              - character_1756996137551.png
+              - crowbar.png
+              - key.png
+              - npc.png
+              - player.png
+              - wooden_box1.png
+            /tilesets
+              - chest2.png
+              - props.png
+              - terrain.png
+              - tileset.png
+        /src
+           - LICENSE
+           - README.md
+           - INDEX.html
         ```
 *   **Configuração Inicial (Objeto `config` do Phaser):** Quais são as definições básicas do seu jogo?
     *   **Dimensões da Tela:** Largura (width) e Altura (height).
