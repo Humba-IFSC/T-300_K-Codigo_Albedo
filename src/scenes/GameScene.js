@@ -6,6 +6,7 @@ import { addItemToInventory, getInventory } from '../systems/items/itemUtils.js'
 import { useCrowbar } from '../systems/items/crowbar.js';
 import { createDoor, setupDoorInteraction } from '../systems/items/doorUtils.js';
 import { useKey } from '../systems/items/key.js';
+import { PushableObjectManager } from '../systems/items/PushableObject.js';
 
 export default class GameScene extends BaseScene {
     constructor() {
@@ -191,6 +192,29 @@ export default class GameScene extends BaseScene {
         });
         this.physics.add.collider(this.player, this.boxes);
 
+        // Sistema de objetos empurráveis estilo Zelda
+        this.pushableManager = new PushableObjectManager(this, this.player);
+        
+        // Criar alguns blocos empurráveis de exemplo
+        // Você pode adicionar mais objetos conforme necessário
+        const pushableBlock1 = this.pushableManager.addObject(450, 200, 'box', {
+            pushSpeed: 60,
+            pushDistance: 32,
+            onPushStart: (obj, direction) => {
+                console.log(`Empurrando bloco para ${direction}`);
+            },
+            onPushEnd: (obj, direction) => {
+                console.log(`Bloco parou em (${obj.sprite.x}, ${obj.sprite.y})`);
+            }
+        });
+        
+        // Adicionar colisão dos objetos empurráveis com paredes
+        if (walls) {
+            this.pushableManager.objects.forEach(obj => {
+                this.physics.add.collider(obj.sprite, walls);
+            });
+        }
+
         // Câmera
         const worldCam = this.cameras.main;
         worldCam.startFollow(this.player);
@@ -201,7 +225,9 @@ export default class GameScene extends BaseScene {
         // Gerenciador de câmera de UI
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
-    const worldObjects = [this.player, this.npc, this.chest, this.keyChest, this.teleportDoor, ...this.boxes.getChildren(), floor, walls].filter(Boolean);
+        // Incluir sprites dos objetos empurráveis na lista de objetos do mundo
+        const pushableSprites = this.pushableManager ? this.pushableManager.objects.map(obj => obj.sprite) : [];
+        const worldObjects = [this.player, this.npc, this.chest, this.keyChest, this.teleportDoor, ...this.boxes.getChildren(), ...pushableSprites, floor, walls].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
@@ -216,6 +242,11 @@ export default class GameScene extends BaseScene {
         if (this.dialogue?.active) return;
 
         this.coordProbe.update();
+        
+        // Atualizar sistema de objetos empurráveis
+        if (this.pushableManager) {
+            this.pushableManager.update();
+        }
 
         // Interação com NPC
         const distanceToNpc = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.npc.x, this.npc.y);
