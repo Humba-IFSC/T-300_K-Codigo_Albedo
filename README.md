@@ -153,11 +153,14 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 ### Checkpoint Final: Tesouro Encontrado! (Resultado Final)
 
-*(Qual é a aparência e a sensação do jogo finalizado, com base nos checkpoints acima?)*
+*   **Descrição da Experiência:** O jogador controla o personagem que explora uma antiga fábrica abandonada, coletando documentos que revelam mais sobre a história desse mundo enquanto resolve puzzles baseados nos principios da termodinâmica, para poder completar a construção da máquina de entropia, que sera necessária nas fases posteriores.
+  
+*   **Próximos Passos (Missões Futuras):** 
 
-*   **Descrição da Experiência:** Descreva como é jogar a versão finalizada do seu projeto.
-    *   *Exemplo:* "O jogador controla o personagem em um cenário azul, pulando em plataformas marrons para coletar moedas douradas que giram. Ao coletar todas, uma mensagem de 'Você Venceu!' aparece na tela."
-*   **Próximos Passos (Missões Futuras):** O que você poderia adicionar depois?
-    *   *Exemplo:* "Adicionar inimigos, criar mais fases, implementar um sistema de vidas."
+     - Adição de um sistema de inventário;
+ 
+     - Criação de um sistema de vida para o personagem principal;
+ 
+     - implementação de um sistema de combate.
 
 ---
