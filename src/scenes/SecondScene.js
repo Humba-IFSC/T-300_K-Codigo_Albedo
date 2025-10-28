@@ -1,7 +1,7 @@
 import { BaseScene } from './BaseScene.js';
 import { CoordProbe } from '../systems/debug/CoordProbe.js';
 import { UICameraManager } from '../systems/ui/UICameraManager.js';
-import { InteractionPrompt } from '../systems/ui/InteractionPrompt.js';
+import { InteractionIcon } from '../systems/ui/InteractionIcon.js';
 
 export default class SecondScene extends BaseScene {
     constructor() {
@@ -64,8 +64,9 @@ export default class SecondScene extends BaseScene {
         this.returnDoor = this.physics.add.sprite(64, 320, 'door').setImmovable(true);
         this.physics.add.overlap(this.player, this.returnDoor, this.handleDoorInteraction, null, this);
 
-        // UI de interação
-        this.doorPrompt = new InteractionPrompt(this, { suffix: ' para voltar' });
+        // UI de interação - Ícone sobre porta (bem menor)
+        this.doorIcon = new InteractionIcon(this, 'button_a', 0.1);
+        this.doorIcon.offsetY = -40;  // Mais próximo do objeto
 
         // Sistemas compartilhados
         this.createDialogueSystem();
@@ -84,7 +85,8 @@ export default class SecondScene extends BaseScene {
         // Gerenciador de câmera de UI
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
-        const worldObjects = [this.player, this.returnDoor, floor, propsLayer, casaLayer, frenteLayer].filter(Boolean);
+        // Incluir ícone de interação na lista de objetos do mundo
+        const worldObjects = [this.player, this.returnDoor, this.doorIcon.icon, floor, propsLayer, casaLayer, frenteLayer].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
@@ -103,13 +105,16 @@ export default class SecondScene extends BaseScene {
         // Interação com porta de retorno
         const distanceToDoor = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.returnDoor.x, this.returnDoor.y);
         if (distanceToDoor < 50) {
-            this.doorPrompt.show();
+            this.doorIcon.showAbove(this.returnDoor);
             if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                 this.handleDoorInteraction();
             }
         } else {
-            this.doorPrompt.hide();
+            this.doorIcon.hide();
         }
+        
+        // Atualizar posição do ícone
+        this.doorIcon.updatePosition();
     }
 
     handleDoorInteraction() {

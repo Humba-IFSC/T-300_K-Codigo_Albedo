@@ -56,6 +56,18 @@ export class DialogueSystem {
         this.active = true;
         this.box.setVisible(true);
         this.text.setVisible(true);
+        
+        // Esconder HUD e desabilitar controles virtuais
+        if (this.scene.hotbar) this.scene.hotbar.hide();
+        if (this.scene.virtualButtons) this.scene.virtualButtons.hide();
+        if (this.scene.virtualJoystick) this.scene.virtualJoystick.disable();
+        
+        // Adicionar listener de clique global para avançar diálogo
+        if (!this.clickHandler) {
+            this.clickHandler = () => this.next();
+            this.scene.input.on('pointerdown', this.clickHandler);
+        }
+        
         this.write(this.messages[this.index]);
     }
 
@@ -153,5 +165,16 @@ export class DialogueSystem {
         this.nextIcon.setVisible(false);
         this.active = false;
         if (this.sound.isPlaying) this.sound.stop();
+        
+        // Mostrar HUD e reabilitar controles virtuais
+        if (this.scene.hotbar) this.scene.hotbar.show();
+        if (this.scene.virtualButtons) this.scene.virtualButtons.show();
+        if (this.scene.virtualJoystick) this.scene.virtualJoystick.enable();
+        
+        // Remover listener de clique
+        if (this.clickHandler) {
+            this.scene.input.off('pointerdown', this.clickHandler);
+            this.clickHandler = null;
+        }
     }
 }

@@ -1,7 +1,7 @@
 import { BaseScene } from './BaseScene.js';
 import { CoordProbe } from '../systems/debug/CoordProbe.js';
 import { UICameraManager } from '../systems/ui/UICameraManager.js';
-import { InteractionPrompt } from '../systems/ui/InteractionPrompt.js';
+import { InteractionIcon } from '../systems/ui/InteractionIcon.js';
 import { addItemToInventory, getInventory } from '../systems/items/itemUtils.js';
 import { useCrowbar } from '../systems/items/crowbar.js';
 import { createDoor, setupDoorInteraction } from '../systems/items/doorUtils.js';
@@ -25,7 +25,7 @@ export default class GameScene extends BaseScene {
             this.hotbar.setItem(nextSlot !== -1 ? nextSlot : 1, 'key'); // 'key' corresponde ao nome do sprite key.png
             this.hotbar.showAnimated();
         }
-    this.chestPrompt.hide();
+    this.chestIcon.hide();
     }
 
     preload() {
@@ -122,17 +122,19 @@ export default class GameScene extends BaseScene {
     this.physics.add.collider(this.player, this.teleportDoor);
     // Não usa mais overlap para teleporte
 
-        // UI de interação
-        this.interactionPrompt = new InteractionPrompt(this, { suffix: ' para falar' });
-        this.boxPrompt = new InteractionPrompt(this, { suffix: ' para quebrar' });
-    this.chestPrompt = new InteractionPrompt(this, { prefix: 'Pressione ', keyLabel: '"ESPAÇO"', suffix: ' para abrir', fontSize: 26 });
-    this.keyChestPrompt = new InteractionPrompt(this, { prefix: 'Pressione ', keyLabel: '"ESPAÇO"', suffix: ' para abrir', fontSize: 26 });
-        this.doorPrompt = new InteractionPrompt(this, { suffix: ' para entrar' });
-        // Alinha todos os prompts na mesma altura
-    this.chestPrompt.container.y = this.interactionPrompt.container.y;
-    this.keyChestPrompt.container.y = this.interactionPrompt.container.y;
-    this.boxPrompt.container.y = this.interactionPrompt.container.y;
-    this.doorPrompt.container.y = this.interactionPrompt.container.y;
+        // UI de interação - Ícones sobre objetos (bem menores)
+        this.npcIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.chestIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.keyChestIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.doorIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.boxIcon = new InteractionIcon(this, 'button_a', 0.05);
+
+        // Alinha todos os ícones mais próximos dos objetos
+        this.chestIcon.offsetY = -40;
+        this.keyChestIcon.offsetY = -40;
+        this.npcIcon.offsetY = -40;  // NPC é mais alto, ajuste extra
+        this.doorIcon.offsetY = -40;
+        this.boxIcon.offsetY = -40;
 
         // Sistemas compartilhados
         this.createDialogueSystem();
@@ -158,7 +160,7 @@ export default class GameScene extends BaseScene {
     this.chestOpened = window._chestOpened || false;
     if (this.chestOpened) {
         this.chest.setFrame(1);
-        this.chestPrompt?.hide();
+        this.chestIcon?.hide();
     }
 
     // Baú da chave
@@ -218,16 +220,25 @@ export default class GameScene extends BaseScene {
         // Câmera
         const worldCam = this.cameras.main;
         worldCam.startFollow(this.player);
-        worldCam.setZoom(2.5);
+        worldCam.setZoom(1);
         if (this.map) worldCam.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         worldCam.roundPixels = true;
 
         // Gerenciador de câmera de UI
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
-        // Incluir sprites dos objetos empurráveis na lista de objetos do mundo
+        // Incluir sprites dos objetos empurráveis e ícones de interação na lista de objetos do mundo
         const pushableSprites = this.pushableManager ? this.pushableManager.objects.map(obj => obj.sprite) : [];
-        const worldObjects = [this.player, this.npc, this.chest, this.keyChest, this.teleportDoor, ...this.boxes.getChildren(), ...pushableSprites, floor, walls].filter(Boolean);
+        const pushableIcon = this.pushableManager ? this.pushableManager.grabIcon.icon : null;
+        const interactionIcons = [
+            this.npcIcon.icon,
+            this.chestIcon.icon,
+            this.keyChestIcon.icon,
+            this.doorIcon.icon,
+            this.boxIcon.icon,
+            pushableIcon
+        ];
+        const worldObjects = [this.player, this.npc, this.chest, this.keyChest, this.teleportDoor, ...this.boxes.getChildren(), ...pushableSprites, ...interactionIcons, floor, walls].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
@@ -248,9 +259,12 @@ export default class GameScene extends BaseScene {
             this.pushableManager.update();
         }
 
+        // RESETAR currentInteractable no INÍCIO do update
+        this.currentInteractable = null;
+
         // Interação com NPC
         const distanceToNpc = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.npc.x, this.npc.y);
-        let npcPromptVisible = false;
+        let npcIconVisible = false;
         if (distanceToNpc < 50) {
             const dx = this.npc.x - this.player.x;
             const dy = this.npc.y - this.player.y;
@@ -262,47 +276,50 @@ export default class GameScene extends BaseScene {
                 facingNpc = (dy > 0 && facing === 'down') || (dy < 0 && facing === 'up');
             }
             if (facingNpc) {
-                this.interactionPrompt.show();
-                npcPromptVisible = true;
+                this.npcIcon.showAbove(this.npc);
+                npcIconVisible = true;
+                this.currentInteractable = 'npc';
                 if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                     this.startNpcDialogue();
                 }
             }
         }
-        if (!npcPromptVisible) this.interactionPrompt.hide();
+        if (!npcIconVisible) this.npcIcon.hide();
 
         // Interação com Baú da crowbar
         if (!this.chestOpened) {
             const distChest = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.chest.x, this.chest.y);
             if (distChest < 40) {
-                this.chestPrompt.show();
+                this.chestIcon.showAbove(this.chest);
+                this.currentInteractable = 'chest';
                 if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                     this.openChest();
                 }
             } else {
-                this.chestPrompt.hide();
+                this.chestIcon.hide();
             }
         } else {
-            this.chestPrompt.hide();
+            this.chestIcon.hide();
         }
 
         // Interação com Baú da chave
         if (!this.keyChestOpened) {
             const distKeyChest = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.keyChest.x, this.keyChest.y);
             if (distKeyChest < 40) {
-                this.keyChestPrompt.show();
+                this.keyChestIcon.showAbove(this.keyChest);
+                this.currentInteractable = 'keyChest';
                 if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                     this.openKeyChest();
                 }
             } else {
-                this.keyChestPrompt.hide();
+                this.keyChestIcon.hide();
             }
         } else {
-            this.keyChestPrompt.hide();
+            this.keyChestIcon.hide();
         }
 
         // Interação com caixas: só se tiver crowbar e ela estiver selecionada
-        let boxPromptVisible = false;
+        let boxIconVisible = false;
         if (this.hasCrowbar && this.boxes) {
             const selectedItem = this.hotbar.getSelectedItem();
             if (selectedItem === 'crowbar') {
@@ -321,8 +338,10 @@ export default class GameScene extends BaseScene {
                     }
                 }
                 if (nearest && nearestDistSq < 50*50) {
-                    this.boxPrompt.show();
-                    boxPromptVisible = true;
+                    this.boxIcon.showAbove(nearest);
+                    boxIconVisible = true;
+                    this.currentInteractable = 'box';
+                    this.nearestBox = nearest;
                     if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                         useCrowbar(nearest);
                         // Salva caixa quebrada por posição
@@ -333,38 +352,108 @@ export default class GameScene extends BaseScene {
                 }
             }
         }
-        if (!boxPromptVisible) this.boxPrompt.hide();
+        if (!boxIconVisible) this.boxIcon.hide();
 
         // Interação com porta teleportadora (apenas com ESPAÇO e chave)
         const distanceToDoor = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.teleportDoor.x, this.teleportDoor.y);
         if (distanceToDoor < 50) {
+            this.currentInteractable = 'door';
             if (!this.teleportDoor.getData('unlocked')) {
-                this.doorPrompt.show();
+                this.doorIcon.showAbove(this.teleportDoor);
                 if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                     // Tenta usar chave
                     const inventory = getInventory();
                     if (useKey(this.teleportDoor, inventory)) {
-                        this.doorPrompt.hide();
+                        this.doorIcon.hide();
                         this.handleDoorTeleport();
                     } else {
-                        this.doorPrompt.hide();
+                        this.doorIcon.hide();
                         this.dialogue.show('Você precisa de uma chave para abrir esta porta!');
                     }
                 }
             } else {
-                this.doorPrompt.show();
+                this.doorIcon.showAbove(this.teleportDoor);
                 if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
                     this.handleDoorTeleport();
                 }
             }
         } else {
-            this.doorPrompt.hide();
+            this.doorIcon.hide();
         }
+        
+        // Atualizar posição dos ícones visíveis
+        this.npcIcon.updatePosition();
+        this.chestIcon.updatePosition();
+        this.keyChestIcon.updatePosition();
+        this.doorIcon.updatePosition();
+        this.boxIcon.updatePosition();
     }
 
     toggleCoordProbe(forceState) { this.coordProbe.toggle(forceState); }
     enableCoordProbe() { this.coordProbe.enable(); }
     disableCoordProbe() { this.coordProbe.disable(); }
+    
+    // Override dos métodos de BaseScene para interação com botões virtuais
+    handleInteraction() {
+        console.log('[GameScene] handleInteraction chamado, currentInteractable:', this.currentInteractable);
+        
+        // Se não há objeto interativo próximo, mostrar mensagem
+        if (!this.currentInteractable) {
+            console.log('[GameScene] Nenhum objeto interativo próximo');
+            // Não fazer nada se não há nada próximo
+            return;
+        }
+        
+        // Executar interação baseada no objeto mais próximo
+        if (this.currentInteractable === 'npc') {
+            console.log('[GameScene] Iniciando diálogo com NPC');
+            this.startNpcDialogue();
+        } else if (this.currentInteractable === 'chest') {
+            console.log('[GameScene] Abrindo baú');
+            this.openChest();
+        } else if (this.currentInteractable === 'keyChest') {
+            console.log('[GameScene] Abrindo baú da chave');
+            this.openKeyChest();
+        } else if (this.currentInteractable === 'box' && this.nearestBox) {
+            console.log('[GameScene] Quebrando caixa');
+            useCrowbar(this.nearestBox);
+            const key = `${this.nearestBox.x},${this.nearestBox.y}`;
+            window._brokenBoxes = window._brokenBoxes || [];
+            if (!window._brokenBoxes.includes(key)) window._brokenBoxes.push(key);
+        } else if (this.currentInteractable === 'door') {
+            console.log('[GameScene] Interagindo com porta');
+            if (!this.teleportDoor.getData('unlocked')) {
+                const inventory = getInventory();
+                if (useKey(this.teleportDoor, inventory)) {
+                    this.doorPrompt.hide();
+                    this.handleDoorTeleport();
+                } else {
+                    this.doorPrompt.hide();
+                    this.dialogue.show('Você precisa de uma chave para abrir esta porta!');
+                }
+            } else {
+                this.handleDoorTeleport();
+            }
+        } else {
+            console.log('[GameScene] Tipo de interação desconhecido:', this.currentInteractable);
+        }
+    }
+    
+    handleActionButton() {
+        // Ativar o botão de ação no pushableManager
+        console.log('[GameScene] Ativando botão de segurar objeto');
+        if (this.pushableManager) {
+            this.pushableManager.setVirtualActionButton(true);
+        }
+    }
+    
+    handleActionButtonRelease() {
+        // Desativar o botão de ação no pushableManager
+        console.log('[GameScene] Desativando botão de segurar objeto');
+        if (this.pushableManager) {
+            this.pushableManager.setVirtualActionButton(false);
+        }
+    }
 
     startNpcDialogue() {
     // Esconde hotbar (suprimindo sem destruir estado)
@@ -445,7 +534,7 @@ export default class GameScene extends BaseScene {
         
         this.chest.setFrame(1); // frame aberto
         this.chestOpened = true;
-        this.chestPrompt.hide();
+        this.chestIcon.hide();
         window._chestOpened = true;
 
         // Adiciona crowbar ao inventário global na ordem
@@ -475,7 +564,7 @@ export default class GameScene extends BaseScene {
             this.hotbar.setItem(nextSlot !== -1 ? nextSlot : 1, 'key');
             this.hotbar.showAnimated();
         }
-        this.chestPrompt.hide();
+        this.keyChestIcon.hide();
         this.dialogue.show('Você encontrou uma chave!');
     }
     playCrowbarPickupAnimation(onComplete) {

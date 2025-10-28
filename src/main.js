@@ -3,10 +3,15 @@ import SecondScene from './scenes/SecondScene.js';
 
 const config = {
     type: Phaser.AUTO,
-    width: 1000,
-    height: 800,
+    width: 800,
+    height: 450,
     pixelArt: true,            // evita borrões e gaps
     backgroundColor: '#000000',
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        parent: 'game-container'
+    },
     render: {
         pixelArt: true,
         antialias: false,
@@ -15,6 +20,13 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: { debug: false }
+    },
+    input: {
+        activePointers: 3,  // Suporta múltiplos toques simultâneos
+        touch: {
+            target: null,
+            capture: true
+        }
     },
     scene: [GameScene, SecondScene]
 };

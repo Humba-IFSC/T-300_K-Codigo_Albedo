@@ -1,6 +1,9 @@
 import { MovementController } from '../systems/input/MovementController.js';
 import { DialogueSystem } from '../systems/ui/DialogueSystem.js';
 import { Hotbar } from '../systems/ui/Hotbar.js';
+import { VirtualJoystick } from '../systems/ui/VirtualJoystick.js';
+import { VirtualButtons } from '../systems/ui/VirtualButtons.js';
+
 
 export class BaseScene extends Phaser.Scene {
     constructor(key) {
@@ -10,6 +13,22 @@ export class BaseScene extends Phaser.Scene {
     preload() {
         // Asset comum de áudio
         this.load.audio('textBlip', 'assets/sounds/Fala-rolando.mp3');
+        
+        // Assets dos botões virtuais
+        console.log('[BaseScene] Carregando assets dos botões...');
+        this.load.image('button_a', 'assets/sprites/button_xbox_digital_a_5.png');
+        this.load.image('button_b', 'assets/sprites/button_xbox_digital_b_4.png');
+        this.load.image('button_x', 'assets/sprites/button_xbox_digital_x_4.png');
+        
+        this.load.on('filecomplete-image-button_a', () => {
+            console.log('[BaseScene] Botão A carregado!');
+        });
+        this.load.on('filecomplete-image-button_b', () => {
+            console.log('[BaseScene] Botão B carregado!');
+        });
+        this.load.on('filecomplete-image-button_x', () => {
+            console.log('[BaseScene] Botão X carregado!');
+        });
     }
 
     createCommonPlayer(x = 100, y = 100) {
@@ -20,7 +39,15 @@ export class BaseScene extends Phaser.Scene {
     this.player.body.setSize(16, 12);
     this.player.body.setOffset(8, 20); // centraliza horizontalmente e posiciona nos pés
         this._createPlayerAnims();
-        this.movement = new MovementController(this, this.player);
+        
+        // Criar controles virtuais para mobile
+        this.createVirtualControls();
+        
+        // Criar controller de movimento com joystick
+        this.movement = new MovementController(this, this.player, { 
+            virtualJoystick: this.virtualJoystick 
+        });
+        
         return this.player;
     }
 
@@ -36,6 +63,100 @@ export class BaseScene extends Phaser.Scene {
     this.dialogue = new DialogueSystem(this);
     this._registerUIElement(this.dialogue.box, this.dialogue.text, this.dialogue.nextIcon);
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    }
+    
+    createVirtualControls() {
+        console.log('[BaseScene] Criando controles virtuais...');
+        
+        // Criar joystick virtual (canto inferior esquerdo)
+        const joystickX = 100;
+        const joystickY = this.scale.height - 100;
+        this.virtualJoystick = new VirtualJoystick(this, joystickX, joystickY);
+        console.log('[BaseScene] Joystick criado');
+        
+        // Criar botões virtuais (canto inferior direito)
+        this.virtualButtons = new VirtualButtons(this);
+        console.log('[BaseScene] Botões virtuais criados');
+        
+        // Configurar eventos dos botões
+        this.events.on('virtualbutton-down', (action) => {
+            this.onVirtualButtonDown(action);
+        });
+        
+        this.events.on('virtualbutton-up', (action) => {
+            this.onVirtualButtonUp(action);
+        });
+        
+        // Registrar elementos na UI
+        this._registerUIElement(...this.virtualJoystick.getElements());
+        this._registerUIElement(...this.virtualButtons.getElements());
+        console.log('[BaseScene] Elementos UI registrados');
+        
+        // Mostrar/esconder controles baseado no dispositivo
+        this.toggleVirtualControls();
+    }
+    
+    onVirtualButtonDown(action) {
+        console.log('[BaseScene] Botão virtual pressionado:', action);
+        console.log('[BaseScene] Diálogo ativo?', this.dialogue?.active);
+        console.log('[BaseScene] currentInteractable:', this.currentInteractable);
+        
+        if (action === 'interact') {
+            // Durante diálogo, avançar texto
+            if (this.dialogue?.active) {
+                console.log('[BaseScene] Avançando diálogo');
+                this.dialogue.next();
+            } else {
+                // Fora do diálogo, executar interação
+                console.log('[BaseScene] Executando handleInteraction');
+                this.handleInteraction();
+            }
+        } else if (action === 'run') {
+            // Ativar corrida
+            console.log('[BaseScene] Ativando corrida');
+            if (this.movement) {
+                this.movement.startRun();
+            }
+        } else if (action === 'action') {
+            // Ação extra - segurar objeto empurrável
+            console.log('[BaseScene] Botão de ação pressionado (segurar objeto)');
+            this.handleActionButton();
+        }
+    }
+    
+    onVirtualButtonUp(action) {
+        if (action === 'run') {
+            // Desativar corrida
+            if (this.movement) {
+                this.movement.stopRun();
+            }
+        } else if (action === 'action') {
+            // Soltar objeto empurrável
+            console.log('[BaseScene] Botão de ação solto (soltar objeto)');
+            this.handleActionButtonRelease();
+        }
+    }
+    
+    handleInteraction() {
+        // Override este método nas cenas filhas para implementar interações
+        console.log('Botão de interação pressionado');
+    }
+    
+    handleActionButton() {
+        // Override este método nas cenas filhas para ações extras
+        console.log('[BaseScene] Botão de ação pressionado');
+    }
+    
+    handleActionButtonRelease() {
+        // Override este método nas cenas filhas quando soltar o botão
+        console.log('[BaseScene] Botão de ação solto');
+    }
+    
+    toggleVirtualControls() {
+        // SEMPRE mostrar controles virtuais
+        console.log('[BaseScene] SEMPRE mostrando controles virtuais');
+        if (this.virtualJoystick) this.virtualJoystick.show();
+        if (this.virtualButtons) this.virtualButtons.show();
     }
 
     createHotbar() {

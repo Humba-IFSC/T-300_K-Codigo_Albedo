@@ -8,7 +8,7 @@
  * - Animação do jogador enquanto empurra
  */
 
-import { InteractionPrompt } from '../ui/InteractionPrompt.js';
+import { InteractionIcon } from '../ui/InteractionIcon.js';
 
 export class PushableObject {
     /**
@@ -265,16 +265,15 @@ export class PushableObjectManager {
         this.grabKeys.push(scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z));
         this.grabKeys.push(scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F));
         
+        // Estado do botão virtual de ação
+        this.virtualActionPressed = false;
+        
         // Objeto atualmente agarrado
         this.grabbedObject = null;
         
-        // Prompt de interação
-        this.grabPrompt = new InteractionPrompt(scene, {
-            prefix: 'Segure ',
-            keyLabel: '"Z ou F"',
-            suffix: ' para mover',
-            fontSize: 24
-        });
+        // Ícone de interação (bem menor)
+        this.grabIcon = new InteractionIcon(scene, 'button_x', 0.05);
+        this.grabIcon.offsetY = -40;  // Mais próximo do objeto
     }
     
     /**
@@ -294,8 +293,8 @@ export class PushableObjectManager {
      * Atualizar todos os objetos (chamar no update da scene)
      */
     update() {
-        // Verificar se alguma tecla de agarrar está pressionada
-        const isGrabKeyPressed = this.grabKeys.some(key => key.isDown);
+        // Verificar se alguma tecla de agarrar está pressionada OU botão virtual
+        const isGrabKeyPressed = this.grabKeys.some(key => key.isDown) || this.virtualActionPressed;
         
         // Se soltou a tecla, soltar o objeto
         if (!isGrabKeyPressed && this.grabbedObject) {
@@ -324,7 +323,7 @@ export class PushableObjectManager {
         if (!movement) return;
         
         const direction = movement.facing;
-        let nearObject = false;
+        let nearObject = null;
         
         // Verificar se está perto de algum objeto
         for (const obj of this.objects) {
@@ -345,17 +344,20 @@ export class PushableObjectManager {
             }
             
             if (facingObject) {
-                nearObject = true;
+                nearObject = obj.sprite;
                 break;
             }
         }
         
-        // Mostrar/esconder prompt
+        // Mostrar/esconder ícone
         if (nearObject) {
-            this.grabPrompt.show();
+            this.grabIcon.showAbove(nearObject);
         } else {
-            this.grabPrompt.hide();
+            this.grabIcon.hide();
         }
+        
+        // Atualizar posição do ícone
+        this.grabIcon.updatePosition();
     }
     
     /**
@@ -481,8 +483,8 @@ export class PushableObjectManager {
                 this.player.y += playerDy * 0.2;
             }
             
-            // Esconder prompt quando está agarrado
-            this.grabPrompt.hide();
+            // Esconder ícone quando está agarrado
+            this.grabIcon.hide();
             
             // Verificar se está se movendo
             const isMoving = Math.abs(this.player.body.velocity.x) > 10 || 
@@ -565,6 +567,14 @@ export class PushableObjectManager {
             this.objects.splice(index, 1);
             obj.destroy();
         }
+    }
+    
+    /**
+     * Define o estado do botão virtual de ação (para mobile)
+     * @param {boolean} pressed - se o botão está pressionado
+     */
+    setVirtualActionButton(pressed) {
+        this.virtualActionPressed = pressed;
     }
     
     /**

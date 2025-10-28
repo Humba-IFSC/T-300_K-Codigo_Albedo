@@ -293,5 +293,23 @@ export class Hotbar {
             }
         }
     }
+    
+    // Esconde instantaneamente (para diálogos)
+    hide() {
+        this.allObjects.forEach(obj => obj.setVisible(false));
+        this.itemSprites.forEach(sprite => {
+            if (sprite) sprite.setVisible(false);
+        });
+    }
+    
+    // Mostra instantaneamente (para diálogos)
+    show() {
+        if (!this.suppressed) {
+            this.allObjects.forEach(obj => obj.setVisible(true));
+            this.itemSprites.forEach(sprite => {
+                if (sprite) sprite.setVisible(true);
+            });
+        }
+    }
 }
 
