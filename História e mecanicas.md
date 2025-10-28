@@ -138,14 +138,19 @@ Em cima da mesa, há um diário onde esta escrito a seguinte mensagem:
 Às vezes ela pode ser a chave para nosso objetivo. Talvez ela seja a chave para estabilizar o reator. Infelizmente eu perdi meus equipamentos… 
 Se eu os tivesse eu poderia continuar minhas pesquisas.”*
 
+
 Os equipamentos são e estão localizados
 
-Calorímetro - localizado no canto da sala 4
-termômetro - localizado em um dos obstáculos na fase 3
-máquina a vapor - localizada no canto da sala 2, deve interagir para ela ser arrastada até o lugar certo
-paineis pintados de preto e branco - localizados em caixas do hall de entrada
 
-Ao encontrar equipamentos perdidos pela fábrica, é possível reproduzir o experimento de Campos Neto, revelando que:
+-Calorímetro - localizado no canto da sala 4;
+
+-termômetro - localizado em um dos obstáculos na fase 3;
+
+-máquina a vapor - localizada no canto da sala 2, deve interagir para ela ser arrastada até o lugar certo;
+
+-paineis pintados de preto e branco - localizados em caixas do hall de entrada;
+
+-Ao encontrar equipamentos perdidos pela fábrica, é possível reproduzir o experimento de Campos Neto, revelando que:
 
 ### ΔU = Q – τ  
  - ΔU > 0 → aumento da temperatura  
