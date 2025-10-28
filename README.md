@@ -7,7 +7,7 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 **Nome do Projeto (Fase do Jogo):** `[Máquina de Entropia]`
 
 ### **Autores/Desenvolvedores:** 
-- Gabriel de Sousa Conforto `Coordenador, roteiro, história, trama e narrativa
+- Gabriel de Sousa Conforto `Coordenador, roteiro, história, trama e narrativa`
 - Marcos Vinícius Faustino `Progamação`
 - Ariel da Silva Coutinho `Arte, som e progamação`
 - Gabriel Corrêa Abreu de Oliveira `Arte, som, testador e relator de bugs`
