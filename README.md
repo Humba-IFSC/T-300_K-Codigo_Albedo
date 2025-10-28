@@ -121,6 +121,8 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 - **CoordProbe**: Debug de coordenadas
 - **Item Systems**: Chaves, portas, pé de cabra e utilitários
 
+
+- **Link para o drive com mais assets e mapas da fase**: https://drive.google.com/drive/folders/1KrCJrPYa5vLtBjGWC55pIlO1effMIHvF?usp=sharing 
 ---
 
 ### Checkpoint 5: Construindo a Fase (Criação de Elementos)
