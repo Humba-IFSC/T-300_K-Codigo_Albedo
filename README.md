@@ -121,8 +121,6 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 - **CoordProbe**: Debug de coordenadas
 - **Item Systems**: Chaves, portas, pé de cabra e utilitários
 
-
-- **Link para o drive com mais assets e mapas da fase**: https://drive.google.com/drive/folders/1KrCJrPYa5vLtBjGWC55pIlO1effMIHvF?usp=sharing 
 ---
 
 ### Checkpoint 5: Construindo a Fase (Criação de Elementos)
@@ -133,7 +131,7 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 *   **Jogador (Player):**
     *   **Posição Inicial:**O jogador chega em um barco nas proximidades da fábrica.
     *   **Física:** O jogador poderá colidir com os limites do mapa e de objetos, mas não há gravidade sendo aplicada no jogo.
-    *   **Animações:** `left` (andando para esquerda), `turn` (parado), `right` (andando para direita).
+    *   **Animações:** `left` (andando para esquerda), `turn` (parado), `right` (andando para direita), `up` (andando para cima), `down` (andando para baixo),
 *   **Coletáveis:** Itens disponíveis para pegar nas salas da fase, tendo documentos e itens com mecânicas próprias.
 *   **Inimigos (Opcional):** Inimigo Ariel Papa-Capim
     *   **Comportamento:** Haverá um inimigo em uma das salas, que patrulha por um caminho predeterminado tendo um campo de visão, matando o jogador caso o veja.
@@ -145,12 +143,11 @@ Desenvolvimento do Jogo T-300 K: Código Albedo com a turna FSC060806 - 2025.2
 
 *(Inspirado em "Atualização do Jogo" e "Função de Coleta". Como o jogo reage e funciona a cada segundo?)*
 
-*   **Controles do Jogador (`update function`):**
-    *   **Esquerda:** Se a tecla de seta para a esquerda for pressionada, aplicar velocidade negativa em X de 150 e tocar a animação `left`.
-    *   **Direita:** Se a tecla de seta para a direita for pressionada, aplicar velocidade positiva em X de 150 e tocar a animação `right`.
+*   **Controles do Jogador (`update function`):** Controle joystick multidirecional e interação com botões virtuais.
+
 *   **Interações e Colisões:**
     *   **Jogador vs. limites:** O jogador deve colidir e não atravessar.
-    *   **Jogador vs. Moedas (`collectCoin function`):** Quando o jogador interagir com um item ou objeto, deverá pegá-lo
+    *   **Jogador vs. Itens coletáveis (`collectCoin function`):** Quando o jogador interagir com um item ou objeto, deverá pegá-lo
 ---
 
 ### Checkpoint Final: Tesouro Encontrado! (Resultado Final)
