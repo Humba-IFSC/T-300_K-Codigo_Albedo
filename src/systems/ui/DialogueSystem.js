@@ -57,6 +57,14 @@ export class DialogueSystem {
         this.box.setVisible(true);
         this.text.setVisible(true);
         
+        // Guardar estado da hotbar se estava aberta manualmente
+        this.wasHotbarOpen = this.scene.hotbar?.isOpen || false;
+        
+        // Fechar hotbar se estiver aberta
+        if (this.scene.hotbar?.isOpen) {
+            this.scene.hotbar.closeManually();
+        }
+        
         // Esconder HUD e desabilitar controles virtuais
         if (this.scene.hotbar) this.scene.hotbar.hide();
         if (this.scene.virtualButtons) this.scene.virtualButtons.hide();
@@ -170,6 +178,11 @@ export class DialogueSystem {
         if (this.scene.hotbar) this.scene.hotbar.show();
         if (this.scene.virtualButtons) this.scene.virtualButtons.show();
         if (this.scene.virtualJoystick) this.scene.virtualJoystick.enable();
+        
+        // Reabrir hotbar se estava aberta antes do diálogo
+        if (this.wasHotbarOpen && this.scene.hotbar) {
+            this.scene.hotbar.openManually();
+        }
         
         // Remover listener de clique
         if (this.clickHandler) {

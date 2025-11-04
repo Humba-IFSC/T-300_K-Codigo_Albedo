@@ -65,18 +65,19 @@ export class VirtualJoystick {
         // Não responde se estiver desabilitado
         if (this.disabled) return;
         
-        // Só ativa o joystick se tocar na metade esquerda da tela
-        // E se não for em um botão interativo
-        if (pointer.x < this.scene.scale.width / 2) {
-            console.log('[VirtualJoystick] Pointer down em', pointer.x, pointer.y);
+        // Verificar se o toque está perto do joystick (raio de ativação)
+        const activationRadius = 150; // Área maior para facilitar o uso
+        const dx = pointer.x - this.x;
+        const dy = pointer.y - this.y;
+        const distToJoystick = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distToJoystick < activationRadius) {
+            console.log('[VirtualJoystick] Pointer down no joystick');
             this.isDragging = true;
             this.pointer = pointer;
             
-            // Posicionar joystick onde tocou
-            this.x = pointer.x;
-            this.y = pointer.y;
-            this.base.setPosition(this.x, this.y);
-            this.stick.setPosition(this.x, this.y);
+            // JOYSTICK FICA FIXO - não move mais!
+            // this.x e this.y permanecem inalterados
             
             // GARANTIR que está visível
             this.base.setVisible(true);

@@ -11,6 +11,7 @@ export class Hotbar {
         this.suppressed = false;
         this.hideTimer = null;
         this.animating = false;
+        this.isOpen = false; // Controla se está aberta manualmente
 
         // Configuração dos slots
         const slotSize = 80;
@@ -30,7 +31,16 @@ export class Hotbar {
                 .setStrokeStyle(5, 0xffffff)
                 .setOrigin(0, 0)
                 .setScrollFactor(0)
-                .setDepth(1000);
+                .setDepth(15000); // Aumentado para ficar acima dos botões virtuais (10000)
+            
+            // Tornar slots clicáveis
+            slot.setInteractive();
+            slot.on('pointerdown', () => {
+                if (!this.suppressed && !this.scene.dialogue?.active) {
+                    this.select(i);
+                }
+            });
+            
             this.slots.push(slot);
             this.itemSprites.push(null); // Inicializa array de sprites
         }
@@ -42,9 +52,48 @@ export class Hotbar {
         ).setStrokeStyle(7, 0xffff88)
           .setOrigin(0, 0)
           .setScrollFactor(0)
-          .setDepth(1001);
+          .setDepth(15001); // Aumentado para ficar acima dos slots
 
-        // Todos os objetos da hotbar
+        // Criar área clicável INVISÍVEL apenas no CENTRO da parte inferior
+        // Evita overlap com joystick (esquerda) e botões (direita)
+        const clickableWidth = scene.scale.width * 0.4; // 40% da largura da tela (centro)
+        const clickableHeight = 60; // Altura da área clicável
+        const clickableY = scene.scale.height - clickableHeight / 2;
+        
+        this.clickableArea = scene.add.rectangle(
+            scene.scale.width / 2,  // Centralizado
+            clickableY, 
+            clickableWidth,  // Apenas 40% da largura (meio da tela)
+            clickableHeight, 
+            0x000000, 
+            0 // Completamente transparente
+        );
+        this.clickableArea.setScrollFactor(0).setDepth(15002);
+        this.clickableArea.setInteractive();
+        this.clickableArea.on('pointerdown', () => {
+            console.log('[Hotbar] Área central inferior clicada!');
+            this.toggleOpen();
+        });
+        
+        // Guardar posição inicial da área para animações
+        this.clickableAreaInitialY = clickableY;
+        
+        // Criar apenas a SETA (sem círculo de fundo)
+        const toggleButtonY = scene.scale.height - 30;
+        
+        this.toggleArrow = scene.add.text(scene.scale.width / 2, toggleButtonY, '▲', {
+            fontSize: '28px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(0.5);
+        this.toggleArrow.setScrollFactor(0).setDepth(15003); // Acima da área clicável
+        
+        // Guardar posição inicial da seta para animações
+        this.toggleArrowInitialY = toggleButtonY;
+        
+        // Todos os objetos da hotbar (sem incluir o toggle button)
         this.allObjects = [...this.slots, this.highlight];
         this.initialYs = this.allObjects.map(o => o.y);
 
@@ -59,7 +108,9 @@ export class Hotbar {
                 const n = parseInt(e.code.replace('Digit', ''));
                 if (n >= 1 && n <= slotCount) {
                     if (this.suppressed) return;
-                    this.showAnimated();
+                    if (!this.isOpen) {
+                        this.showAnimated();
+                    }
                     this.select(n - 1);
                 }
             }
@@ -68,9 +119,107 @@ export class Hotbar {
         if (!this.hidden) this._registerInteraction();
     }
 
+    /**
+     * Alterna entre aberto e fechado manualmente
+     */
+    toggleOpen() {
+        // Não permitir abrir durante diálogos
+        if (this.scene.dialogue?.active) {
+            console.log('[Hotbar] Não é possível abrir durante diálogo');
+            return;
+        }
+        
+        if (this.suppressed) return;
+        
+        if (this.isOpen) {
+            this.closeManually();
+        } else {
+            this.openManually();
+        }
+    }
+
+    /**
+     * Abre a hotbar manualmente e esconde controles
+     */
+    openManually() {
+        if (this.isOpen || this.suppressed || this.scene.dialogue?.active) return;
+        
+        console.log('[Hotbar] Abrindo manualmente');
+        this.isOpen = true;
+        
+        // Cancela timer de auto-hide
+        if (this.hideTimer) this.hideTimer.remove(false);
+        
+        // Esconde controles móveis
+        if (this.scene.mobileControls) {
+            this.scene.mobileControls.hide();
+        }
+        
+        // Mostra hotbar
+        this.showAnimated();
+        
+        // Atualiza seta
+        this.toggleArrow.setText('▼');
+        
+        // Anima seta para subir junto com a hotbar
+        const targetY = this.baseY - 60; // Fica acima da hotbar
+        this.scene.tweens.add({
+            targets: this.toggleArrow,
+            y: targetY,
+            duration: 320,
+            ease: 'Sine.easeOut'
+        });
+        
+        // Anima área clicável para subir junto
+        const areaTargetY = targetY - 30; // Centralizada na seta
+        this.scene.tweens.add({
+            targets: this.clickableArea,
+            y: areaTargetY,
+            duration: 320,
+            ease: 'Sine.easeOut'
+        });
+    }
+
+    /**
+     * Fecha a hotbar manualmente e mostra controles
+     */
+    closeManually() {
+        if (!this.isOpen) return;
+        
+        console.log('[Hotbar] Fechando manualmente');
+        this.isOpen = false;
+        
+        // Mostra controles móveis
+        if (this.scene.mobileControls) {
+            this.scene.mobileControls.show();
+        }
+        
+        // Esconde hotbar
+        this.hideAnimated();
+        
+        // Atualiza seta
+        this.toggleArrow.setText('▲');
+        
+        // Anima seta para voltar à posição original
+        this.scene.tweens.add({
+            targets: this.toggleArrow,
+            y: this.toggleArrowInitialY,
+            duration: 350,
+            ease: 'Sine.easeIn'
+        });
+        
+        // Anima área clicável para voltar
+        this.scene.tweens.add({
+            targets: this.clickableArea,
+            y: this.clickableAreaInitialY,
+            duration: 350,
+            ease: 'Sine.easeIn'
+        });
+    }
+
     _registerInteraction() {
         if (this.hideTimer) this.hideTimer.remove(false);
-        if (this.suppressed) return;
+        if (this.suppressed || this.isOpen) return; // Não auto-esconder se aberta manualmente
         this.hideTimer = this.scene.time.delayedCall(this.inactivityMs, () => this.hideAnimated());
     }
 
@@ -100,7 +249,9 @@ export class Hotbar {
                 onComplete: () => {
                     if (i === this.allObjects.length - 1) {
                         this.animating = false;
-                        this._registerInteraction();
+                        if (!this.isOpen) {
+                            this._registerInteraction();
+                        }
                         console.log(`[Hotbar] Animação de exibição completa`);
                     }
                 }
@@ -123,7 +274,7 @@ export class Hotbar {
     }
 
     hideAnimated() {
-        if (this.hidden || this.suppressed || this.animating) return;
+        if (this.hidden || this.suppressed || this.animating || this.isOpen) return; // Não esconder se aberta manualmente
         this.hidden = true;
         this.animating = true;
         
@@ -174,6 +325,9 @@ export class Hotbar {
         this.itemSprites.forEach(sprite => {
             if (sprite) { sprite.setVisible(false); sprite.active = false; }
         });
+        // Esconder seta e área clicável
+        this.toggleArrow.setVisible(false);
+        this.clickableArea.setVisible(false);
     }
 
     unsuppress(show = true) {
@@ -195,7 +349,10 @@ export class Hotbar {
             }
         });
         this.hidden = !show;
-        if (show) this._registerInteraction();
+        // Mostrar seta e área clicável
+        this.toggleArrow.setVisible(true);
+        this.clickableArea.setVisible(true);
+        if (show && !this.isOpen) this._registerInteraction();
     }
 
     // Método principal para adicionar itens
@@ -226,7 +383,7 @@ export class Hotbar {
             // Usar blackcrowbar.png ao invés de placeholder
             sprite = this.scene.add.image(centerX, centerY, 'blackcrowbar')
                 .setScrollFactor(0)
-                .setDepth(2000)
+                .setDepth(15100) // Acima da hotbar para ficar visível
                 .setVisible(true);
             
             // Escala para caber no slot
@@ -241,7 +398,7 @@ export class Hotbar {
             if (this.scene.textures.exists(textureKey)) {
                 sprite = this.scene.add.image(centerX, centerY, textureKey)
                     .setScrollFactor(0)
-                    .setDepth(2000)
+                    .setDepth(15100) // Acima da hotbar para ficar visível
                     .setVisible(true);
                 
                 // Escala para caber no slot
@@ -256,7 +413,7 @@ export class Hotbar {
                 sprite = this.scene.add.rectangle(centerX, centerY, 40, 40, 0x0000ff)
                     .setStrokeStyle(3, 0xffffff)
                     .setScrollFactor(0)
-                    .setDepth(2000)
+                    .setDepth(15100) // Acima da hotbar para ficar visível
                     .setVisible(true);
                 console.log(`[Hotbar] ✓ Placeholder azul criado para ${textureKey}`);
             }
@@ -300,6 +457,8 @@ export class Hotbar {
         this.itemSprites.forEach(sprite => {
             if (sprite) sprite.setVisible(false);
         });
+        this.toggleArrow.setVisible(false);
+        this.clickableArea.setVisible(false);
     }
     
     // Mostra instantaneamente (para diálogos)
@@ -309,6 +468,8 @@ export class Hotbar {
             this.itemSprites.forEach(sprite => {
                 if (sprite) sprite.setVisible(true);
             });
+            this.toggleArrow.setVisible(true);
+            this.clickableArea.setVisible(true);
         }
     }
 }

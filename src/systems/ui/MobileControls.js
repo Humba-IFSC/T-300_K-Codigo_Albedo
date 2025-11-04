@@ -241,8 +241,11 @@ class VirtualJoystick {
         this.isDragging = false;
         this.pointer = null;
         this.disabled = false;
-        this.baseX = 0;
-        this.baseY = 0;
+        
+        // Posição fixa do joystick (canto inferior esquerdo)
+        const margin = 100;
+        this.baseX = margin;
+        this.baseY = scene.scale.height - margin;
         
         // Criar elementos visuais
         this._createVisuals();
@@ -250,21 +253,21 @@ class VirtualJoystick {
         // Configurar interação
         this._setupInteraction();
         
-        // Inicialmente visível mas transparente
+        // Inicialmente visível
         this.show();
     }
     
     _createVisuals() {
         const { baseRadius, stickRadius, alpha } = this.config;
         
-        // Base do joystick
-        this.base = this.scene.add.circle(0, 0, baseRadius, 0x333333, alpha);
+        // Base do joystick - posição fixa
+        this.base = this.scene.add.circle(this.baseX, this.baseY, baseRadius, 0x333333, alpha);
         this.base.setStrokeStyle(2, 0xffffff, alpha);
         this.base.setScrollFactor(0);
         this.base.setDepth(1000);
         
-        // Stick do joystick
-        this.stick = this.scene.add.circle(0, 0, stickRadius, 0x666666, alpha + 0.2);
+        // Stick do joystick - começa na mesma posição da base
+        this.stick = this.scene.add.circle(this.baseX, this.baseY, stickRadius, 0x666666, alpha + 0.2);
         this.stick.setStrokeStyle(2, 0xffffff, alpha + 0.2);
         this.stick.setScrollFactor(0);
         this.stick.setDepth(1001);
@@ -279,20 +282,20 @@ class VirtualJoystick {
     _onPointerDown(pointer) {
         if (this.disabled) return;
         
-        // Ativa apenas na metade esquerda da tela
-        if (pointer.x < this.scene.scale.width / 2) {
+        // Verifica se o toque está perto do joystick (raio de ativação maior)
+        const activationRadius = 150; // Área maior para facilitar o uso
+        const dx = pointer.x - this.baseX;
+        const dy = pointer.y - this.baseY;
+        const distToJoystick = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distToJoystick < activationRadius) {
             this.isDragging = true;
             this.pointer = pointer;
             
-            // Posiciona o joystick onde foi tocado
-            this.baseX = pointer.x;
-            this.baseY = pointer.y;
-            this.base.setPosition(this.baseX, this.baseY);
-            this.stick.setPosition(this.baseX, this.baseY);
+            // Joystick fica sempre na posição fixa
+            // Não altera baseX e baseY
             
-            // Torna visível e mais opaco
-            this.base.setVisible(true);
-            this.stick.setVisible(true);
+            // Torna mais opaco quando ativo
             this.base.setAlpha(0.8);
             this.stick.setAlpha(1);
             
@@ -345,6 +348,7 @@ class VirtualJoystick {
         this.direction.y = 0;
         this.distance = 0;
         this.angle = 0;
+        // Stick volta para o centro da base (posição fixa)
         this.stick.setPosition(this.baseX, this.baseY);
     }
     
