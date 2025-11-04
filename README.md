@@ -1,5 +1,8 @@
 # 📖 História do Jogo
 
+## Atualização de Branch
+- [Procedimento](/docs/procedimento_branch.md)
+
 ## Modelos de DDJ:
 - [Template do DDJ](/docs/DDJ.md)
 - [Regras para o DDJ](/docs/regras.md)
