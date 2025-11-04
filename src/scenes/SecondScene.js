@@ -32,7 +32,7 @@ export default class SecondScene extends BaseScene {
         let floor = null;
         if (map.getLayerIndex('chao') !== -1) {
             floor = map.createLayer('chao', terrainTiles, 0, 0);
-            floor.setDepth(0); // Garante que fique abaixo dos objetos
+            floor.setDepth(1); // Garante que fique abaixo dos objetos
         }
         // Objetos (árvores, pedras, etc) - apenas esta camada tem colisão
         let propsLayer = null;

@@ -216,6 +216,75 @@ export default class GameScene extends BaseScene {
                 this.physics.add.collider(obj.sprite, walls);
             });
         }
+        
+        // Adicionar colisão dos objetos empurráveis com caixas quebráveis
+        if (this.boxes) {
+            this.pushableManager.objects.forEach(obj => {
+                this.physics.add.collider(obj.sprite, this.boxes, (pushableSprite, boxSprite) => {
+                    // Quando colidir, parar o movimento do objeto empurrável
+                    if (obj.isPushing) {
+                        console.log('[GameScene] Caixa empurrável colidiu com caixa quebrável');
+                        obj.sprite.setVelocity(0);
+                        obj.isPushing = false;
+                        obj.pusher = null;
+                        obj.pushDirection = null;
+                    }
+                });
+            });
+        }
+        
+        // Adicionar colisão dos objetos empurráveis com baús
+        this.pushableManager.objects.forEach(obj => {
+            // Colisão com baú da crowbar
+            if (this.chest) {
+                this.physics.add.collider(obj.sprite, this.chest, () => {
+                    if (obj.isPushing) {
+                        console.log('[GameScene] Caixa empurrável colidiu com baú');
+                        obj.sprite.setVelocity(0);
+                        obj.isPushing = false;
+                        obj.pusher = null;
+                        obj.pushDirection = null;
+                    }
+                });
+            }
+            
+            // Colisão com baú da chave
+            if (this.keyChest) {
+                this.physics.add.collider(obj.sprite, this.keyChest, () => {
+                    if (obj.isPushing) {
+                        console.log('[GameScene] Caixa empurrável colidiu com baú da chave');
+                        obj.sprite.setVelocity(0);
+                        obj.isPushing = false;
+                        obj.pusher = null;
+                        obj.pushDirection = null;
+                    }
+                });
+            }
+        });
+        
+        // Adicionar colisão entre objetos empurráveis (para não se atravessarem)
+        for (let i = 0; i < this.pushableManager.objects.length; i++) {
+            for (let j = i + 1; j < this.pushableManager.objects.length; j++) {
+                const obj1 = this.pushableManager.objects[i];
+                const obj2 = this.pushableManager.objects[j];
+                this.physics.add.collider(obj1.sprite, obj2.sprite, () => {
+                    // Parar ambos os objetos se estiverem se empurrando
+                    if (obj1.isPushing) {
+                        console.log('[GameScene] Caixa empurrável colidiu com outra caixa empurrável');
+                        obj1.sprite.setVelocity(0);
+                        obj1.isPushing = false;
+                        obj1.pusher = null;
+                        obj1.pushDirection = null;
+                    }
+                    if (obj2.isPushing) {
+                        obj2.sprite.setVelocity(0);
+                        obj2.isPushing = false;
+                        obj2.pusher = null;
+                        obj2.pushDirection = null;
+                    }
+                });
+            }
+        }
 
         // Câmera
         const worldCam = this.cameras.main;
@@ -440,19 +509,24 @@ export default class GameScene extends BaseScene {
     }
     
     handleActionButton() {
-        // Ativar o botão de ação no pushableManager
-        console.log('[GameScene] Ativando botão de segurar objeto');
+        // Simula um press do botão (toggle) - ativa e desativa rapidamente
+        console.log('[GameScene] Toggle do botão de segurar objeto');
         if (this.pushableManager) {
+            // Ativa momentaneamente para simular um "press"
             this.pushableManager.setVirtualActionButton(true);
+            // Agenda desativação no próximo frame para simular release
+            this.time.delayedCall(50, () => {
+                if (this.pushableManager) {
+                    this.pushableManager.setVirtualActionButton(false);
+                }
+            });
         }
     }
     
     handleActionButtonRelease() {
-        // Desativar o botão de ação no pushableManager
-        console.log('[GameScene] Desativando botão de segurar objeto');
-        if (this.pushableManager) {
-            this.pushableManager.setVirtualActionButton(false);
-        }
+        // Com toggle, não precisa fazer nada no release
+        // O toggle já foi processado no handleActionButton
+        console.log('[GameScene] Release do botão (ignorado com toggle)');
     }
 
     startNpcDialogue() {

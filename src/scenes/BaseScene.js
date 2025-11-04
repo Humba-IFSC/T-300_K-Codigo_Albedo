@@ -118,8 +118,8 @@ export class BaseScene extends Phaser.Scene {
                 this.movement.startRun();
             }
         } else if (action === 'action') {
-            // Ação extra - segurar objeto empurrável
-            console.log('[BaseScene] Botão de ação pressionado (segurar objeto)');
+            // Toggle do botão de ação (agarrar/soltar objeto empurrável)
+            console.log('[BaseScene] Botão de ação pressionado (toggle)');
             this.handleActionButton();
         }
     }
@@ -131,8 +131,9 @@ export class BaseScene extends Phaser.Scene {
                 this.movement.stopRun();
             }
         } else if (action === 'action') {
-            // Soltar objeto empurrável
-            console.log('[BaseScene] Botão de ação solto (soltar objeto)');
+            // Com toggle, não precisa fazer nada no release
+            // O toggle é gerenciado no down
+            console.log('[BaseScene] Botão de ação solto (ignorado com toggle)');
             this.handleActionButtonRelease();
         }
     }

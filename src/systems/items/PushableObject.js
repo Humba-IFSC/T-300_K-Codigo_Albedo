@@ -259,14 +259,18 @@ export class PushableObjectManager {
         this.player = player;
         this.objects = [];
         this.grabKeys = []; // Teclas para agarrar/empurrar
-        this.autoPush = false; // Desativado - agora precisa segurar tecla
+        this.autoPush = false; // Desativado - agora usa toggle
         
         // Teclas de agarrar (Z e F como pedido)
         this.grabKeys.push(scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z));
         this.grabKeys.push(scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F));
         
-        // Estado do botão virtual de ação
+        // Estado do botão virtual de ação (toggle)
         this.virtualActionPressed = false;
+        this.virtualActionPressedLastFrame = false;
+        
+        // Estado toggle das teclas
+        this.grabKeysPressedLastFrame = false;
         
         // Objeto atualmente agarrado
         this.grabbedObject = null;
@@ -293,23 +297,35 @@ export class PushableObjectManager {
      * Atualizar todos os objetos (chamar no update da scene)
      */
     update() {
-        // Verificar se alguma tecla de agarrar está pressionada OU botão virtual
+        // Detectar se a tecla/botão foi PRESSIONADA neste frame (toggle)
         const isGrabKeyPressed = this.grabKeys.some(key => key.isDown) || this.virtualActionPressed;
+        const justPressed = isGrabKeyPressed && !this.grabKeysPressedLastFrame && !this.virtualActionPressedLastFrame;
         
-        // Se soltou a tecla, soltar o objeto
-        if (!isGrabKeyPressed && this.grabbedObject) {
-            this.grabbedObject.release();
-            this.grabbedObject = null;
+        // Atualizar estado do frame anterior
+        this.grabKeysPressedLastFrame = this.grabKeys.some(key => key.isDown);
+        this.virtualActionPressedLastFrame = this.virtualActionPressed;
+        
+        // Se pressionou (toggle), alternar entre agarrar e soltar
+        if (justPressed) {
+            if (this.grabbedObject) {
+                // Já está agarrando algo, soltar
+                this.grabbedObject.release();
+                this.grabbedObject = null;
+                console.log('[PushableObjectManager] Objeto solto (toggle)');
+            } else {
+                // Não está agarrando nada, tentar agarrar
+                this._tryGrabNearestObject();
+            }
         }
         
         // Atualizar cada objeto
         this.objects.forEach(obj => obj.update());
         
-        // Se está segurando a tecla, tentar agarrar/mover objeto
-        if (isGrabKeyPressed) {
+        // Se está agarrando algo, processar movimento
+        if (this.grabbedObject) {
             this._handleGrabbing();
         } else {
-            // Não está segurando, mostrar prompt se estiver perto
+            // Não está agarrando, mostrar prompt se estiver perto
             this._checkShowPrompt();
         }
     }
@@ -410,6 +426,46 @@ export class PushableObjectManager {
     }
     
     /**
+     * Tenta agarrar o objeto mais próximo que está de frente para o player
+     * @private
+     */
+    _tryGrabNearestObject() {
+        const movement = this.scene.movement;
+        if (!movement) return;
+        
+        const direction = movement.facing;
+        
+        // Tentar agarrar objeto próximo
+        for (const obj of this.objects) {
+            if (obj.isGrabbed) continue;
+            
+            const dx = obj.sprite.x - this.player.x;
+            const dy = obj.sprite.y - this.player.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Precisa estar perto (40px)
+            if (distance > 40) continue;
+            
+            // Verificar se está de frente para o objeto
+            let facingObject = false;
+            
+            if (Math.abs(dx) > Math.abs(dy)) {
+                facingObject = (dx > 0 && direction === 'right') || (dx < 0 && direction === 'left');
+            } else {
+                facingObject = (dy > 0 && direction === 'down') || (dy < 0 && direction === 'up');
+            }
+            
+            if (facingObject) {
+                // Agarrar este objeto
+                obj.grab(this.player);
+                this.grabbedObject = obj;
+                console.log('[PushableObjectManager] Objeto agarrado (toggle)');
+                break; // Só agarra um por vez
+            }
+        }
+    }
+    
+    /**
      * Gerencia o sistema de agarrar/empurrar/puxar
      * @private
      */
@@ -417,21 +473,21 @@ export class PushableObjectManager {
         const movement = this.scene.movement;
         if (!movement) return;
         
-        const direction = movement.facing;
+        // Só processa se já está agarrando um objeto
+        if (!this.grabbedObject) return;
         
-        // Se já está agarrando um objeto
-        if (this.grabbedObject) {
-            // Calcular distância ao objeto
-            const dx = this.grabbedObject.sprite.x - this.player.x;
-            const dy = this.grabbedObject.sprite.y - this.player.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            // Se muito longe, soltar
-            if (distance > 50) {
-                this.grabbedObject.release();
-                this.grabbedObject = null;
-                return;
-            }
+        // Calcular distância ao objeto
+        const dx = this.grabbedObject.sprite.x - this.player.x;
+        const dy = this.grabbedObject.sprite.y - this.player.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Se muito longe, soltar automaticamente
+        if (distance > 50) {
+            this.grabbedObject.release();
+            this.grabbedObject = null;
+            console.log('[PushableObjectManager] Objeto solto automaticamente (distância)');
+            return;
+        }
             
             // IMPORTANTE: Manter o jogador grudado na caixa
             // Calcular posição ideal do jogador baseado na direção que ele está olhando
@@ -524,38 +580,36 @@ export class PushableObjectManager {
             
             // Tentar mover o objeto
             if (pushOrPullDirection) {
+                // Garantir que o jogador esteja olhando para a caixa enquanto a move.
+                // O PushableObjectManager.update() é chamado depois do MovementController.update(),
+                // então aqui podemos forçar a direção (facing) e a animação do player para
+                // apontar sempre para a caixa, como se estivesse se movendo em direção a ela.
+                try {
+                    const movement = this.scene.movement;
+                    if (movement) {
+                        // Determinar direção baseada na posição relativa da caixa
+                        const ddx = this.grabbedObject.sprite.x - this.player.x;
+                        const ddy = this.grabbedObject.sprite.y - this.player.y;
+                        if (Math.abs(ddx) > Math.abs(ddy)) {
+                            movement.facing = ddx > 0 ? 'right' : 'left';
+                        } else {
+                            movement.facing = ddy > 0 ? 'down' : 'up';
+                        }
+
+                        // Forçar animação correspondente (walk/run conforme estado)
+                        const prefix = (movement.isRunning && movement._hasRunAnimCache) ? 'run' : 'walk';
+                        const animKey = `${prefix}-${movement.facing}`;
+                        if (this.player && this.player.anims) {
+                            this.player.anims.play(animKey, true);
+                        }
+                    }
+                } catch (e) {
+                    // Segurança: se algo falhar aqui, não quebrar o empurrão
+                    console.warn('[PushableObjectManager] erro ao forçar facing:', e);
+                }
+
                 this.grabbedObject.push(pushOrPullDirection, this.player);
             }
-            
-        } else {
-            // Não está agarrando nada, tentar agarrar objeto próximo
-            for (const obj of this.objects) {
-                if (obj.isGrabbed) continue;
-                
-                const dx = obj.sprite.x - this.player.x;
-                const dy = obj.sprite.y - this.player.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                // Precisa estar perto (40px)
-                if (distance > 40) continue;
-                
-                // Verificar se está de frente para o objeto
-                let facingObject = false;
-                
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    facingObject = (dx > 0 && direction === 'right') || (dx < 0 && direction === 'left');
-                } else {
-                    facingObject = (dy > 0 && direction === 'down') || (dy < 0 && direction === 'up');
-                }
-                
-                if (facingObject) {
-                    // Agarrar este objeto
-                    obj.grab(this.player);
-                    this.grabbedObject = obj;
-                    break; // Só agarra um por vez
-                }
-            }
-        }
     }
     
     /**
