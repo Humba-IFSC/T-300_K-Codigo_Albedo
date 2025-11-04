@@ -314,6 +314,12 @@ export default class GameScene extends BaseScene {
 
         worldCam.setRenderToTexture && worldCam.setRoundPixels && (worldCam._padding = 2);
         this.sortDepths();
+        
+        // Tecla ESC para voltar ao menu
+        this.input.keyboard.on('keydown-ESC', () => {
+            console.log('[GameScene] Voltando ao menu');
+            this.scene.start('TitleScene');
+        });
     }
 
     update() {
