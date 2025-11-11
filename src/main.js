@@ -1,5 +1,6 @@
 import TitleScene from './scenes/TitleScene.js';
 import IntroScene from './scenes/IntroScene.js';
+import Intro2Scene from './scenes/Intro2Scene.js';
 import GameScene from './scenes/GameScene.js';
 import SecondScene from './scenes/SecondScene.js';
 
@@ -30,7 +31,7 @@ const config = {
             capture: true
         }
     },
-    scene: [TitleScene, IntroScene, GameScene, SecondScene] // TitleScene é a primeira
+    scene: [TitleScene, IntroScene, Intro2Scene, GameScene, SecondScene] // TitleScene é a primeira
 };
 
 const game = new Phaser.Game(config);
