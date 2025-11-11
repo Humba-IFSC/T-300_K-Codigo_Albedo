@@ -8,6 +8,7 @@ import { CoordProbe } from '../systems/debug/CoordProbe.js';
 export default class IntroScene extends BaseScene {
     constructor() {
         super('IntroScene');
+        this.cutsceneActive = false; // Inicializar flag
     }
 
     preload() {
@@ -142,6 +143,21 @@ export default class IntroScene extends BaseScene {
         if (shouldStartCutscene) {
             console.log('[IntroScene] Iniciando cutscene de caminhada');
             this.startWalkingCutscene();
+        } else {
+            // Se não há cutscene, garantir que controles estão habilitados
+            this.cutsceneActive = false;
+            if (this.player.body) {
+                this.player.body.enable = true;
+                this.player.body.setVelocity(0, 0);
+            }
+            // Garantir que controles virtuais estão visíveis
+            if (this.mobileControls) {
+                this.mobileControls.show();
+            }
+            if (this.hotbar) {
+                this.hotbar.show();
+            }
+            console.log('[IntroScene] Cutscene não iniciada - controles habilitados');
         }
         
         // Probe de coordenadas (debug)
@@ -219,8 +235,17 @@ export default class IntroScene extends BaseScene {
         // Desabilitar controles do jogador
         this.cutsceneActive = true;
         
+        // Inicializar sistema de pular cutscene
+        this.skipCutsceneHoldTime = 0;
+        this.skipCutsceneRequired = 1000; // 1 segundo segurando (reduzido)
+        this.isSkippingCutscene = false;
+        this.skipInputConfigured = false; // Flag para evitar duplicação de listeners
+        
         // Criar barras cinemáticas (letterbox)
         this.createCinematicBars();
+        
+        // Criar prompt de pular cutscene
+        this.createSkipPrompt();
         
         // Esconder HUD - mobileControls
         console.log('[IntroScene] Escondendo mobileControls...');
@@ -356,6 +381,190 @@ export default class IntroScene extends BaseScene {
     }
     
     /**
+     * Cria o prompt visual para pular a cutscene
+     */
+    createSkipPrompt() {
+        // Prevenir criação duplicada
+        if (this.skipPromptContainer) {
+            console.log('[IntroScene] Skip prompt já existe, ignorando');
+            return;
+        }
+        
+        const centerX = this.cameras.main.width / 2;
+        const bottomY = this.cameras.main.height - 80; // 80px do fundo
+        
+        // Container para o prompt
+        this.skipPromptContainer = this.add.container(centerX, bottomY);
+        this.skipPromptContainer.setDepth(100001); // Acima das barras cinemáticas
+        this.skipPromptContainer.setScrollFactor(0);
+        this.skipPromptContainer.setAlpha(0);
+        
+        // Fundo do prompt
+        const promptBg = this.add.rectangle(0, 0, 320, 50, 0x000000, 0.7);
+        promptBg.setStrokeStyle(2, 0xffffff, 0.8);
+        
+        // Texto do prompt
+        const promptText = this.add.text(0, 0, 'Segure na tela para pular', {
+            fontSize: '18px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            align: 'center'
+        });
+        promptText.setOrigin(0.5);
+        
+        // Barra de progresso (fundo)
+        this.skipProgressBg = this.add.rectangle(0, 22, 280, 8, 0x444444, 0.8);
+        
+        // Barra de progresso (preenchimento)
+        this.skipProgressBar = this.add.rectangle(-140, 22, 0, 8, 0x00ff00, 1);
+        this.skipProgressBar.setOrigin(0, 0.5);
+        
+        // Adicionar elementos ao container
+        this.skipPromptContainer.add([promptBg, promptText, this.skipProgressBg, this.skipProgressBar]);
+        
+        // IMPORTANTE: Fazer a câmera PRINCIPAL ignorar o prompt (renderizar apenas na câmera de UI)
+        if (this.cameras.main) {
+            this.cameras.main.ignore(this.skipPromptContainer);
+        }
+        
+        // NÃO fazer fade in automático - o prompt fica invisível até o jogador clicar
+        // Apenas configurar input para segurar na tela
+        if (!this.skipInputConfigured) {
+            this.setupSkipCutsceneInput();
+            this.skipInputConfigured = true;
+        }
+    }
+    
+    /**
+     * Esconde o prompt de pular cutscene
+     */
+    hideSkipPrompt() {
+        if (this.skipPromptContainer && this.skipPromptContainer.alpha > 0) {
+            this.tweens.add({
+                targets: this.skipPromptContainer,
+                alpha: 0,
+                duration: 300,
+                ease: 'Power2'
+            });
+        }
+    }
+    
+    /**
+     * Mostra o prompt de pular cutscene
+     */
+    showSkipPrompt() {
+        if (this.skipPromptContainer && this.skipPromptContainer.alpha < 1) {
+            // Cancelar timer anterior
+            if (this.skipPromptHideTimer) {
+                this.skipPromptHideTimer.remove();
+            }
+            
+            this.tweens.add({
+                targets: this.skipPromptContainer,
+                alpha: 1,
+                duration: 300,
+                ease: 'Power2'
+            });
+            
+            // Auto-hide após 1.5 segundos
+            this.skipPromptHideTimer = this.time.delayedCall(1500, () => {
+                this.hideSkipPrompt();
+            });
+        }
+    }
+    
+    /**
+     * Configura input para pular cutscene
+     */
+    setupSkipCutsceneInput() {
+        // Input de mouse/touch
+        this.input.on('pointerdown', () => {
+            if (this.cutsceneActive && !this.isSkippingCutscene) {
+                this.skipCutscenePressed = true;
+                this.skipCutsceneHoldTime = 0;
+                this.showSkipPrompt();
+                
+                // Cancelar auto-hide enquanto estiver segurando
+                if (this.skipPromptHideTimer) {
+                    this.skipPromptHideTimer.remove();
+                    this.skipPromptHideTimer = null;
+                }
+            }
+        });
+        
+        this.input.on('pointerup', () => {
+            this.skipCutscenePressed = false;
+            this.skipCutsceneHoldTime = 0;
+            // Resetar barra de progresso
+            if (this.skipProgressBar) {
+                this.skipProgressBar.width = 0;
+            }
+            
+            // Quando soltar, agendar auto-hide novamente
+            if (this.cutsceneActive && !this.isSkippingCutscene) {
+                this.skipPromptHideTimer = this.time.delayedCall(1500, () => {
+                    this.hideSkipPrompt();
+                });
+            }
+        });
+        
+        // Tecla Espaço também pula
+        this.input.keyboard.on('keydown-SPACE', () => {
+            if (this.cutsceneActive && !this.isSkippingCutscene) {
+                this.skipCutscene();
+            }
+        });
+    }
+    
+    /**
+     * Pula a cutscene imediatamente - vai direto para Intro2Scene
+     */
+    skipCutscene() {
+        if (!this.cutsceneActive || this.isSkippingCutscene) return;
+        
+        console.log('[IntroScene] Pulando cutscene...');
+        this.isSkippingCutscene = true;
+        
+        // Parar todos os tweens do player
+        this.tweens.killTweensOf(this.player);
+        
+        // Parar animação
+        if (this.player.anims) {
+            this.player.anims.stop();
+        }
+        
+        // Esconder prompt
+        if (this.skipPromptContainer) {
+            this.skipPromptContainer.destroy();
+            this.skipPromptContainer = null;
+        }
+        
+        // Parar música (fade out rápido)
+        const music = this.sound.get('audentropia');
+        if (music && music.isPlaying) {
+            this.tweens.add({
+                targets: music,
+                volume: 0,
+                duration: 500,
+                onComplete: () => {
+                    music.stop();
+                }
+            });
+        }
+        
+        // Ir direto para Intro2Scene (pular primeira parte)
+        // Marcar que deve pular a segunda parte também
+        window._intro2CutsceneSeen = true;
+        window._playerEntryPos = { x: 15 * 32 + 16, y: 8 * 32 + 16 }; // Posição final
+        window._startCutscene = false;
+        
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.time.delayedCall(500, () => {
+            this.scene.start('Intro2Scene');
+        });
+    }
+    
+    /**
      * Cria as barras pretas cinemáticas
      */
     createCinematicBars() {
@@ -480,7 +689,7 @@ export default class IntroScene extends BaseScene {
         // Mas vamos forçar para garantir
         this.time.delayedCall(100, () => {
             if (!this.isTransitioning) {
-                // Salvar que é continuação da cutscene
+                // Salvar que é continuação da cutscene (primeira vez)
                 window._startCutscene = true;
                 window._playerEntryPos = { x: 15 * 32 + 16, y: 17 * 32 + 16 }; // Spawnar no tile 15 (vermelho)
                 
@@ -499,11 +708,16 @@ export default class IntroScene extends BaseScene {
         
         console.log('[IntroScene] Player entrou na zona de transição - mudando para Intro2Scene');
         
-        // Salvar posição para spawn na próxima cena (parte inferior do intro2)
-        window._playerEntryPos = { x: 15 * 32 + 16, y: 17 * 32 + 16 }; // Spawnar no tile 15 (vermelho)
-        
-        // Flag para iniciar cutscene na Intro2Scene
-        window._startCutscene = true;
+        // Verificar se a cutscene já foi vista
+        if (window._intro2CutsceneSeen) {
+            // Se já viu a cutscene, spawnar próximo à zona de transição de volta (tile 18)
+            window._playerEntryPos = { x: 15 * 32 + 16, y: 17 * 32 + 16 }; // Um tile acima da zona de transição
+            window._startCutscene = false; // NÃO iniciar cutscene
+        } else {
+            // Primeira vez: spawnar no início e iniciar cutscene
+            window._playerEntryPos = { x: 15 * 32 + 16, y: 17 * 32 + 16 }; // Spawnar no tile 15 (vermelho)
+            window._startCutscene = true; // Iniciar cutscene
+        }
         
         // Transição suave
         this.cameras.main.fadeOut(500, 0, 0, 0);
@@ -539,7 +753,25 @@ export default class IntroScene extends BaseScene {
         // Não atualizar controles durante cutscene
         if (!this.cutsceneActive) {
             this.updateBase();
-        }        // Atualizar CoordProbe
+        } else {
+            // Durante cutscene, verificar se está segurando para pular
+            if (this.skipCutscenePressed && !this.isSkippingCutscene) {
+                this.skipCutsceneHoldTime += this.game.loop.delta;
+                
+                // Atualizar barra de progresso
+                if (this.skipProgressBar) {
+                    const progress = Math.min(this.skipCutsceneHoldTime / this.skipCutsceneRequired, 1);
+                    this.skipProgressBar.width = 280 * progress;
+                }
+                
+                // Se segurou tempo suficiente, pular cutscene
+                if (this.skipCutsceneHoldTime >= this.skipCutsceneRequired) {
+                    this.skipCutscene();
+                }
+            }
+        }
+        
+        // Atualizar CoordProbe
         if (this.coordProbe) {
             this.coordProbe.update();
         }
