@@ -1,6 +1,7 @@
 import { BaseScene } from './BaseScene.js';
 import { UICameraManager } from '../systems/ui/UICameraManager.js';
 import { CoordProbe } from '../systems/debug/CoordProbe.js';
+import { InteractionIcon } from '../systems/ui/InteractionIcon.js';
 
 /**
  * Intro2Scene - Segunda cena de introdução
@@ -96,16 +97,18 @@ export default class Intro2Scene extends BaseScene {
         
         // Criar camadas baseadas no intro2.json atualizado
         // Ordem de criação define o depth (z-index) - primeira camada fica atrás
-        let chao = null;
-        let caminho = null;
-        let fabrica = null;
+        let floor = null;
+        let caminhoeflores = null;
+        let paredefabrica = null;
         let cerca = null;
-        let fachada = null;
+        let decoracaofabrica = null;
+        let troncos1 = null;
         let arvores = null;
+        let troncos2 = null;
         
         // 1. Chão (base)
-        if (map.getLayer('chao')) {
-            chao = map.createLayer('chao', allTilesets, 0, 0);
+        if (map.getLayer('floor')) {
+            floor = map.createLayer('floor', allTilesets, 0, 0);
         }
         
         // 2. Cerca (bem atrás)
@@ -113,24 +116,34 @@ export default class Intro2Scene extends BaseScene {
             cerca = map.createLayer('Cerca', allTilesets, 0, 0);
         }
         
-        // 3. Caminho
-        if (map.getLayer('caminho')) {
-            caminho = map.createLayer('caminho', allTilesets, 0, 0);
+        // 3. Caminho e flores
+        if (map.getLayer('caminhoeflores')) {
+            caminhoeflores = map.createLayer('caminhoeflores', allTilesets, 0, 0);
         }
         
-        // 4. Fábrica
-        if (map.getLayer('fabrica')) {
-            fabrica = map.createLayer('fabrica', allTilesets, 0, 0);
+        // 4. Parede da fábrica
+        if (map.getLayer('paredefabrica')) {
+            paredefabrica = map.createLayer('paredefabrica', allTilesets, 0, 0);
         }
         
-        // 5. Fachada
-        if (map.getLayer('fachada')) {
-            fachada = map.createLayer('fachada', allTilesets, 0, 0);
+        // 5. Decoração da fábrica
+        if (map.getLayer('decoracaofabrica')) {
+            decoracaofabrica = map.createLayer('decoracaofabrica', allTilesets, 0, 0);
         }
         
-        // 6. Árvores (na frente)
+        // 6. Troncos 1 (camada de baixo)
+        if (map.getLayer('troncos1')) {
+            troncos1 = map.createLayer('troncos1', allTilesets, 0, 0);
+        }
+        
+        // 7. Árvores (na frente)
         if (map.getLayer('arvores')) {
             arvores = map.createLayer('arvores', allTilesets, 0, 0);
+        }
+        
+        // 8. Troncos 2 (camada de cima)
+        if (map.getLayer('troncos2')) {
+            troncos2 = map.createLayer('troncos2', allTilesets, 0, 0);
         }
         
         // Configurar colisão com cerca
@@ -138,14 +151,19 @@ export default class Intro2Scene extends BaseScene {
             cerca.setCollisionByExclusion([-1, 0]);
         }
         
-        // Configurar colisão com fachada
-        if (fachada) {
-            fachada.setCollisionByExclusion([-1, 0]);
+        // Configurar colisão com parede da fábrica
+        if (paredefabrica) {
+            paredefabrica.setCollisionByExclusion([-1, 0]);
         }
         
-        // Configurar colisão com fábrica
-        if (fabrica) {
-            fabrica.setCollisionByExclusion([-1, 0]);
+        // Configurar colisão com decoração da fábrica
+        if (decoracaofabrica) {
+            decoracaofabrica.setCollisionByExclusion([-1, 0]);
+        }
+        
+        // Configurar colisão com troncos1
+        if (troncos1) {
+            troncos1.setCollisionByExclusion([-1, 0]);
         }
         
         // Configurar colisão com árvores - IMPORTANTE: todas as árvores precisam bloquear
@@ -157,6 +175,11 @@ export default class Intro2Scene extends BaseScene {
             arvores.setCollisionByProperty({ collides: true });
             
             console.log('[Intro2Scene] Colisão configurada na camada de árvores');
+        }
+        
+        // Configurar colisão com troncos2
+        if (troncos2) {
+            troncos2.setCollisionByExclusion([-1, 0]);
         }
         
         // Configurar limites do mundo
@@ -180,21 +203,27 @@ export default class Intro2Scene extends BaseScene {
         window._startCutscene = false;
         
         // Adicionar colisão do player com camadas colisíveis
-        if (chao) {
-            this.physics.add.collider(this.player, chao);
+        if (floor) {
+            this.physics.add.collider(this.player, floor);
         }
         if (cerca) {
             this.physics.add.collider(this.player, cerca);
         }
-        if (fachada) {
-            this.physics.add.collider(this.player, fachada);
+        if (paredefabrica) {
+            this.physics.add.collider(this.player, paredefabrica);
         }
-        if (fabrica) {
-            this.physics.add.collider(this.player, fabrica);
+        if (decoracaofabrica) {
+            this.physics.add.collider(this.player, decoracaofabrica);
+        }
+        if (troncos1) {
+            this.physics.add.collider(this.player, troncos1);
         }
         if (arvores) {
             this.physics.add.collider(this.player, arvores);
             console.log('[Intro2Scene] Collider player-arvores criado');
+        }
+        if (troncos2) {
+            this.physics.add.collider(this.player, troncos2);
         }
         
         // Debug: verificar tiles com colisão
@@ -202,10 +231,31 @@ export default class Intro2Scene extends BaseScene {
             console.log('[Intro2Scene] Tiles na camada arvores:', arvores.layer.data.flat().filter(t => t.index > 0).length);
         }
         
-        // Sistemas comuns
+        // Sistemas comuns (diálogo e hotbar - controles virtuais já foram criados no createCommonPlayer)
         this.createDialogueSystem();
         this.createHotbar();
-        this.createVirtualControls();
+        
+        // Placa da fábrica (tile 16, 7)
+        const tileSize = 32;
+        const signTileX = 16;
+        const signTileY = 7;
+        const signX = signTileX * tileSize + tileSize / 2;
+        const signY = signTileY * tileSize + tileSize / 2;
+        
+        // Criar zona invisível para a placa
+        this.factorySign = this.add.zone(signX, signY, 32, 32);
+        this.physics.world.enable(this.factorySign);
+        this.factorySign.body.setImmovable(true);
+        this.factorySign.body.moves = false;
+        
+        // Ícone de interação para a placa
+        this.signIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.signIcon.offsetY = -40;
+        
+        // NÃO registrar nos elementos de UI - deve aparecer só na câmera do mundo
+        // Deixar no mundo para aparecer acima da placa
+        
+        console.log('[Intro2Scene] Placa criada em tile (16, 7) -> pixel:', signX, signY);
         
         // CUTSCENE: Iniciar caminhada automática se a flag estiver setada
         console.log('[Intro2Scene] Verificando cutscene - shouldStartCutscene:', shouldStartCutscene);
@@ -249,14 +299,23 @@ export default class Intro2Scene extends BaseScene {
         // Gerenciador de câmera de UI
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
+        
+        // Adicionar ícones de interação ao array de objetos do mundo
+        const signIconObjects = [];
+        if (this.signIcon?.icon) signIconObjects.push(this.signIcon.icon);
+        if (this.signIcon?.pulse) signIconObjects.push(this.signIcon.pulse);
+        
         const worldObjects = [
             this.player, 
-            chao,
-            caminho, 
-            fabrica,
+            floor,
+            caminhoeflores, 
+            paredefabrica,
             cerca,
-            fachada,
-            arvores
+            decoracaofabrica,
+            troncos1,
+            arvores,
+            troncos2,
+            ...signIconObjects
         ].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
@@ -333,12 +392,21 @@ export default class Intro2Scene extends BaseScene {
         // Criar prompt de pular cutscene
         this.createSkipPrompt();
         
-        // Esconder HUD - mobileControls
-        console.log('[Intro2Scene] Escondendo mobileControls...');
+        // Esconder HUD durante cutscene
+        console.log('[Intro2Scene] Escondendo controles virtuais...');
         
-        if (this.mobileControls) {
-            this.mobileControls.hide();
-            console.log('[Intro2Scene] mobileControls.hide() chamado');
+        if (this.virtualJoystick) {
+            this.virtualJoystick.base.setVisible(false);
+            this.virtualJoystick.stick.setVisible(false);
+            this.virtualJoystick.disabled = true;
+        }
+        
+        if (this.virtualButtons && this.virtualButtons.buttons) {
+            this.virtualButtons.buttons.forEach(btn => {
+                if (btn && btn.container) {
+                    btn.container.setVisible(false);
+                }
+            });
         }
         
         if (this.hotbar && this.hotbar.allObjects) {
@@ -489,15 +557,19 @@ export default class Intro2Scene extends BaseScene {
      * Restaura o HUD após a cutscene
      */
     restoreHUD() {
-        // Mostrar HUD novamente - RESTAURAR TUDO
+        // Mostrar HUD novamente
         console.log('[Intro2Scene] Mostrando HUD...');
         
-        // Restaurar mobileControls (joystick e botões)
-        if (this.mobileControls) {
-            this.mobileControls.show();
+        // Restaurar virtual joystick
+        if (this.virtualJoystick) {
+            this.virtualJoystick.base.setVisible(true);
+            this.virtualJoystick.stick.setVisible(true);
+            this.virtualJoystick.disabled = false;
+            this.virtualJoystick.base.setAlpha(0.6);
+            this.virtualJoystick.stick.setAlpha(0.8);
         }
         
-        // Restaurar virtual buttons individualmente
+        // Restaurar virtual buttons
         if (this.virtualButtons && this.virtualButtons.buttons) {
             this.virtualButtons.buttons.forEach(btn => {
                 if (btn.container) {
@@ -505,18 +577,6 @@ export default class Intro2Scene extends BaseScene {
                     btn.container.setAlpha(1);
                 }
             });
-        }
-        
-        // Restaurar virtual joystick
-        if (this.virtualJoystick) {
-            if (this.virtualJoystick.base) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.base.setAlpha(0.6);
-            }
-            if (this.virtualJoystick.stick) {
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.stick.setAlpha(0.8);
-            }
         }
         
         // Restaurar hotbar
@@ -841,6 +901,89 @@ export default class Intro2Scene extends BaseScene {
         });
     }
     
+    /**
+     * Lê a placa da fábrica
+     */
+    readFactorySign() {
+        console.log('[Intro2Scene] Lendo placa da fábrica');
+        
+        // Esconder ícone de interação
+        if (this.signIcon) {
+            this.signIcon.hide();
+        }
+        
+        // Esconder e suprimir hotbar
+        if (this.hotbar) {
+            this.hotbar.suppress();
+        }
+        
+        // Esconder controles virtuais manualmente
+        if (this.virtualJoystick) {
+            // Forçar invisibilidade do joystick
+            this.virtualJoystick.base.setVisible(false);
+            this.virtualJoystick.stick.setVisible(false);
+            this.virtualJoystick.disabled = true;
+            console.log('[Intro2Scene] Joystick escondido manualmente');
+        }
+        
+        if (this.virtualButtons) {
+            // Forçar invisibilidade de cada botão
+            this.virtualButtons.buttons.forEach(btn => {
+                if (btn && btn.container) {
+                    btn.container.setVisible(false);
+                }
+            });
+            console.log('[Intro2Scene] Botões escondidos manualmente');
+        }
+        
+        // Mostrar diálogo
+        this.dialogue.show('Fábrica de Aris Thorne', {
+            disableSound: true
+        });
+        
+        // Sobrescrever close() para restaurar controles
+        const originalClose = this.dialogue.close.bind(this.dialogue);
+        this.dialogue.close = () => {
+            originalClose();
+            
+            console.log('[Intro2Scene] Restaurando controles');
+            
+            // Restaurar hotbar
+            if (this.hotbar) {
+                this.hotbar.unsuppress(false);
+            }
+            
+            // Restaurar joystick
+            if (this.virtualJoystick) {
+                this.virtualJoystick.base.setVisible(true);
+                this.virtualJoystick.stick.setVisible(true);
+                this.virtualJoystick.disabled = false;
+                console.log('[Intro2Scene] Joystick restaurado manualmente');
+            }
+            
+            // Restaurar botões
+            if (this.virtualButtons) {
+                this.virtualButtons.buttons.forEach(btn => {
+                    if (btn && btn.container) {
+                        btn.container.setVisible(true);
+                    }
+                });
+                console.log('[Intro2Scene] Botões restaurados manualmente');
+            }
+        };
+    }
+    
+    /**
+     * Override do método de interação para suportar a placa
+     */
+    handleInteraction() {
+        console.log('[Intro2Scene] handleInteraction chamado, cutsceneActive:', this.cutsceneActive, 'currentInteractable:', this.currentInteractable);
+        if (!this.cutsceneActive && this.currentInteractable === 'sign') {
+            console.log('[Intro2Scene] Lendo placa via handleInteraction');
+            this.readFactorySign();
+        }
+    }
+
     onReturnToIntro() {
         // Verificar flags para evitar transição múltipla ou prematura
         if (this.isTransitioningBack || !this.canTransitionBack) return;
@@ -907,6 +1050,71 @@ export default class Intro2Scene extends BaseScene {
         // Atualizar CoordProbe
         if (this.coordProbe) {
             this.coordProbe.update();
+        }
+        
+        // Interação com a placa da fábrica (somente quando não está em cutscene e não está em diálogo)
+        if (!this.cutsceneActive && !this.dialogue?.active && this.factorySign && this.player) {
+            const distanceToSign = Phaser.Math.Distance.Between(
+                this.player.x, 
+                this.player.y, 
+                this.factorySign.x, 
+                this.factorySign.y
+            );
+            
+            let signIconVisible = false;
+            if (distanceToSign < 50) {
+                // Mostrar ícone quando próximo
+                if (!this.signIcon.visible) {
+                    this.signIcon.showAbove(this.factorySign);
+                    console.log('[Intro2Scene] Mostrado ícone da placa');
+                }
+                signIconVisible = true;
+                this.currentInteractable = 'sign';
+                
+                // CRÍTICO: Desabilitar E tornar invisível a área clicável da hotbar
+                if (this.hotbar && this.hotbar.clickableArea) {
+                    this.hotbar.clickableArea.disableInteractive();
+                    this.hotbar.clickableArea.setVisible(false);
+                    this.hotbar.clickableArea.setActive(false);
+                    console.log('[Intro2Scene] Área clicável da hotbar DESABILITADA e INVISÍVEL próximo à placa');
+                }
+            }
+            
+            if (!signIconVisible) {
+                if (this.signIcon.visible) {
+                    this.signIcon.hide();
+                    console.log('[Intro2Scene] Escondido ícone da placa (longe)');
+                }
+                if (this.currentInteractable === 'sign') {
+                    this.currentInteractable = null;
+                    
+                    // Re-habilitar E tornar visível a área clicável da hotbar
+                    if (this.hotbar && this.hotbar.clickableArea) {
+                        this.hotbar.clickableArea.setInteractive();
+                        this.hotbar.clickableArea.setVisible(true);
+                        this.hotbar.clickableArea.setActive(true);
+                        console.log('[Intro2Scene] Área clicável da hotbar REABILITADA e VISÍVEL');
+                    }
+                }
+            }
+            
+            // Atualizar posição do ícone
+            this.signIcon.updatePosition();
+        } else if (this.dialogue?.active) {
+            // Durante diálogo, esconder ícone e limpar interactable
+            if (this.signIcon) {
+                this.signIcon.hide();
+            }
+            if (this.currentInteractable === 'sign') {
+                this.currentInteractable = null;
+                
+                // Re-habilitar E tornar visível a área clicável da hotbar
+                if (this.hotbar && this.hotbar.clickableArea) {
+                    this.hotbar.clickableArea.setInteractive();
+                    this.hotbar.clickableArea.setVisible(true);
+                    this.hotbar.clickableArea.setActive(true);
+                }
+            }
         }
         
         // Ordenar depth dos objetos por Y

@@ -185,6 +185,7 @@ export class VirtualJoystick {
      * Desabilita o joystick
      */
     disable() {
+        console.log('[VirtualJoystick] Desabilitando joystick');
         this.disabled = true;
         // Reseta estado se estava sendo usado
         if (this.isDragging) {
@@ -199,14 +200,21 @@ export class VirtualJoystick {
         // SEMPRE esconde quando desabilita (ex: durante diálogo)
         this.base.setVisible(false);
         this.stick.setVisible(false);
+        console.log('[VirtualJoystick] Joystick escondido:', !this.base.visible, !this.stick.visible);
     }
     
     /**
      * Habilita o joystick
      */
     enable() {
+        console.log('[VirtualJoystick] Habilitando joystick');
         this.disabled = false;
-        // Não mostra automaticamente - aparecerá no próximo toque
+        // Mostrar visualmente quando habilitar
+        this.base.setVisible(true);
+        this.stick.setVisible(true);
+        this.base.setAlpha(this.alpha);
+        this.stick.setAlpha(this.alpha);
+        console.log('[VirtualJoystick] Joystick visível:', this.base.visible, this.stick.visible);
     }
     
     /**

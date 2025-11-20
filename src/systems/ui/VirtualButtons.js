@@ -117,15 +117,27 @@ export class VirtualButtons {
         console.log('[VirtualButtons] Container criado em', x, y, 'depth:', container.depth, 'visível:', container.visible);
         
         // Configurar eventos no container
-        container.on('pointerdown', () => {
+        container.on('pointerdown', (pointer, localX, localY, event) => {
+            // CRÍTICO: Parar propagação para evitar que o evento chegue à hotbar
+            if (event && event.stopPropagation) {
+                event.stopPropagation();
+            }
             this.onButtonDown(action, sprite, scale);
         });
         
-        container.on('pointerup', () => {
+        container.on('pointerup', (pointer, localX, localY, event) => {
+            // CRÍTICO: Parar propagação
+            if (event && event.stopPropagation) {
+                event.stopPropagation();
+            }
             this.onButtonUp(action, sprite, scale);
         });
         
-        container.on('pointerout', () => {
+        container.on('pointerout', (pointer, localX, localY, event) => {
+            // CRÍTICO: Parar propagação
+            if (event && event.stopPropagation) {
+                event.stopPropagation();
+            }
             this.onButtonUp(action, sprite, scale);
         });
         
@@ -145,6 +157,11 @@ export class VirtualButtons {
     
     onButtonDown(action, sprite, originalScale) {
         console.log('[VirtualButtons] Botão pressionado:', action);
+        
+        // IMPORTANTE: Bloquear área clicável da hotbar imediatamente
+        if (this.scene.hotbar && this.scene.hotbar.lockClick) {
+            this.scene.hotbar.lockClick(500);
+        }
         
         // Feedback visual - aumentar opacidade e diminuir escala
         sprite.setAlpha(1);
@@ -226,8 +243,10 @@ export class VirtualButtons {
      * Esconde todos os botões
      */
     hide() {
+        console.log('[VirtualButtons] Escondendo', this.buttons.length, 'botões');
         this.buttons.forEach(button => {
             button.container.setVisible(false);
+            console.log('[VirtualButtons] Botão', button.action, 'escondido');
         });
     }
     
@@ -235,8 +254,10 @@ export class VirtualButtons {
      * Mostra todos os botões
      */
     show() {
+        console.log('[VirtualButtons] Mostrando', this.buttons.length, 'botões');
         this.buttons.forEach(button => {
             button.container.setVisible(true);
+            console.log('[VirtualButtons] Botão', button.action, 'visível em', button.container.x, button.container.y);
         });
     }
     

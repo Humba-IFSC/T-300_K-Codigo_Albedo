@@ -12,6 +12,7 @@ export class Hotbar {
         this.hideTimer = null;
         this.animating = false;
         this.isOpen = false; // Controla se está aberta manualmente
+        this.clickLocked = false; // Previne cliques acidentais da hotbar
 
         // Configuração dos slots
         const slotSize = 80;
@@ -32,6 +33,11 @@ export class Hotbar {
                 .setOrigin(0, 0)
                 .setScrollFactor(0)
                 .setDepth(15000); // Aumentado para ficar acima dos botões virtuais (10000)
+            
+            // Fazer a câmera principal ignorar o slot (renderizar apenas na câmera de UI)
+            if (scene.cameras && scene.cameras.main) {
+                scene.cameras.main.ignore(slot);
+            }
             
             // Tornar slots clicáveis
             slot.setInteractive();
@@ -54,26 +60,44 @@ export class Hotbar {
           .setScrollFactor(0)
           .setDepth(15001); // Aumentado para ficar acima dos slots
 
+        // Fazer a câmera principal ignorar o highlight (renderizar apenas na câmera de UI)
+        if (scene.cameras && scene.cameras.main) {
+            scene.cameras.main.ignore(this.highlight);
+        }
+
         // Criar área clicável INVISÍVEL apenas no CENTRO da parte inferior
         // Evita overlap com joystick (esquerda) e botões (direita)
-        const clickableWidth = scene.scale.width * 0.4; // 40% da largura da tela (centro)
+        const clickableWidth = scene.scale.width * 0.3; // REDUZIDO: 30% da largura (apenas centro)
         const clickableHeight = 60; // Altura da área clicável
         const clickableY = scene.scale.height - clickableHeight / 2;
         
         this.clickableArea = scene.add.rectangle(
             scene.scale.width / 2,  // Centralizado
             clickableY, 
-            clickableWidth,  // Apenas 40% da largura (meio da tela)
+            clickableWidth,  // Apenas 30% da largura (MENOR para evitar overlap)
             clickableHeight, 
             0x000000, 
             0 // Completamente transparente
         );
-        this.clickableArea.setScrollFactor(0).setDepth(15002);
+        this.clickableArea.setScrollFactor(0).setDepth(9000); // DEPTH MENOR que botões virtuais (10000)
         this.clickableArea.setInteractive();
-        this.clickableArea.on('pointerdown', () => {
+        this.clickableArea.on('pointerdown', (pointer, localX, localY, event) => {
+            // IMPORTANTE: Verificar se o clique está bloqueado
+            if (this.clickLocked) {
+                console.log('[Hotbar] Clique bloqueado (clickLocked=true)');
+                return;
+            }
+            
             console.log('[Hotbar] Área central inferior clicada!');
+            // Parar propagação para evitar conflitos
+            event.stopPropagation();
             this.toggleOpen();
         });
+        
+        // Fazer a câmera principal ignorar a área clicável (renderizar apenas na câmera de UI)
+        if (scene.cameras && scene.cameras.main) {
+            scene.cameras.main.ignore(this.clickableArea);
+        }
         
         // Guardar posição inicial da área para animações
         this.clickableAreaInitialY = clickableY;
@@ -89,6 +113,11 @@ export class Hotbar {
             strokeThickness: 3
         }).setOrigin(0.5);
         this.toggleArrow.setScrollFactor(0).setDepth(15003); // Acima da área clicável
+        
+        // Fazer a câmera principal ignorar a seta (renderizar apenas na câmera de UI)
+        if (scene.cameras && scene.cameras.main) {
+            scene.cameras.main.ignore(this.toggleArrow);
+        }
         
         // Guardar posição inicial da seta para animações
         this.toggleArrowInitialY = toggleButtonY;
@@ -120,12 +149,36 @@ export class Hotbar {
     }
 
     /**
+     * Bloqueia temporariamente cliques na área clicável
+     * Usado para prevenir abertura acidental ao usar botões virtuais
+     */
+    lockClick(duration = 300) {
+        this.clickLocked = true;
+        console.log('[Hotbar] Clique bloqueado por', duration, 'ms');
+        
+        if (this.unlockTimer) {
+            this.unlockTimer.remove(false);
+        }
+        
+        this.unlockTimer = this.scene.time.delayedCall(duration, () => {
+            this.clickLocked = false;
+            console.log('[Hotbar] Clique desbloqueado');
+        });
+    }
+
+    /**
      * Alterna entre aberto e fechado manualmente
      */
     toggleOpen() {
         // Não permitir abrir durante diálogos
         if (this.scene.dialogue?.active) {
             console.log('[Hotbar] Não é possível abrir durante diálogo');
+            return;
+        }
+        
+        // Não permitir abrir se há um interactable ativo (ex: placa)
+        if (this.scene.currentInteractable) {
+            console.log('[Hotbar] Não é possível abrir perto de interactable:', this.scene.currentInteractable);
             return;
         }
         
@@ -150,10 +203,13 @@ export class Hotbar {
         // Cancela timer de auto-hide
         if (this.hideTimer) this.hideTimer.remove(false);
         
-        // Esconde controles móveis
-        if (this.scene.mobileControls) {
-            this.scene.mobileControls.hide();
+        // Desabilita joystick para evitar interferência
+        if (this.scene.virtualJoystick) {
+            this.scene.virtualJoystick.disabled = true;
+            console.log('[Hotbar] Joystick desabilitado');
         }
+        
+        // Mantém botões virtuais visíveis e funcionais
         
         // Mostra hotbar
         this.showAnimated();
@@ -161,8 +217,8 @@ export class Hotbar {
         // Atualiza seta
         this.toggleArrow.setText('▼');
         
-        // Anima seta para subir junto com a hotbar
-        const targetY = this.baseY - 60; // Fica acima da hotbar
+        // Anima seta para subir junto com a hotbar (mais próxima)
+        const targetY = this.baseY - 20; // Mais perto da hotbar (era -60)
         this.scene.tweens.add({
             targets: this.toggleArrow,
             y: targetY,
@@ -171,7 +227,7 @@ export class Hotbar {
         });
         
         // Anima área clicável para subir junto
-        const areaTargetY = targetY - 30; // Centralizada na seta
+        const areaTargetY = targetY - 20; // Centralizada na seta
         this.scene.tweens.add({
             targets: this.clickableArea,
             y: areaTargetY,
@@ -189,9 +245,10 @@ export class Hotbar {
         console.log('[Hotbar] Fechando manualmente');
         this.isOpen = false;
         
-        // Mostra controles móveis
-        if (this.scene.mobileControls) {
-            this.scene.mobileControls.show();
+        // Reabilita joystick
+        if (this.scene.virtualJoystick) {
+            this.scene.virtualJoystick.disabled = false;
+            console.log('[Hotbar] Joystick reabilitado');
         }
         
         // Esconde hotbar

@@ -102,13 +102,24 @@ export class BaseScene extends Phaser.Scene {
         console.log('[BaseScene] currentInteractable:', this.currentInteractable);
         
         if (action === 'interact') {
+            // IMPORTANTE: Bloquear hotbar ANTES de qualquer ação
+            if (this.hotbar) {
+                this.hotbar.lockClick(500);
+            }
+            
             // Durante diálogo, avançar texto
             if (this.dialogue?.active) {
                 console.log('[BaseScene] Avançando diálogo');
                 this.dialogue.next();
-            } else {
-                // Fora do diálogo, executar interação
-                console.log('[BaseScene] Executando handleInteraction');
+            } 
+            // Se há um interactable (ex: placa), executar interação
+            else if (this.currentInteractable) {
+                console.log('[BaseScene] Executando handleInteraction (currentInteractable:', this.currentInteractable, ')');
+                this.handleInteraction();
+            }
+            // Caso contrário, executar interação genérica
+            else {
+                console.log('[BaseScene] Executando handleInteraction genérico');
                 this.handleInteraction();
             }
         } else if (action === 'run') {

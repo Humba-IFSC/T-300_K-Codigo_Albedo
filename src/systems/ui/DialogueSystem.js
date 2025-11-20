@@ -50,12 +50,15 @@ export class DialogueSystem {
         this.sound = scene.sound.add('textBlip', { loop: true, volume: 0.3, rate: 1 });
     }
 
-    show(messages) {
+    show(messages, options = {}) {
         this.messages = Array.isArray(messages) ? messages : [messages];
         this.index = 0;
         this.active = true;
         this.box.setVisible(true);
         this.text.setVisible(true);
+        
+        // Guardar opções (como desabilitar som)
+        this.options = options;
         
         // Guardar estado da hotbar se estava aberta manualmente
         this.wasHotbarOpen = this.scene.hotbar?.isOpen || false;
@@ -65,10 +68,8 @@ export class DialogueSystem {
             this.scene.hotbar.closeManually();
         }
         
-        // Esconder HUD e desabilitar controles virtuais
-        if (this.scene.hotbar) this.scene.hotbar.hide();
-        if (this.scene.virtualButtons) this.scene.virtualButtons.hide();
-        if (this.scene.virtualJoystick) this.scene.virtualJoystick.disable();
+        // Nota: O esconder/mostrar dos controles virtuais é gerenciado pela cena
+        // através do override do método close()
         
         // Adicionar listener de clique global para avançar diálogo
         if (!this.clickHandler) {
@@ -83,7 +84,11 @@ export class DialogueSystem {
         this.text.setText('');
         this.writing = true;
         this.nextIcon.setVisible(false);
-        if (!this.sound.isPlaying) this.sound.play();
+        
+        // Tocar som apenas se não estiver desabilitado
+        if (!this.options?.disableSound && !this.sound.isPlaying) {
+            this.sound.play();
+        }
 
         let i = 0;
         let currentLine = '';
@@ -174,10 +179,8 @@ export class DialogueSystem {
         this.active = false;
         if (this.sound.isPlaying) this.sound.stop();
         
-        // Mostrar HUD e reabilitar controles virtuais
-        if (this.scene.hotbar) this.scene.hotbar.show();
-        if (this.scene.virtualButtons) this.scene.virtualButtons.show();
-        if (this.scene.virtualJoystick) this.scene.virtualJoystick.enable();
+        // Nota: O mostrar dos controles virtuais é gerenciado pela cena
+        // através do override deste método
         
         // Reabrir hotbar se estava aberta antes do diálogo
         if (this.wasHotbarOpen && this.scene.hotbar) {
