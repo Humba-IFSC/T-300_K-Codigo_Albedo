@@ -57,3 +57,135 @@ No final colocamos todos os dígitos na ordem e ativamos o laboratório, nos dan
 É aqui que o jogador descobre elementos essenciais sobre a história do jogo, como o envolvimento da DeltaUmbra com o Dr. Thorne, os métodos da solução do problema, a origem do vírus Kaloris, o seu funcionamento, etc. Além disso, essa fase serve como ponto de saída para as outras fases do jogo, usando o barco ***Borealis***.
 
 
+TELA 1 — INICIALIZAÇÃO DO TABLET
+(Tela piscando. Ruídos de sistema reiniciando.)
+Sistema iniciando… carregando dados de segurança…
+PROJETO T-300K — ARQUIVO RESTRITO
+Autoridade máxima: Dr. A. Thorne
+Status global: CRÍTICO
+Nível de ameaça ao clima: EXTREMO
+Identificando usuário…
+Acesso concedido.
+
+[BOTÃO: Acessar histórico]
+
+TELA 2 — HOLOREGISTRO 001 (Holograma do Dr. Thorne)
+(A imagem de Thorne aparece instável, com falhas de energia.)
+
+“Se você está vendo isso, o mundo já está ardendo.
+O calor que tomou o planeta não é natural.
+Não é apenas o efeito estufa acelerado pelos humanos.
+Nós encontramos algo no gelo.
+Algo antigo, poderoso e perigoso.
+Algo que nunca deveria ter voltado.”
+
+A imagem sofre interferência e se interrompe por um segundo.
+
+[BOTÃO: Continuar]
+
+TELA 3 — Relatório da Escavação
+(Fotos borradas de gelo profundo, tubos e microscópios aparecem no fundo.)
+
+Local: Estação de Estudos Climáticos da Antártida (ECPA)
+Data da descoberta: CLASSIFICADO
+Profundidade da coleta: 3.200 metros
+Temperatura da amostra: -40°C
+Idade estimada: aproximadamente 20.000 anos
+
+Vírus pré-histórico identificado: KALORIS
+Estado inicial: Dormente, totalmente inativo no gelo
+Efeito conhecido: Aumenta a temperatura corporal do hospedeiro e do ambiente ao redor
+
+Observação do relatório:
+“O aquecimento local foi tão intenso que a câmara quase derreteu por dentro.”
+
+[BOTÃO: Ver anomalia climática]
+
+TELA 4 — O Primeiro Desastre
+(Aparecem gráficos antigos e mapas se inundando rapidamente.)
+
+“Há 20 mil anos, o mundo esquentou rápido demais.
+O gelo derreteu em ritmo impossível de ser natural.
+Oceanos transbordaram.
+Cidades primitivas desapareceram sob a água.
+Foi quase o fim da humanidade.”
+
+(Os gráficos mudam para uma queda brusca de temperatura.)
+
+“Mas quando o planeta se tornou quase totalmente coberto de água,
+a luz solar começou a ser refletida.
+O albedo aumentou.
+E assim teve início uma era glacial.”
+
+(Aparece uma imagem do vírus sendo engolido pelo gelo.)
+
+“O Kaloris ficou preso ali.
+Adormecido durante milênios.”
+
+[BOTÃO: Continuar]
+
+TELA 5 — O Retorno
+(Alarmes e interferência na tela. Imagens de um laboratório caótico.)
+
+“No presente, ao escavarmos o gelo para entender o clima,
+nós quebramos o selo que mantinha o Kaloris preso.
+E ele despertou novamente.”
+
+(O símbolo da Delta Umbra surge com distorção e glitch.)
+
+“Mas não foi acidente para todos.
+Alguém sabia.
+Alguém estava esperando por isso…”
+
+[BOTÃO: Continuar]
+
+TELA 6 — Delta Umbra Corp
+(Imagens aéreas de grandes instalações industriais e enclaves refrigerados.)
+
+“Uma corporação sombria, a Delta Umbra,
+capturou o conhecimento sobre o vírus
+antes mesmo de nós compreendermos o perigo real.”
+
+“Aquecimento extremo.
+Escassez.
+Caos climático.
+Eles lucram enquanto o mundo sofre.”
+
+“A humanidade culpa apenas os gases de efeito estufa.
+Mas o verdadeiro inimigo é invisível, microscópico e planejado.”
+
+(Arquivo de alerta: “Kaloris liberado na atmosfera aquecida.”)
+
+“Eles querem poder absoluto
+e o controle do clima como arma.”
+
+[BOTÃO: Últimas palavras de Thorne]
+
+TELA 7 — Último recado do Dr. Thorne
+(O holograma de Thorne volta, bem mais fraco, com falhas constantes.)
+
+“Helena, Pedro… se estão vendo isso, eu falhei em impedir o desastre.
+O Projeto T-300K é nossa última esperança.
+Se conseguirem coletar todas as partes dele,
+talvez o planeta tenha uma chance.”
+
+“A máquina pode resfriar a Terra e conter o Kaloris.
+Mas também pode destruir tudo
+se cair em mãos erradas.”
+
+(O rosto dele distorce.)
+
+“Não confiem em ninguém.
+Até mesmo eu… posso já não ser o mesmo.”
+
+(O holograma se apaga definitivamente.)
+
+[BOTÃO: Missão desbloqueada]
+
+TELA FINAL — Missão desbloqueada
+Arquivo do Kaloris restaurado com sucesso.
+Objetivo atualizado: reunir os componentes do Projeto T-300K.
+Destino: Laboratório de Monitoramento Urbano — Fase 2: A Febre Urbana.
+O tempo está contra nós.
+
+[BOTÃO: Encerrar]
