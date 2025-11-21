@@ -49,13 +49,7 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 
 
 
-## Final:
-
-
-No final colocamos todos os dígitos na ordem e ativamos o laboratório, nos dando acesso ao laboratório, além do computador que explica toda a questão do porque a *DeltaUmbra* estava trabalhando com o vírus.
-
-É aqui que o jogador descobre elementos essenciais sobre a história do jogo, como o envolvimento da DeltaUmbra com o Dr. Thorne, os métodos da solução do problema, a origem do vírus Kaloris, o seu funcionamento, etc. Além disso, essa fase serve como ponto de saída para as outras fases do jogo, usando o barco ***Borealis***.
-
+## Roteiro geral do jogo:
 
 TELA 1 — INICIALIZAÇÃO DO TABLET
 (Tela piscando. Ruídos de sistema reiniciando.)
@@ -189,3 +183,11 @@ Destino: Laboratório de Monitoramento Urbano — Fase 2: A Febre Urbana.
 O tempo está contra nós.
 
 [BOTÃO: Encerrar]
+
+
+
+## Final:
+
+No final colocamos todos os dígitos na ordem e ativamos o laboratório, nos dando acesso ao laboratório, além do computador que explica toda a questão do porque a *DeltaUmbra* estava trabalhando com o vírus.
+
+É aqui que o jogador descobre elementos essenciais sobre a história do jogo, como o envolvimento da DeltaUmbra com o Dr. Thorne, os métodos da solução do problema, a origem do vírus Kaloris, o seu funcionamento, etc. Além disso, essa fase serve como ponto de saída para as outras fases do jogo, usando o barco ***Borealis***.
