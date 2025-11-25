@@ -257,6 +257,39 @@ export default class Intro2Scene extends BaseScene {
         
         console.log('[Intro2Scene] Placa criada em tile (16, 7) -> pixel:', signX, signY);
         
+        // Zona de transição para HallDoHalliradoScene - tile 14,3 (entrada esquerda)
+        const hallLeftTileX = 14;
+        const hallLeftTileY = 3;
+        const hallLeftX = hallLeftTileX * tileSize + tileSize / 2;
+        const hallLeftY = hallLeftTileY * tileSize + tileSize / 2;
+        
+        this.hallEntranceLeft = this.add.zone(hallLeftX, hallLeftY, 32, 32);
+        this.physics.world.enable(this.hallEntranceLeft);
+        this.hallEntranceLeft.body.setImmovable(true);
+        this.hallEntranceLeft.body.moves = false;
+        
+        // Zona de transição para HallDoHalliradoScene - tile 15,3 (entrada direita)
+        const hallRightTileX = 15;
+        const hallRightTileY = 3;
+        const hallRightX = hallRightTileX * tileSize + tileSize / 2;
+        const hallRightY = hallRightTileY * tileSize + tileSize / 2;
+        
+        this.hallEntranceRight = this.add.zone(hallRightX, hallRightY, 32, 32);
+        this.physics.world.enable(this.hallEntranceRight);
+        this.hallEntranceRight.body.setImmovable(true);
+        this.hallEntranceRight.body.moves = false;
+        
+        // Ícone de interação para entrada do hall (centralizado entre as duas zonas)
+        const hallIconX = (hallLeftX + hallRightX) / 2;
+        const hallIconY = hallLeftY;
+        this.hallIconZone = this.add.zone(hallIconX, hallIconY, 64, 32);
+        this.physics.world.enable(this.hallIconZone);
+        
+        this.hallIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.hallIcon.offsetY = -24;
+        
+        console.log('[Intro2Scene] Entradas do hall criadas - Esquerda:', hallLeftX, hallLeftY, '- Direita:', hallRightX, hallRightY);
+        
         // CUTSCENE: Iniciar caminhada automática se a flag estiver setada
         console.log('[Intro2Scene] Verificando cutscene - shouldStartCutscene:', shouldStartCutscene);
         if (shouldStartCutscene) {
@@ -305,6 +338,10 @@ export default class Intro2Scene extends BaseScene {
         if (this.signIcon?.icon) signIconObjects.push(this.signIcon.icon);
         if (this.signIcon?.pulse) signIconObjects.push(this.signIcon.pulse);
         
+        const hallIconObjects = [];
+        if (this.hallIcon?.icon) hallIconObjects.push(this.hallIcon.icon);
+        if (this.hallIcon?.pulse) hallIconObjects.push(this.hallIcon.pulse);
+        
         const worldObjects = [
             this.player, 
             floor,
@@ -315,7 +352,8 @@ export default class Intro2Scene extends BaseScene {
             troncos1,
             arvores,
             troncos2,
-            ...signIconObjects
+            ...signIconObjects,
+            ...hallIconObjects
         ].filter(Boolean);
         this.worldObjects = worldObjects;
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
@@ -974,7 +1012,7 @@ export default class Intro2Scene extends BaseScene {
     }
     
     /**
-     * Override do método de interação para suportar a placa
+     * Override do método de interação para suportar a placa e entrada do hall
      */
     handleInteraction() {
         console.log('[Intro2Scene] handleInteraction chamado, cutsceneActive:', this.cutsceneActive, 'currentInteractable:', this.currentInteractable);
@@ -982,6 +1020,39 @@ export default class Intro2Scene extends BaseScene {
             console.log('[Intro2Scene] Lendo placa via handleInteraction');
             this.readFactorySign();
         }
+        if (!this.cutsceneActive && (this.currentInteractable === 'hall-left' || this.currentInteractable === 'hall-right')) {
+            console.log('[Intro2Scene] Entrando no Hall do Hallirado via handleInteraction');
+            this.enterHall(this.currentInteractable);
+        }
+    }
+    
+    /**
+     * Transição para HallDoHalliradoScene
+     * @param {string} entrance - 'hall-left' ou 'hall-right'
+     */
+    enterHall(entrance) {
+        console.log('[Intro2Scene] Iniciando transição para HallDoHalliradoScene via:', entrance);
+        
+        // Esconder ícone
+        if (this.hallIcon) {
+            this.hallIcon.hide();
+        }
+        
+        // Definir posição de spawn no Hall baseado na entrada
+        // hall-left (tile 14,3 da intro2) -> spawn no tile 19,19 do hall
+        // hall-right (tile 15,3 da intro2) -> spawn no tile 20,19 do hall
+        if (entrance === 'hall-left') {
+            window._playerEntryPos = { x: 19 * 32 + 16, y: 19 * 32 + 16 };
+        } else {
+            window._playerEntryPos = { x: 20 * 32 + 16, y: 19 * 32 + 16 };
+        }
+        
+        // Fade out
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        
+        this.time.delayedCall(500, () => {
+            this.scene.start('HallDoHalliradoScene');
+        });
     }
 
     onReturnToIntro() {
@@ -1100,12 +1171,80 @@ export default class Intro2Scene extends BaseScene {
             
             // Atualizar posição do ícone
             this.signIcon.updatePosition();
+        }
+        
+        // Interação com a entrada do hall (somente quando não está em cutscene e não está em diálogo)
+        if (!this.cutsceneActive && !this.dialogue?.active && this.hallIconZone && this.player) {
+            const distanceToHallLeft = Phaser.Math.Distance.Between(
+                this.player.x, 
+                this.player.y, 
+                this.hallEntranceLeft.x, 
+                this.hallEntranceLeft.y
+            );
+            
+            const distanceToHallRight = Phaser.Math.Distance.Between(
+                this.player.x, 
+                this.player.y, 
+                this.hallEntranceRight.x, 
+                this.hallEntranceRight.y
+            );
+            
+            // Determinar qual entrada está mais próxima
+            const nearLeft = distanceToHallLeft < 50;
+            const nearRight = distanceToHallRight < 50;
+            
+            let hallIconVisible = false;
+            if (nearLeft || nearRight) {
+                // Mostrar ícone quando próximo de qualquer entrada
+                if (!this.hallIcon.visible) {
+                    this.hallIcon.showAbove(this.hallIconZone);
+                    console.log('[Intro2Scene] Mostrado ícone da entrada do hall');
+                }
+                hallIconVisible = true;
+                
+                // Armazenar qual entrada está próxima
+                if (nearLeft) {
+                    this.currentInteractable = 'hall-left';
+                } else {
+                    this.currentInteractable = 'hall-right';
+                }
+                
+                // Desabilitar área clicável da hotbar
+                if (this.hotbar && this.hotbar.clickableArea) {
+                    this.hotbar.clickableArea.disableInteractive();
+                    this.hotbar.clickableArea.setVisible(false);
+                    this.hotbar.clickableArea.setActive(false);
+                }
+            }
+            
+            if (!hallIconVisible) {
+                if (this.hallIcon.visible) {
+                    this.hallIcon.hide();
+                    console.log('[Intro2Scene] Escondido ícone da entrada do hall (longe)');
+                }
+                if (this.currentInteractable === 'hall-left' || this.currentInteractable === 'hall-right') {
+                    this.currentInteractable = null;
+                    
+                    // Re-habilitar área clicável da hotbar
+                    if (this.hotbar && this.hotbar.clickableArea) {
+                        this.hotbar.clickableArea.setInteractive();
+                        this.hotbar.clickableArea.setVisible(true);
+                        this.hotbar.clickableArea.setActive(true);
+                    }
+                }
+            }
+            
+            // Atualizar posição do ícone
+            this.hallIcon.updatePosition();
         } else if (this.dialogue?.active) {
             // Durante diálogo, esconder ícone e limpar interactable
             if (this.signIcon) {
                 this.signIcon.hide();
             }
-            if (this.currentInteractable === 'sign') {
+            if (this.hallIcon) {
+                this.hallIcon.hide();
+            }
+            if (this.currentInteractable === 'sign' || this.currentInteractable === 'hall-left' || this.currentInteractable === 'hall-right') {
                 this.currentInteractable = null;
                 
                 // Re-habilitar E tornar visível a área clicável da hotbar

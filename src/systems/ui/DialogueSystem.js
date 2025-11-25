@@ -50,6 +50,100 @@ export class DialogueSystem {
         this.sound = scene.sound.add('textBlip', { loop: true, volume: 0.3, rate: 1 });
     }
 
+    /**
+     * Separa uma palavra em sílabas seguindo as regras da língua portuguesa
+     */
+    syllabify(word) {
+        // Converter para minúsculas para análise
+        const lower = word.toLowerCase();
+        const syllables = [];
+        let currentSyllable = '';
+        
+        // Vogais
+        const vowels = 'aeiouáéíóúâêîôûãõ';
+        const isVowel = (c) => vowels.includes(c);
+        
+        for (let i = 0; i < lower.length; i++) {
+            const c = lower[i];
+            const next = lower[i + 1] || '';
+            const next2 = lower[i + 2] || '';
+            
+            currentSyllable += word[i]; // Manter capitalização original
+            
+            // Regras de separação silábica
+            if (isVowel(c)) {
+                // Vogal seguida de consoante e vogal: se-pa-rar
+                if (!isVowel(next) && isVowel(next2)) {
+                    // Verificar dígrafos que não se separam
+                    const digraph = (c + next).toLowerCase();
+                    if (['ch', 'lh', 'nh', 'qu', 'gu'].includes(digraph)) {
+                        currentSyllable += word[i + 1];
+                        i++;
+                    } else {
+                        syllables.push(currentSyllable);
+                        currentSyllable = '';
+                    }
+                }
+                // Vogal seguida de duas consoantes: sep-a-rar
+                else if (!isVowel(next) && !isVowel(next2) && next2) {
+                    const cons1 = next.toLowerCase();
+                    const cons2 = next2.toLowerCase();
+                    
+                    // Encontros consonantais que ficam juntos (br, cr, dr, fr, gr, pr, tr, bl, cl, fl, gl, pl)
+                    const inseparable = ['br', 'cr', 'dr', 'fr', 'gr', 'pr', 'tr', 'vr', 
+                                        'bl', 'cl', 'fl', 'gl', 'pl', 'tl'];
+                    
+                    if (inseparable.includes(cons1 + cons2)) {
+                        syllables.push(currentSyllable);
+                        currentSyllable = '';
+                    } else {
+                        currentSyllable += word[i + 1];
+                        i++;
+                        syllables.push(currentSyllable);
+                        currentSyllable = '';
+                    }
+                }
+                // Ditongos: não separar (ai, ei, oi, ui, au, eu, iu, ou)
+                else if (isVowel(next)) {
+                    const diphthong = (c + next).toLowerCase();
+                    if (['ai', 'ei', 'oi', 'ui', 'au', 'eu', 'iu', 'ou', 'ão', 'ãe', 'õe'].includes(diphthong)) {
+                        currentSyllable += word[i + 1];
+                        i++;
+                    }
+                }
+            }
+        }
+        
+        // Adicionar última sílaba
+        if (currentSyllable) {
+            syllables.push(currentSyllable);
+        }
+        
+        return syllables.length > 0 ? syllables : [word];
+    }
+
+    /**
+     * Encontra o melhor ponto de quebra em uma palavra
+     */
+    findBreakPoint(word) {
+        const syllables = this.syllabify(word);
+        
+        // Se a palavra tem apenas uma sílaba, não quebra
+        if (syllables.length <= 1) {
+            return { part1: word, part2: '' };
+        }
+        
+        // Quebrar antes da última sílaba para maximizar uso da linha
+        let part1 = '';
+        for (let i = 0; i < syllables.length - 1; i++) {
+            part1 += syllables[i];
+        }
+        
+        const part2 = syllables[syllables.length - 1];
+        
+        return { part1: part1 + '-', part2 };
+    }
+
     show(messages, options = {}) {
         this.messages = Array.isArray(messages) ? messages : [messages];
         this.index = 0;
@@ -90,39 +184,21 @@ export class DialogueSystem {
             this.sound.play();
         }
 
+        // Pré-processar o texto completo com quebras de linha corretas
+        const processedText = this.preprocessText(message);
+        
         let i = 0;
-        let currentLine = '';
         const appendChar = (ch) => {
-            if (ch === '\n') { // quebra manual existente na string
-                this.text.setText(this.text.text + '\n');
-                currentLine = '';
-                return;
-            }
-            // Testar largura incluindo este char
-            const testLine = currentLine + ch;
-            this.measureText.setText(testLine);
-            if (this.measureText.width > this.wrapWidth) {
-                // quebra de linha antes do char; se char for espaço, não leva para próxima linha
-                if (ch === ' ') {
-                    this.text.setText(this.text.text + '\n');
-                    currentLine = '';
-                } else {
-                    this.text.setText(this.text.text + '\n' + ch);
-                    currentLine = ch;
-                }
-            } else {
-                this.text.setText(this.text.text + ch);
-                currentLine = testLine;
-            }
+            this.text.setText(this.text.text + ch);
         };
 
         this.timer = this.scene.time.addEvent({
             delay: 40,
-            repeat: message.length - 1,
+            repeat: processedText.length - 1,
             callback: () => {
-                appendChar(message[i]);
+                appendChar(processedText[i]);
                 i++;
-                if (i === message.length) {
+                if (i === processedText.length) {
                     this.writing = false;
                     if (this.sound.isPlaying) this.sound.stop();
                     if (this.index < this.messages.length - 1) this.nextIcon.setVisible(true);
@@ -130,35 +206,77 @@ export class DialogueSystem {
             }
         });
     }
+    
+    /**
+     * Pré-processa o texto aplicando quebras de linha e hifenização
+     */
+    preprocessText(message) {
+        let result = '';
+        let currentLine = '';
+        let currentWord = '';
+        
+        for (const ch of message) {
+            if (ch === '\n') {
+                result += currentWord + '\n';
+                currentLine = '';
+                currentWord = '';
+                continue;
+            }
+            
+            if (ch === ' ') {
+                const testLine = currentLine + currentWord + ' ';
+                this.measureText.setText(testLine);
+                
+                if (this.measureText.width > this.wrapWidth) {
+                    result += '\n' + currentWord + ' ';
+                    currentLine = currentWord + ' ';
+                } else {
+                    result += currentWord + ' ';
+                    currentLine = testLine;
+                }
+                currentWord = '';
+            } else {
+                currentWord += ch;
+                const testLine = currentLine + currentWord;
+                this.measureText.setText(testLine);
+                
+                if (this.measureText.width > this.wrapWidth) {
+                    if (currentWord.length > 3) {
+                        const { part1, part2 } = this.findBreakPoint(currentWord);
+                        this.measureText.setText(currentLine + part1);
+                        
+                        if (this.measureText.width <= this.wrapWidth && part2) {
+                            result += part1 + '\n';
+                            currentLine = '';
+                            currentWord = part2;
+                        } else {
+                            result += '\n';
+                            currentLine = '';
+                        }
+                    } else {
+                        result += '\n';
+                        currentLine = '';
+                    }
+                }
+            }
+        }
+        
+        if (currentWord) {
+            result += currentWord;
+        }
+        
+        return result;
+    }
 
     next() {
         if (!this.active) return;
         if (this.writing) {
             if (this.timer) this.timer.remove(false);
-            // Reconstruir texto completo com lógica de wrap para finalizar instantaneamente
+            // Usar texto pré-processado para finalizar instantaneamente
             const full = this.messages[this.index];
-            this.text.setText('');
-            let currentLine = '';
-            for (const ch of full) {
-                if (ch === '\n') {
-                    this.text.setText(this.text.text + '\n');
-                    currentLine = '';
-                    continue;
-                }
-                this.measureText.setText(currentLine + ch);
-                if (this.measureText.width > this.wrapWidth) {
-                    if (ch === ' ') {
-                        this.text.setText(this.text.text + '\n');
-                        currentLine = '';
-                    } else {
-                        this.text.setText(this.text.text + '\n' + ch);
-                        currentLine = ch;
-                    }
-                } else {
-                    this.text.setText(this.text.text + ch);
-                    currentLine += ch;
-                }
-            }
+            const processedText = this.preprocessText(full);
+            this.text.setText(processedText);
+            
             this.writing = false;
             if (this.sound.isPlaying) this.sound.stop();
             if (this.index < this.messages.length - 1) this.nextIcon.setVisible(true);
