@@ -41,22 +41,23 @@ export default class TitleScene extends Phaser.Scene {
         const maps = [
             { name: 'Introdução', scene: 'IntroScene', color: 0x3498db },
             { name: 'Mapa Principal', scene: 'GameScene', color: 0x2ecc71 },
-            { name: 'Segunda Área', scene: 'SecondScene', color: 0xe74c3c }
+            { name: 'Segunda Área', scene: 'HallDoHalliradoScene', color: 0xe74c3c },
+            { name: 'Hall do Hallirado', scene: 'HallDoHalliradoScene', color: 0x9b59b6 }
         ];
         
-        const startY = 250;
-        const spacing = 120;
+        const startY = 220;
+        const spacing = 100;
         
         maps.forEach((map, index) => {
             const y = startY + (index * spacing);
             
             // Botão (retângulo)
-            const button = this.add.rectangle(width / 2, y, 400, 80, map.color, 0.9);
+            const button = this.add.rectangle(width / 2, y, 400, 70, map.color, 0.9);
             button.setInteractive({ useHandCursor: true });
             
             // Texto do botão
             const text = this.add.text(width / 2, y, map.name, {
-                fontSize: '32px',
+                fontSize: '28px',
                 fontFamily: 'Arial',
                 color: '#ffffff',
                 fontStyle: 'bold'
