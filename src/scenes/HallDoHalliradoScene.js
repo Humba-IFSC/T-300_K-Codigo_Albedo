@@ -136,10 +136,28 @@ export class HallDoHalliradoScene extends BaseScene {
         
         console.log('[HallDoHalliradoScene] Cartaz criado em tile (27, 17-18) -> pixel:', posterX, posterY);
         
+        // Lista de visitação (tiles 21, 10-11)
+        const listTileX = 21;
+        const listTileY = 10; // Usar o tile superior
+        const listX = listTileX * tileSize + tileSize / 2;
+        const listY = listTileY * tileSize + tileSize / 2;
+        
+        // Criar zona invisível para a lista
+        this.visitList = this.add.zone(listX, listY, 32, 64); // 2 tiles de altura
+        this.physics.world.enable(this.visitList);
+        this.visitList.body.setImmovable(true);
+        this.visitList.body.moves = false;
+        
+        // Ícone de interação para a lista
+        this.listIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.listIcon.offsetY = -40;
+        
+        console.log('[HallDoHalliradoScene] Lista criada em tile (21, 10-11) -> pixel:', listX, listY);
+        
         // Configurar câmera principal (igual Intro2Scene)
         const worldCam = this.cameras.main;
         worldCam.startFollow(this.player);
-        worldCam.setZoom(2);
+        worldCam.setZoom(1.5); // Zoom maior para melhor visualização
         
         // Limitar câmera à área da sala (tiles 10-29 em X, tiles 7-19 em Y)
         // Tile 10 = 320px, Tile 29 = 960px (29+1)*32 = 960
@@ -164,6 +182,10 @@ export class HallDoHalliradoScene extends BaseScene {
         if (this.posterIcon?.icon) posterIconObjects.push(this.posterIcon.icon);
         if (this.posterIcon?.pulse) posterIconObjects.push(this.posterIcon.pulse);
         
+        const listIconObjects = [];
+        if (this.listIcon?.icon) listIconObjects.push(this.listIcon.icon);
+        if (this.listIcon?.pulse) listIconObjects.push(this.listIcon.pulse);
+        
         const worldObjects = [
             this.player,
             this.shadowLayer,
@@ -175,7 +197,8 @@ export class HallDoHalliradoScene extends BaseScene {
             this.webLayer,
             this.switchLayer,
             this.doorLayer,
-            ...posterIconObjects
+            ...posterIconObjects,
+            ...listIconObjects
         ].filter(Boolean);
         
         this.worldObjects = worldObjects;
@@ -245,12 +268,66 @@ export class HallDoHalliradoScene extends BaseScene {
             
             // Atualizar posição do ícone
             this.posterIcon.updatePosition();
-        } else if (this.dialogue?.active) {
-            // Durante diálogo, esconder ícone e limpar interactable
+        }
+        
+        // Interação com a lista de visitação
+        if (!this.dialogue?.active && this.visitList && this.player) {
+            const distanceToList = Phaser.Math.Distance.Between(
+                this.player.x, 
+                this.player.y, 
+                this.visitList.x, 
+                this.visitList.y
+            );
+            
+            let listIconVisible = false;
+            if (distanceToList < 50) {
+                // Mostrar ícone quando próximo
+                if (!this.listIcon.visible) {
+                    this.listIcon.showAbove(this.visitList);
+                    console.log('[HallDoHalliradoScene] Mostrado ícone da lista');
+                }
+                listIconVisible = true;
+                this.currentInteractable = 'list';
+                
+                // Desabilitar área clicável da hotbar
+                if (this.hotbar && this.hotbar.clickableArea) {
+                    this.hotbar.clickableArea.disableInteractive();
+                    this.hotbar.clickableArea.setVisible(false);
+                    this.hotbar.clickableArea.setActive(false);
+                }
+            }
+            
+            if (!listIconVisible) {
+                if (this.listIcon.visible) {
+                    this.listIcon.hide();
+                    console.log('[HallDoHalliradoScene] Escondido ícone da lista (longe)');
+                }
+                if (this.currentInteractable === 'list') {
+                    this.currentInteractable = null;
+                    
+                    // Re-habilitar área clicável da hotbar
+                    if (this.hotbar && this.hotbar.clickableArea) {
+                        this.hotbar.clickableArea.setInteractive();
+                        this.hotbar.clickableArea.setVisible(true);
+                        this.hotbar.clickableArea.setActive(true);
+                    }
+                }
+            }
+            
+            // Atualizar posição do ícone
+            this.listIcon.updatePosition();
+        }
+        
+        // Durante diálogo, esconder ícones e limpar interactable
+        if (this.dialogue?.active) {
+            // Esconder ícones
             if (this.posterIcon) {
                 this.posterIcon.hide();
             }
-            if (this.currentInteractable === 'poster') {
+            if (this.listIcon) {
+                this.listIcon.hide();
+            }
+            if (this.currentInteractable === 'poster' || this.currentInteractable === 'list') {
                 this.currentInteractable = null;
                 
                 // Re-habilitar área clicável da hotbar
@@ -274,6 +351,77 @@ export class HallDoHalliradoScene extends BaseScene {
         if (this.currentInteractable === 'poster') {
             this.readWantedPoster();
         }
+        
+        // Interação com a lista de visitação
+        if (this.currentInteractable === 'list') {
+            this.readVisitList();
+        }
+    }
+    
+    /**
+     * Lê a lista de visitação
+     */
+    readVisitList() {
+        console.log('[HallDoHalliradoScene] Lendo lista de visitação');
+        
+        // Esconder ícone de interação
+        if (this.listIcon) {
+            this.listIcon.hide();
+        }
+        
+        // Esconder e suprimir hotbar
+        if (this.hotbar) {
+            this.hotbar.suppress();
+        }
+        
+        // Esconder controles virtuais manualmente
+        if (this.virtualJoystick) {
+            this.virtualJoystick.base.setVisible(false);
+            this.virtualJoystick.stick.setVisible(false);
+            this.virtualJoystick.disabled = true;
+        }
+        
+        if (this.virtualButtons) {
+            this.virtualButtons.buttons.forEach(btn => {
+                if (btn && btn.container) {
+                    btn.container.setVisible(false);
+                }
+            });
+        }
+        
+        // Mostrar diálogo
+        this.dialogue.show('Lista de visitação da fábrica, Dr. Aris Thorne estava presente.', {
+            disableSound: true
+        });
+        
+        // Sobrescrever close() para restaurar controles
+        const originalClose = this.dialogue.close.bind(this.dialogue);
+        this.dialogue.close = () => {
+            originalClose();
+            
+            console.log('[HallDoHalliradoScene] Restaurando controles');
+            
+            // Restaurar hotbar
+            if (this.hotbar) {
+                this.hotbar.unsuppress(false);
+            }
+            
+            // Restaurar joystick
+            if (this.virtualJoystick) {
+                this.virtualJoystick.base.setVisible(true);
+                this.virtualJoystick.stick.setVisible(true);
+                this.virtualJoystick.disabled = false;
+            }
+            
+            // Restaurar botões
+            if (this.virtualButtons) {
+                this.virtualButtons.buttons.forEach(btn => {
+                    if (btn && btn.container) {
+                        btn.container.setVisible(true);
+                    }
+                });
+            }
+        };
     }
     
     /**
