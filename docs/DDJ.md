@@ -187,14 +187,15 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 
 ### *[Áudios](../assets/audio):*
 
-1. ambiente-laboratório.mp3
+#### 1. ambiente-laboratório.mp3
 **Duração:** ~2min37s  
 **Descrição:** Áudio contínuo com sons de equipamentos, ventilação e reverberação típica de laboratório.  
 **Uso sugerido:**  
 - Trilha base para cenas internas.  
 - Ambiência de simulações científicas.
 
-2. Bateria-Ligando_Desligando.mp3
+
+#### 2. Bateria-Ligando_Desligando.mp3
 **Duração:** ~4,7s  
 **Descrição:** Som curto de bateria/dispositivo ligando e desligando.  
 **Uso sugerido:**  
@@ -202,7 +203,7 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Ligar/desligar módulos de coleta.  
 - Sonorização de interfaces.
 
-3. click-mouse.mp3
+#### 3. click-mouse.mp3
 **Duração:** ~1,5s  
 **Descrição:** Cliques mecânicos de mouse.  
 **Uso sugerido:**  
@@ -210,7 +211,7 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Manipulação de dados.  
 - Interações de software.
 
-4. fechando-livro.mp3
+#### 4. fechando-livro.mp3
 **Duração:** ~1,3s  
 **Descrição:** Livro ou caderno sendo fechado.  
 **Uso sugerido:**  
@@ -218,14 +219,14 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Transições de pesquisa.  
 - Organização documental.
 
-5. Folhando.mp3
+#### 5. Folheando.mp3
 **Duração:** ~3,3s  
 **Descrição:** Folhear páginas de livro ou caderno.  
 **Uso sugerido:**  
 - Revisar dados impressos.  
 - Tarefas administrativas.
 
-6. laser_motor.mp3
+#### 6. laser_motor.mp3
 **Duração:** ~8,1s  
 **Descrição:** Motor elétrico ou laser industrial operando.  
 **Uso sugerido:**  
@@ -233,7 +234,7 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Máquinas de análise de gelo, sedimentos ou água.  
 - Ferramentas automatizadas.
 
-7. Mar.mp3
+#### 7. Mar.mp3
 **Duração:** ~20s  
 **Descrição:** Som de ondas — ambiente costeiro gelado.  
 **Uso sugerido:**  
@@ -241,14 +242,14 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Cenas da costa Antártica.  
 - Transições entre interior e exterior.
 
-8. passos-neve.mp3
+#### 8. passos-neve.mp3
 **Duração:** ~5,4s  
 **Descrição:** Passos sobre neve compacta.  
 **Uso sugerido:**  
 - Movimentação entre módulos da estação.  
 - Explorações externas.
 
-9. porta-laboratorio_maquina.mp3
+#### 9. porta-laboratorio_maquina.mp3
 **Duração:** ~12,4s  
 **Descrição:** Porta pesada, automática ou pressurizada, abrindo ou fechando.  
 **Uso sugerido:**  
@@ -256,13 +257,13 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Transições entre ambientes pressurizados.  
 - Acesso a câmaras frias.
 
-10. running-6358.mp3
+#### 10. running-6358.mp3
 **Duração:** ~5,9s  
 **Descrição:** Passos rápidos ou corrida leve.  
 **Uso sugerido:**  
 - Movimentação rápida dentro do laboratório.
 
-11. som-tecnologiaXD-1.mp3
+#### 11. som-tecnologiaXD-1.mp3
 **Duração:** ~10,0s  
 **Descrição:** Sequência de bipes, pulsos e sons eletrônicos de equipamentos ativos.  
 **Uso sugerido:**  
@@ -270,7 +271,7 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Processos internos de máquinas.  
 - Scanners e analisadores.
 
-12. som-tecnologiaXD-2.mp3
+#### 12. som-tecnologiaXD-2.mp3
 **Duração:** ~10,4s  
 **Descrição:** Ruído eletrônico suave e contínuo de monitoramento.  
 **Uso sugerido:**  
@@ -278,14 +279,14 @@ A luz vermelha do módulo se apaga e dá lugar a uma faixa verde, indicando que 
 - Sensores em operação contínua.  
 - Ambiência tecnológica de fundo.
 
-13. teclado-computador.mp3
+#### 13. teclado-computador.mp3
 **Duração:** ~10,1s  
 **Descrição:** Digitação contínua e natural.  
 **Uso sugerido:**  
 - Procesamento e análise de dados.  
 - Programação e controle de equipamentos.
 
-14. Vento.mp3
+#### 14. Vento.mp3
 **Duração:** ~5,2s  
 **Descrição:** Rajada de vento frio, típica da Antártica.  
 **Uso sugerido:**  
