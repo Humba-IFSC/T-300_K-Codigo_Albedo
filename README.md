@@ -8,7 +8,7 @@ Após a disseminação do vírus Kaloris, o mundo mergulhou no caos. O antigo la
 
 [Fluxograma da fase](/assets/resumos/fluxograma.png)
 
-[Mini-Documentário](/assets/resumos/o_protocolo_thorne.mp4)
+[Mini-Documentário]()
 
 
 ## O que acontecerá na fase:
