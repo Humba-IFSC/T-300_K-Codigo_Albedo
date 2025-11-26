@@ -41,8 +41,8 @@ export default class TitleScene extends Phaser.Scene {
         const maps = [
             { name: 'Introdução', scene: 'IntroScene', color: 0x3498db },
             { name: 'Mapa Principal', scene: 'GameScene', color: 0x2ecc71 },
-            { name: 'Segunda Área', scene: 'HallDoHalliradoScene', color: 0xe74c3c },
-            { name: 'Hall do Hallirado', scene: 'HallDoHalliradoScene', color: 0x9b59b6 }
+            { name: 'Hall do Hallirado', scene: 'TcheScene', color: 0x9b59b6 },
+            { name: 'Mapa Tche (Cyberpunk)', scene: 'TcheScene', color: 0xe74c3c }
         ];
         
         const startY = 220;

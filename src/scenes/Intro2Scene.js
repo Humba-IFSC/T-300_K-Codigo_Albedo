@@ -35,6 +35,10 @@ export default class Intro2Scene extends BaseScene {
     create() {
         console.log('[Intro2Scene] Criando segunda cena de introdução');
         
+        // Inicializar variáveis de estado
+        this.currentInteractable = null;
+        this.cutsceneActive = false;
+        
         // Criar mapa com tratamento de erro
         try {
             const map = this.make.tilemap({ key: 'intro2_map' });
@@ -187,10 +191,12 @@ export default class Intro2Scene extends BaseScene {
         
         // Criar player - usar posição salva ou posição padrão (centro inferior)
         const entryPos = window._playerEntryPos;
+        console.log('[Intro2Scene] window._playerEntryPos:', entryPos);
+        
         const spawnX = entryPos?.x ?? (map.width / 2) * 32 + 16;
         const spawnY = entryPos?.y ?? (map.height - 2) * 32 + 16;
         
-        console.log('[Intro2Scene] Spawn do player:', { x: spawnX, y: spawnY, entryPos });
+        console.log('[Intro2Scene] Spawn do player:', { x: spawnX, y: spawnY, default: !entryPos });
         
         this.createCommonPlayer(spawnX, spawnY);
         
@@ -199,6 +205,7 @@ export default class Intro2Scene extends BaseScene {
         const shouldStartCutscene = (window._startCutscene || false) && !window._intro2CutsceneSeen;
         
         // Limpar flags temporárias
+        console.log('[Intro2Scene] Limpando window._playerEntryPos');
         window._playerEntryPos = null;
         window._startCutscene = false;
         
@@ -252,43 +259,26 @@ export default class Intro2Scene extends BaseScene {
         this.signIcon = new InteractionIcon(this, 'button_a', 0.05);
         this.signIcon.offsetY = -40;
         
-        // NÃO registrar nos elementos de UI - deve aparecer só na câmera do mundo
-        // Deixar no mundo para aparecer acima da placa
-        
         console.log('[Intro2Scene] Placa criada em tile (16, 7) -> pixel:', signX, signY);
+        console.log('[Intro2Scene] SignIcon criado:', this.signIcon ? 'SIM' : 'NÃO', 'Icon sprite:', this.signIcon?.icon ? 'OK' : 'ERRO');
         
-        // Zona de transição para HallDoHalliradoScene - tile 14,3 (entrada esquerda)
-        const hallLeftTileX = 14;
-        const hallLeftTileY = 3;
-        const hallLeftX = hallLeftTileX * tileSize + tileSize / 2;
-        const hallLeftY = hallLeftTileY * tileSize + tileSize / 2;
+        // Zona de transição para HallDoHalliradoScene - uma zona no meio das duas portas
+        // Portas em tiles (14,3) e (15,3) - criar zona entre elas
+        const hallTileX = 14.5; // Meio entre 14 e 15
+        const hallTileY = 3;
+        const hallX = hallTileX * tileSize + 16;
+        const hallY = hallTileY * tileSize + tileSize / 2;
         
-        this.hallEntranceLeft = this.add.zone(hallLeftX, hallLeftY, 32, 32);
-        this.physics.world.enable(this.hallEntranceLeft);
-        this.hallEntranceLeft.body.setImmovable(true);
-        this.hallEntranceLeft.body.moves = false;
+        this.hallEntrance = this.add.zone(hallX, hallY, 64, 32); // Largura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.hallEntrance);
+        this.hallEntrance.body.setImmovable(true);
+        this.hallEntrance.body.moves = false;
         
-        // Zona de transição para HallDoHalliradoScene - tile 15,3 (entrada direita)
-        const hallRightTileX = 15;
-        const hallRightTileY = 3;
-        const hallRightX = hallRightTileX * tileSize + tileSize / 2;
-        const hallRightY = hallRightTileY * tileSize + tileSize / 2;
-        
-        this.hallEntranceRight = this.add.zone(hallRightX, hallRightY, 32, 32);
-        this.physics.world.enable(this.hallEntranceRight);
-        this.hallEntranceRight.body.setImmovable(true);
-        this.hallEntranceRight.body.moves = false;
-        
-        // Ícone de interação para entrada do hall (centralizado entre as duas zonas)
-        const hallIconX = (hallLeftX + hallRightX) / 2;
-        const hallIconY = hallLeftY;
-        this.hallIconZone = this.add.zone(hallIconX, hallIconY, 64, 32);
-        this.physics.world.enable(this.hallIconZone);
-        
+        // Ícone de interação para entrada do hall
         this.hallIcon = new InteractionIcon(this, 'button_a', 0.05);
         this.hallIcon.offsetY = -24;
         
-        console.log('[Intro2Scene] Entradas do hall criadas - Esquerda:', hallLeftX, hallLeftY, '- Direita:', hallRightX, hallRightY);
+        console.log('[Intro2Scene] Entrada do hall criada no meio em:', hallX, hallY);
         
         // CUTSCENE: Iniciar caminhada automática se a flag estiver setada
         console.log('[Intro2Scene] Verificando cutscene - shouldStartCutscene:', shouldStartCutscene);
@@ -296,18 +286,30 @@ export default class Intro2Scene extends BaseScene {
             this.startWalkingCutscene();
         } else {
             // Se não há cutscene, garantir que controles estão habilitados
+            console.log('[Intro2Scene] SEM CUTSCENE - inicializando controles');
             this.cutsceneActive = false;
             if (this.player.body) {
                 this.player.body.enable = true;
                 this.player.body.setVelocity(0, 0);
             }
+            
             // Garantir que controles virtuais estão visíveis
-            if (this.mobileControls) {
-                this.mobileControls.show();
-            }
-            if (this.hotbar) {
-                this.hotbar.show();
-            }
+            this.time.delayedCall(100, () => {
+                console.log('[Intro2Scene] Mostrando controles virtuais manualmente');
+                if (this.virtualJoystick) {
+                    this.virtualJoystick.show();
+                    console.log('[Intro2Scene] Joystick mostrado');
+                }
+                if (this.virtualButtons) {
+                    this.virtualButtons.show();
+                    console.log('[Intro2Scene] Botões mostrados');
+                }
+                if (this.hotbar) {
+                    this.hotbar.show();
+                    console.log('[Intro2Scene] Hotbar mostrada');
+                }
+            });
+            
             // Habilitar transição de volta imediatamente se não houver cutscene
             this.time.delayedCall(1000, () => {
                 this.canTransitionBack = true;
@@ -642,6 +644,31 @@ export default class Intro2Scene extends BaseScene {
         
         console.log('[Intro2Scene] HUD restaurado completamente');
         
+        // Restaurar alpha do DialogueSystem (foi forçado para 0 durante cutscene)
+        if (this.dialogue) {
+            if (this.dialogue.box) this.dialogue.box.setAlpha(0.6); // Alpha original
+            if (this.dialogue.text) this.dialogue.text.setAlpha(1);
+            if (this.dialogue.nextIcon) this.dialogue.nextIcon.setAlpha(1);
+            console.log('[Intro2Scene] Alpha do diálogo restaurado');
+        }
+        
+        // Forçar atualização dos ícones de interação - restaurar visibilidade
+        this.time.delayedCall(100, () => {
+            console.log('[Intro2Scene] Restaurando ícones de interação');
+            
+            // Restaurar signIcon se existir
+            if (this.signIcon && this.signIcon.icon) {
+                this.signIcon.icon.setAlpha(1);
+                // A visibilidade será gerenciada pela lógica de proximidade
+            }
+            
+            // Restaurar hallIcon se existir
+            if (this.hallIcon && this.hallIcon.icon) {
+                this.hallIcon.icon.setAlpha(1);
+                // A visibilidade será gerenciada pela lógica de proximidade
+            }
+        });
+        
         // HABILITAR A TRANSIÇÃO DE VOLTA após o HUD ser restaurado
         this.canTransitionBack = true;
         console.log('[Intro2Scene] Transição de volta para IntroScene HABILITADA');
@@ -908,6 +935,7 @@ export default class Intro2Scene extends BaseScene {
             phaseTitle.setScrollFactor(0, 0); // Fixo na tela
             phaseTitle.setDepth(100001); // Acima de tudo
             phaseTitle.setAlpha(0);
+            phaseTitle.setInteractive(false); // NÃO bloquear interações
             
             // Ignorar pela câmera de UI se existir
             if (this.uiCamManager && this.cameras.main) {
@@ -931,6 +959,10 @@ export default class Intro2Scene extends BaseScene {
                             ease: 'Power2',
                             onComplete: () => {
                                 phaseTitle.destroy();
+                                console.log('[Intro2Scene] Phase title destru\u00eddo - garantindo que intera\u00e7\u00f5es funcionem');
+                                
+                                // Garantir que nada est\u00e1 bloqueando intera\u00e7\u00f5es
+                                this.input.enabled = true;
                             }
                         });
                     });
@@ -940,16 +972,9 @@ export default class Intro2Scene extends BaseScene {
     }
     
     /**
-     * Lê a placa da fábrica
+     * Esconde os controles virtuais (hotbar, joystick, botões)
      */
-    readFactorySign() {
-        console.log('[Intro2Scene] Lendo placa da fábrica');
-        
-        // Esconder ícone de interação
-        if (this.signIcon) {
-            this.signIcon.hide();
-        }
-        
+    hideVirtualControls() {
         // Esconder e suprimir hotbar
         if (this.hotbar) {
             this.hotbar.suppress();
@@ -957,73 +982,109 @@ export default class Intro2Scene extends BaseScene {
         
         // Esconder controles virtuais manualmente
         if (this.virtualJoystick) {
-            // Forçar invisibilidade do joystick
             this.virtualJoystick.base.setVisible(false);
             this.virtualJoystick.stick.setVisible(false);
             this.virtualJoystick.disabled = true;
-            console.log('[Intro2Scene] Joystick escondido manualmente');
         }
         
         if (this.virtualButtons) {
-            // Forçar invisibilidade de cada botão
             this.virtualButtons.buttons.forEach(btn => {
                 if (btn && btn.container) {
                     btn.container.setVisible(false);
                 }
             });
-            console.log('[Intro2Scene] Botões escondidos manualmente');
         }
+    }
+    
+    /**
+     * Restaura os controles virtuais (hotbar, joystick, botões)
+     */
+    showVirtualControls() {
+        console.log('[Intro2Scene] Restaurando controles');
+        
+        // Restaurar hotbar
+        if (this.hotbar) {
+            this.hotbar.unsuppress(false);
+        }
+        
+        // Restaurar joystick
+        if (this.virtualJoystick) {
+            this.virtualJoystick.base.setVisible(true);
+            this.virtualJoystick.stick.setVisible(true);
+            this.virtualJoystick.disabled = false;
+        }
+        
+        // Restaurar botões
+        if (this.virtualButtons) {
+            this.virtualButtons.buttons.forEach(btn => {
+                if (btn && btn.container) {
+                    btn.container.setVisible(true);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Lê a placa da fábrica
+     */
+    readFactorySign() {
+        console.log('[Intro2Scene] === readFactorySign INICIADO ===');
+        console.log('[Intro2Scene] dialogue existe?', !!this.dialogue);
+        console.log('[Intro2Scene] dialogue.box existe?', !!this.dialogue?.box);
+        console.log('[Intro2Scene] dialogue.text existe?', !!this.dialogue?.text);
+        console.log('[Intro2Scene] dialogue.show é função?', typeof this.dialogue?.show);
+        
+        // Esconder ícone de interação
+        if (this.signIcon) {
+            this.signIcon.hide();
+        }
+        
+        // Esconder controles
+        this.hideVirtualControls();
+        
+        console.log('[Intro2Scene] Registrando callback');
+        
+        // Registrar callback para restaurar controles
+        this.dialogue.onCloseCallback = () => {
+            console.log('[Intro2Scene] Callback executado');
+            this.showVirtualControls();
+            this.dialogue.onCloseCallback = null;
+        };
+        
+        console.log('[Intro2Scene] Chamando dialogue.show()');
         
         // Mostrar diálogo
         this.dialogue.show('Fábrica de Aris Thorne', {
             disableSound: true
         });
         
-        // Sobrescrever close() para restaurar controles
-        const originalClose = this.dialogue.close.bind(this.dialogue);
-        this.dialogue.close = () => {
-            originalClose();
-            
-            console.log('[Intro2Scene] Restaurando controles');
-            
-            // Restaurar hotbar
-            if (this.hotbar) {
-                this.hotbar.unsuppress(false);
-            }
-            
-            // Restaurar joystick
-            if (this.virtualJoystick) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.disabled = false;
-                console.log('[Intro2Scene] Joystick restaurado manualmente');
-            }
-            
-            // Restaurar botões
-            if (this.virtualButtons) {
-                this.virtualButtons.buttons.forEach(btn => {
-                    if (btn && btn.container) {
-                        btn.container.setVisible(true);
-                    }
-                });
-                console.log('[Intro2Scene] Botões restaurados manualmente');
-            }
-        };
+        console.log('[Intro2Scene] dialogue.show() chamado');
+        console.log('[Intro2Scene] dialogue.active:', this.dialogue.active);
+        console.log('[Intro2Scene] dialogue.box.visible:', this.dialogue.box.visible);
     }
     
     /**
      * Override do método de interação para suportar a placa e entrada do hall
      */
     handleInteraction() {
-        console.log('[Intro2Scene] handleInteraction chamado, cutsceneActive:', this.cutsceneActive, 'currentInteractable:', this.currentInteractable);
+        console.log('[Intro2Scene] === handleInteraction CHAMADO ===');
+        console.log('[Intro2Scene] - cutsceneActive:', this.cutsceneActive);
+        console.log('[Intro2Scene] - currentInteractable:', this.currentInteractable);
+        console.log('[Intro2Scene] - dialogue existe?', !!this.dialogue);
+        console.log('[Intro2Scene] - dialogue ativo?', this.dialogue?.active);
+        
         if (!this.cutsceneActive && this.currentInteractable === 'sign') {
-            console.log('[Intro2Scene] Lendo placa via handleInteraction');
+            console.log('[Intro2Scene] Executando readFactorySign');
             this.readFactorySign();
+            return;
         }
-        if (!this.cutsceneActive && (this.currentInteractable === 'hall-left' || this.currentInteractable === 'hall-right')) {
+        if (!this.cutsceneActive && this.currentInteractable === 'hall') {
             console.log('[Intro2Scene] Entrando no Hall do Hallirado via handleInteraction');
             this.enterHall(this.currentInteractable);
+            return;
         }
+        
+        console.log('[Intro2Scene] Nenhuma interação válida');
     }
     
     /**
@@ -1031,26 +1092,27 @@ export default class Intro2Scene extends BaseScene {
      * @param {string} entrance - 'hall-left' ou 'hall-right'
      */
     enterHall(entrance) {
-        console.log('[Intro2Scene] Iniciando transição para HallDoHalliradoScene via:', entrance);
+        console.log('[Intro2Scene] === ENTRANDO NO HALL ===');
+        console.log('[Intro2Scene] Entrada pela porta:', entrance);
         
         // Esconder ícone
         if (this.hallIcon) {
             this.hallIcon.hide();
         }
         
-        // Definir posição de spawn no Hall baseado na entrada
-        // hall-left (tile 14,3 da intro2) -> spawn no tile 19,19 do hall
-        // hall-right (tile 15,3 da intro2) -> spawn no tile 20,19 do hall
-        if (entrance === 'hall-left') {
-            window._playerEntryPos = { x: 19 * 32 + 16, y: 19 * 32 + 16 };
-        } else {
-            window._playerEntryPos = { x: 20 * 32 + 16, y: 19 * 32 + 16 };
-        }
+        // Spawn sempre no meio das portas do HallDoHalliradoScene
+        // Portas estão em tiles (19,19) e (20,19)
+        // Spawn no meio (19.5) um tile acima (Y=18) para aparecer dentro do hall
+        const tileSize = 32;
+        window._playerEntryPos = { x: 19.5 * tileSize + 16, y: 18 * tileSize + 16 };
+        
+        console.log('[Intro2Scene] Definindo window._playerEntryPos (meio):', window._playerEntryPos);
         
         // Fade out
         this.cameras.main.fadeOut(500, 0, 0, 0);
         
         this.time.delayedCall(500, () => {
+            console.log('[Intro2Scene] Iniciando HallDoHalliradoScene');
             this.scene.start('HallDoHalliradoScene');
         });
     }
@@ -1124,7 +1186,7 @@ export default class Intro2Scene extends BaseScene {
         }
         
         // Interação com a placa da fábrica (somente quando não está em cutscene e não está em diálogo)
-        if (!this.cutsceneActive && !this.dialogue?.active && this.factorySign && this.player) {
+        if (!this.cutsceneActive && !this.dialogue?.active && this.factorySign && this.player && this.signIcon) {
             const distanceToSign = Phaser.Math.Distance.Between(
                 this.player.x, 
                 this.player.y, 
@@ -1132,23 +1194,24 @@ export default class Intro2Scene extends BaseScene {
                 this.factorySign.y
             );
             
+            // Debug: mostrar distância a cada segundo
+            if (this.time.now % 1000 < 16) {
+                console.log('[Intro2Scene] Distância à placa:', distanceToSign.toFixed(2), 'cutsceneActive:', this.cutsceneActive, 'dialogue.active:', this.dialogue?.active);
+            }
+            
             let signIconVisible = false;
             if (distanceToSign < 50) {
                 // Mostrar ícone quando próximo
+                signIconVisible = true;
+                this.currentInteractable = 'sign';
+                
                 if (!this.signIcon.visible) {
                     this.signIcon.showAbove(this.factorySign);
                     console.log('[Intro2Scene] Mostrado ícone da placa');
                 }
-                signIconVisible = true;
-                this.currentInteractable = 'sign';
-                
-                // CRÍTICO: Desabilitar E tornar invisível a área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.disableInteractive();
-                    this.hotbar.clickableArea.setVisible(false);
-                    this.hotbar.clickableArea.setActive(false);
-                    console.log('[Intro2Scene] Área clicável da hotbar DESABILITADA e INVISÍVEL próximo à placa');
-                }
+            } else {
+                // Longe da placa
+                signIconVisible = false;
             }
             
             if (!signIconVisible) {
@@ -1158,14 +1221,6 @@ export default class Intro2Scene extends BaseScene {
                 }
                 if (this.currentInteractable === 'sign') {
                     this.currentInteractable = null;
-                    
-                    // Re-habilitar E tornar visível a área clicável da hotbar
-                    if (this.hotbar && this.hotbar.clickableArea) {
-                        this.hotbar.clickableArea.setInteractive();
-                        this.hotbar.clickableArea.setVisible(true);
-                        this.hotbar.clickableArea.setActive(true);
-                        console.log('[Intro2Scene] Área clicável da hotbar REABILITADA e VISÍVEL');
-                    }
                 }
             }
             
@@ -1174,63 +1229,31 @@ export default class Intro2Scene extends BaseScene {
         }
         
         // Interação com a entrada do hall (somente quando não está em cutscene e não está em diálogo)
-        if (!this.cutsceneActive && !this.dialogue?.active && this.hallIconZone && this.player) {
-            const distanceToHallLeft = Phaser.Math.Distance.Between(
+        if (!this.cutsceneActive && !this.dialogue?.active && this.hallEntrance && this.player) {
+            const distanceToHall = Phaser.Math.Distance.Between(
                 this.player.x, 
                 this.player.y, 
-                this.hallEntranceLeft.x, 
-                this.hallEntranceLeft.y
+                this.hallEntrance.x, 
+                this.hallEntrance.y
             );
             
-            const distanceToHallRight = Phaser.Math.Distance.Between(
-                this.player.x, 
-                this.player.y, 
-                this.hallEntranceRight.x, 
-                this.hallEntranceRight.y
-            );
+            const nearHall = distanceToHall < 50;
             
-            // Determinar qual entrada está mais próxima
-            const nearLeft = distanceToHallLeft < 50;
-            const nearRight = distanceToHallRight < 50;
-            
-            let hallIconVisible = false;
-            if (nearLeft || nearRight) {
-                // Mostrar ícone quando próximo de qualquer entrada
+            if (nearHall) {
+                // Mostrar ícone quando próximo da entrada
+                this.currentInteractable = 'hall';
+                
                 if (!this.hallIcon.visible) {
-                    this.hallIcon.showAbove(this.hallIconZone);
+                    this.hallIcon.showAbove(this.hallEntrance);
                     console.log('[Intro2Scene] Mostrado ícone da entrada do hall');
                 }
-                hallIconVisible = true;
-                
-                // Armazenar qual entrada está próxima
-                if (nearLeft) {
-                    this.currentInteractable = 'hall-left';
-                } else {
-                    this.currentInteractable = 'hall-right';
-                }
-                
-                // Desabilitar área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.disableInteractive();
-                    this.hotbar.clickableArea.setVisible(false);
-                    this.hotbar.clickableArea.setActive(false);
-                }
-            }
-            
-            if (!hallIconVisible) {
+            } else {
                 if (this.hallIcon.visible) {
                     this.hallIcon.hide();
                     console.log('[Intro2Scene] Escondido ícone da entrada do hall (longe)');
                 }
-                if (this.currentInteractable === 'hall-left' || this.currentInteractable === 'hall-right') {
+                if (this.currentInteractable === 'hall') {
                     this.currentInteractable = null;
-                    
-                    // Re-habilitar área clicável da hotbar
-                    if (this.hotbar && this.hotbar.clickableArea) {
-                        this.hotbar.clickableArea.setInteractive();
-                        this.hotbar.clickableArea.setVisible(true);
-                        this.hotbar.clickableArea.setActive(true);
-                    }
                 }
             }
             
@@ -1244,7 +1267,7 @@ export default class Intro2Scene extends BaseScene {
             if (this.hallIcon) {
                 this.hallIcon.hide();
             }
-            if (this.currentInteractable === 'sign' || this.currentInteractable === 'hall-left' || this.currentInteractable === 'hall-right') {
+            if (this.currentInteractable === 'sign' || this.currentInteractable === 'hall') {
                 this.currentInteractable = null;
                 
                 // Re-habilitar E tornar visível a área clicável da hotbar

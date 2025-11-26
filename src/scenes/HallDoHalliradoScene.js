@@ -33,6 +33,11 @@ export class HallDoHalliradoScene extends BaseScene {
     create() {
         console.log('[HallDoHalliradoScene] Criando cena Hall do Hallirado');
         
+        // Inicializar variáveis de estado
+        this.currentInteractable = null;
+        this.lightsOn = false;
+        this.switchUsed = false;
+        
         // Criar o mapa a partir do JSON
         this.map = this.make.tilemap({ key: 'halldohallirado' });
         
@@ -94,16 +99,23 @@ export class HallDoHalliradoScene extends BaseScene {
         // Configurar limites do mundo
         this.physics.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         
-        // Criar o jogador - usar posição salva ou posição padrão (centro do hall)
+        // Criar o jogador - usar posição salva ou posição padrão (meio das portas)
         const entryPos = window._playerEntryPos;
-        const spawnX = entryPos?.x ?? 480;
-        const spawnY = entryPos?.y ?? 384;
+        console.log('[HallDoHalliradoScene] window._playerEntryPos:', entryPos);
         
-        console.log('[HallDoHalliradoScene] Spawn do player:', { x: spawnX, y: spawnY, entryPos });
+        // Posição padrão: meio das portas (tile 19.5, 18)
+        const defaultX = 19.5 * 32 + 16;
+        const defaultY = 18 * 32 + 16;
+        
+        const spawnX = entryPos?.x ?? defaultX;
+        const spawnY = entryPos?.y ?? defaultY;
+        
+        console.log('[HallDoHalliradoScene] Spawn do player:', { x: spawnX, y: spawnY, default: !entryPos });
         
         this.createCommonPlayer(spawnX, spawnY);
         
-        // Limpar flag de entrada
+        // Limpar flag de entrada DEPOIS de usar
+        console.log('[HallDoHalliradoScene] Limpando window._playerEntryPos');
         window._playerEntryPos = null;
         
         // Criar divisória DEPOIS do player para ficar acima dele
@@ -151,6 +163,7 @@ export class HallDoHalliradoScene extends BaseScene {
         this.posterIcon.offsetY = -40;
         
         console.log('[HallDoHalliradoScene] Cartaz criado em tile (27, 17-18) -> pixel:', posterX, posterY);
+        console.log('[HallDoHalliradoScene] PosterIcon criado:', this.posterIcon ? 'SIM' : 'NÃO', 'Icon sprite:', this.posterIcon?.icon ? 'OK' : 'ERRO');
         
         // Lista de visitação (tiles 21, 10-11)
         const listTileX = 21;
@@ -209,6 +222,32 @@ export class HallDoHalliradoScene extends BaseScene {
         
         console.log('[HallDoHalliradoScene] Interruptor criado em tile (16, 8) -> pixel:', switchX, switchY);
         
+        // Zonas de saída para voltar à Intro2Scene (portas no tile Y=19)
+        // Criar uma zona no meio das duas portas
+        const exitTileX = 19.5; // Meio entre tiles 19 e 20
+        const exitTileY = 19;
+        const exitX = exitTileX * tileSize + 16;
+        const exitY = exitTileY * tileSize + tileSize / 2;
+        
+        this.exitZone = this.add.zone(exitX, exitY, 64, 32); // Largura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.exitZone);
+        this.exitZone.body.setImmovable(true);
+        this.exitZone.body.moves = false;
+        
+        console.log('[HallDoHalliradoScene] Zona de saída criada no meio em:', exitX, exitY);
+        
+        // Overlap para detectar saída
+        this.physics.add.overlap(
+            this.player,
+            this.exitZone,
+            () => this.exitToIntro2(),
+            null,
+            this
+        );
+        
+        // Flag para evitar múltiplas transições
+        this.isTransitioning = false;
+        
         // Configurar câmera principal (igual Intro2Scene)
         const worldCam = this.cameras.main;
         worldCam.startFollow(this.player);
@@ -232,9 +271,14 @@ export class HallDoHalliradoScene extends BaseScene {
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
         
+        console.log('[HallDoHalliradoScene] Configurando ícones de interação...');
+        
         // Adicionar ícones de interação ao array de objetos do mundo
         const posterIconObjects = [];
-        if (this.posterIcon?.icon) posterIconObjects.push(this.posterIcon.icon);
+        if (this.posterIcon?.icon) {
+            posterIconObjects.push(this.posterIcon.icon);
+            console.log('[HallDoHalliradoScene] Poster icon adicionado');
+        }
         if (this.posterIcon?.pulse) posterIconObjects.push(this.posterIcon.pulse);
         
         const listIconObjects = [];
@@ -296,22 +340,24 @@ export class HallDoHalliradoScene extends BaseScene {
                 this.wantedPoster.y
             );
             
+            // Debug: mostrar distância a cada 60 frames (~1 segundo)
+            if (this.time.now % 1000 < 16) {
+                console.log('[HallDoHalliradoScene] Distância ao poster:', distanceToPoster.toFixed(2), 'Player:', this.player.x.toFixed(0), this.player.y.toFixed(0), 'Poster:', this.wantedPoster.x.toFixed(0), this.wantedPoster.y.toFixed(0));
+            }
+            
             let posterIconVisible = false;
             if (distanceToPoster < 50) {
                 // Mostrar ícone quando próximo
-                if (!this.posterIcon.visible) {
-                    this.posterIcon.showAbove(this.wantedPoster);
-                    console.log('[HallDoHalliradoScene] Mostrado ícone do cartaz');
-                }
                 posterIconVisible = true;
                 this.currentInteractable = 'poster';
                 
-                // Desabilitar área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.disableInteractive();
-                    this.hotbar.clickableArea.setVisible(false);
-                    this.hotbar.clickableArea.setActive(false);
+                if (!this.posterIcon.visible) {
+                    console.log('[HallDoHalliradoScene] MOSTRANDO ícone do cartaz');
+                    this.posterIcon.showAbove(this.wantedPoster);
                 }
+            } else {
+                // Longe do poster
+                posterIconVisible = false;
             }
             
             if (!posterIconVisible) {
@@ -321,13 +367,6 @@ export class HallDoHalliradoScene extends BaseScene {
                 }
                 if (this.currentInteractable === 'poster') {
                     this.currentInteractable = null;
-                    
-                    // Re-habilitar área clicável da hotbar
-                    if (this.hotbar && this.hotbar.clickableArea) {
-                        this.hotbar.clickableArea.setInteractive();
-                        this.hotbar.clickableArea.setVisible(true);
-                        this.hotbar.clickableArea.setActive(true);
-                    }
                 }
             }
             
@@ -347,18 +386,12 @@ export class HallDoHalliradoScene extends BaseScene {
             let listIconVisible = false;
             if (distanceToList < 50) {
                 // Mostrar ícone quando próximo
-                if (!this.listIcon.visible) {
-                    this.listIcon.showAbove(this.visitList);
-                    console.log('[HallDoHalliradoScene] Mostrado ícone da lista');
-                }
                 listIconVisible = true;
                 this.currentInteractable = 'list';
                 
-                // Desabilitar área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.disableInteractive();
-                    this.hotbar.clickableArea.setVisible(false);
-                    this.hotbar.clickableArea.setActive(false);
+                if (!this.listIcon.visible) {
+                    this.listIcon.showAbove(this.visitList);
+                    console.log('[HallDoHalliradoScene] Mostrado ícone da lista');
                 }
             }
             
@@ -369,13 +402,6 @@ export class HallDoHalliradoScene extends BaseScene {
                 }
                 if (this.currentInteractable === 'list') {
                     this.currentInteractable = null;
-                    
-                    // Re-habilitar área clicável da hotbar
-                    if (this.hotbar && this.hotbar.clickableArea) {
-                        this.hotbar.clickableArea.setInteractive();
-                        this.hotbar.clickableArea.setVisible(true);
-                        this.hotbar.clickableArea.setActive(true);
-                    }
                 }
             }
             
@@ -395,18 +421,12 @@ export class HallDoHalliradoScene extends BaseScene {
             let switchIconVisible = false;
             if (distanceToSwitch < 50) {
                 // Mostrar ícone quando próximo
-                if (!this.switchIcon.visible) {
-                    this.switchIcon.showAbove(this.lightSwitch);
-                    console.log('[HallDoHalliradoScene] Mostrado ícone do interruptor');
-                }
                 switchIconVisible = true;
                 this.currentInteractable = 'switch';
                 
-                // Desabilitar área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.disableInteractive();
-                    this.hotbar.clickableArea.setVisible(false);
-                    this.hotbar.clickableArea.setActive(false);
+                if (!this.switchIcon.visible) {
+                    this.switchIcon.showAbove(this.lightSwitch);
+                    console.log('[HallDoHalliradoScene] Mostrado ícone do interruptor');
                 }
             }
             
@@ -417,13 +437,6 @@ export class HallDoHalliradoScene extends BaseScene {
                 }
                 if (this.currentInteractable === 'switch') {
                     this.currentInteractable = null;
-                    
-                    // Re-habilitar área clicável da hotbar
-                    if (this.hotbar && this.hotbar.clickableArea) {
-                        this.hotbar.clickableArea.setInteractive();
-                        this.hotbar.clickableArea.setVisible(true);
-                        this.hotbar.clickableArea.setActive(true);
-                    }
                 }
             }
             
@@ -443,18 +456,12 @@ export class HallDoHalliradoScene extends BaseScene {
             let mapIconVisible = false;
             if (distanceToMap < 50) {
                 // Mostrar ícone quando próximo
-                if (!this.mapIcon.visible) {
-                    this.mapIcon.showAbove(this.factoryMap);
-                    console.log('[HallDoHalliradoScene] Mostrado ícone do mapa');
-                }
                 mapIconVisible = true;
                 this.currentInteractable = 'map';
                 
-                // Desabilitar área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.disableInteractive();
-                    this.hotbar.clickableArea.setVisible(false);
-                    this.hotbar.clickableArea.setActive(false);
+                if (!this.mapIcon.visible) {
+                    this.mapIcon.showAbove(this.factoryMap);
+                    console.log('[HallDoHalliradoScene] Mostrado ícone do mapa');
                 }
             }
             
@@ -465,13 +472,6 @@ export class HallDoHalliradoScene extends BaseScene {
                 }
                 if (this.currentInteractable === 'map') {
                     this.currentInteractable = null;
-                    
-                    // Re-habilitar área clicável da hotbar
-                    if (this.hotbar && this.hotbar.clickableArea) {
-                        this.hotbar.clickableArea.setInteractive();
-                        this.hotbar.clickableArea.setVisible(true);
-                        this.hotbar.clickableArea.setActive(true);
-                    }
                 }
             }
             
@@ -479,31 +479,12 @@ export class HallDoHalliradoScene extends BaseScene {
             this.mapIcon.updatePosition();
         }
         
-        // Durante diálogo, esconder ícones e limpar interactable
+        // Durante diálogo, apenas esconder ícones (manter currentInteractable)
         if (this.dialogue?.active) {
-            // Esconder ícones
-            if (this.posterIcon) {
-                this.posterIcon.hide();
-            }
-            if (this.listIcon) {
-                this.listIcon.hide();
-            }
-            if (this.switchIcon) {
-                this.switchIcon.hide();
-            }
-            if (this.mapIcon) {
-                this.mapIcon.hide();
-            }
-            if (this.currentInteractable === 'poster' || this.currentInteractable === 'list' || this.currentInteractable === 'switch' || this.currentInteractable === 'map') {
-                this.currentInteractable = null;
-                
-                // Re-habilitar área clicável da hotbar
-                if (this.hotbar && this.hotbar.clickableArea) {
-                    this.hotbar.clickableArea.setInteractive();
-                    this.hotbar.clickableArea.setVisible(true);
-                    this.hotbar.clickableArea.setActive(true);
-                }
-            }
+            if (this.posterIcon) this.posterIcon.hide();
+            if (this.listIcon) this.listIcon.hide();
+            if (this.switchIcon) this.switchIcon.hide();
+            if (this.mapIcon) this.mapIcon.hide();
         }
         
         // Lógica específica da cena pode ser adicionada aqui
@@ -512,43 +493,46 @@ export class HallDoHalliradoScene extends BaseScene {
     handleInteraction() {
         super.handleInteraction();
         
-        console.log('[HallDoHalliradoScene] handleInteraction chamado, currentInteractable:', this.currentInteractable);
+        console.log('[HallDoHalliradoScene] handleInteraction chamado');
+        console.log('[HallDoHalliradoScene] - currentInteractable:', this.currentInteractable);
+        console.log('[HallDoHalliradoScene] - dialogue existe?', !!this.dialogue);
+        console.log('[HallDoHalliradoScene] - dialogue ativo?', this.dialogue?.active);
         
         // Interação com o cartaz de procurado
         if (this.currentInteractable === 'poster') {
+            console.log('[HallDoHalliradoScene] Executando readWantedPoster');
             this.readWantedPoster();
+            return;
         }
         
         // Interação com a lista de visitação
         if (this.currentInteractable === 'list') {
+            console.log('[HallDoHalliradoScene] Executando readVisitList');
             this.readVisitList();
+            return;
         }
         
         // Interação com o interruptor
         if (this.currentInteractable === 'switch') {
+            console.log('[HallDoHalliradoScene] Executando toggleLights');
             this.toggleLights();
+            return;
         }
         
         // Interação com o mapa
         if (this.currentInteractable === 'map') {
+            console.log('[HallDoHalliradoScene] Executando readFactoryMap');
             this.readFactoryMap();
+            return;
         }
+        
+        console.log('[HallDoHalliradoScene] Nenhuma interação válida');
     }
     
     /**
-     * Alterna o estado das luzes (opacidade da camada de sombra)
+     * Esconde os controles virtuais (hotbar, joystick, botões)
      */
-    toggleLights() {
-        console.log('[HallDoHalliradoScene] Alternando luzes');
-        
-        // Marcar interruptor como usado
-        this.switchUsed = true;
-        
-        // Esconder ícone de interação
-        if (this.switchIcon) {
-            this.switchIcon.hide();
-        }
-        
+    hideVirtualControls() {
         // Esconder e suprimir hotbar
         if (this.hotbar) {
             this.hotbar.suppress();
@@ -568,6 +552,52 @@ export class HallDoHalliradoScene extends BaseScene {
                 }
             });
         }
+    }
+    
+    /**
+     * Restaura os controles virtuais (hotbar, joystick, botões)
+     */
+    showVirtualControls() {
+        console.log('[HallDoHalliradoScene] Restaurando controles');
+        
+        // Restaurar hotbar
+        if (this.hotbar) {
+            this.hotbar.unsuppress(false);
+        }
+        
+        // Restaurar joystick
+        if (this.virtualJoystick) {
+            this.virtualJoystick.base.setVisible(true);
+            this.virtualJoystick.stick.setVisible(true);
+            this.virtualJoystick.disabled = false;
+        }
+        
+        // Restaurar botões
+        if (this.virtualButtons) {
+            this.virtualButtons.buttons.forEach(btn => {
+                if (btn && btn.container) {
+                    btn.container.setVisible(true);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Alterna o estado das luzes (opacidade da camada de sombra)
+     */
+    toggleLights() {
+        console.log('[HallDoHalliradoScene] Alternando luzes');
+        
+        // Marcar interruptor como usado
+        this.switchUsed = true;
+        
+        // Esconder ícone de interação
+        if (this.switchIcon) {
+            this.switchIcon.hide();
+        }
+        
+        // Esconder controles
+        this.hideVirtualControls();
         
         // Ligar luzes (só pode ligar, não desligar)
         this.lightsOn = true;
@@ -585,39 +615,16 @@ export class HallDoHalliradoScene extends BaseScene {
             });
         }
         
+        // Registrar callback para restaurar controles
+        this.dialogue.onCloseCallback = () => {
+            this.showVirtualControls();
+            this.dialogue.onCloseCallback = null;
+        };
+        
         // Mostrar diálogo indicando a ação
         this.dialogue.show('Interruptor acionado. As luzes foram ligadas!', {
             disableSound: true
         });
-        
-        // Sobrescrever close() para restaurar controles
-        const originalClose = this.dialogue.close.bind(this.dialogue);
-        this.dialogue.close = () => {
-            originalClose();
-            
-            console.log('[HallDoHalliradoScene] Restaurando controles');
-            
-            // Restaurar hotbar
-            if (this.hotbar) {
-                this.hotbar.unsuppress(false);
-            }
-            
-            // Restaurar joystick
-            if (this.virtualJoystick) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.disabled = false;
-            }
-            
-            // Restaurar botões
-            if (this.virtualButtons) {
-                this.virtualButtons.buttons.forEach(btn => {
-                    if (btn && btn.container) {
-                        btn.container.setVisible(true);
-                    }
-                });
-            }
-        };
     }
     
     /**
@@ -637,131 +644,64 @@ export class HallDoHalliradoScene extends BaseScene {
             this.listIcon.hide();
         }
         
-        // Esconder e suprimir hotbar
-        if (this.hotbar) {
-            this.hotbar.suppress();
-        }
+        // Esconder controles
+        this.hideVirtualControls();
         
-        // Esconder controles virtuais manualmente
-        if (this.virtualJoystick) {
-            this.virtualJoystick.base.setVisible(false);
-            this.virtualJoystick.stick.setVisible(false);
-            this.virtualJoystick.disabled = true;
-        }
-        
-        if (this.virtualButtons) {
-            this.virtualButtons.buttons.forEach(btn => {
-                if (btn && btn.container) {
-                    btn.container.setVisible(false);
-                }
-            });
-        }
+        // Registrar callback para restaurar controles
+        this.dialogue.onCloseCallback = () => {
+            this.showVirtualControls();
+            this.dialogue.onCloseCallback = null;
+        };
         
         // Mostrar diálogo
         this.dialogue.show('Lista de visitação da fábrica, Dr. Aris Thorne estava presente.', {
             disableSound: true
         });
-        
-        // Sobrescrever close() para restaurar controles
-        const originalClose = this.dialogue.close.bind(this.dialogue);
-        this.dialogue.close = () => {
-            originalClose();
-            
-            console.log('[HallDoHalliradoScene] Restaurando controles');
-            
-            // Restaurar hotbar
-            if (this.hotbar) {
-                this.hotbar.unsuppress(false);
-            }
-            
-            // Restaurar joystick
-            if (this.virtualJoystick) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.disabled = false;
-            }
-            
-            // Restaurar botões
-            if (this.virtualButtons) {
-                this.virtualButtons.buttons.forEach(btn => {
-                    if (btn && btn.container) {
-                        btn.container.setVisible(true);
-                    }
-                });
-            }
-        };
     }
     
     /**
      * Lê o cartaz de procurado
      */
     readWantedPoster() {
-        console.log('[HallDoHalliradoScene] Lendo cartaz de procurado');
+        console.log('[HallDoHalliradoScene] === readWantedPoster INICIADO ===');
+        console.log('[HallDoHalliradoScene] lightsOn:', this.lightsOn);
         
         // Verificar se está muito escuro
         if (!this.lightsOn) {
+            console.log('[HallDoHalliradoScene] Muito escuro, mostrando mensagem');
             this.showDarkMessage();
             return;
         }
+        
+        console.log('[HallDoHalliradoScene] Escondendo ícone e controles');
         
         // Esconder ícone de interação
         if (this.posterIcon) {
             this.posterIcon.hide();
         }
         
-        // Esconder e suprimir hotbar
-        if (this.hotbar) {
-            this.hotbar.suppress();
-        }
+        // Esconder controles
+        this.hideVirtualControls();
         
-        // Esconder controles virtuais manualmente
-        if (this.virtualJoystick) {
-            this.virtualJoystick.base.setVisible(false);
-            this.virtualJoystick.stick.setVisible(false);
-            this.virtualJoystick.disabled = true;
-        }
+        console.log('[HallDoHalliradoScene] Registrando callback');
         
-        if (this.virtualButtons) {
-            this.virtualButtons.buttons.forEach(btn => {
-                if (btn && btn.container) {
-                    btn.container.setVisible(false);
-                }
-            });
-        }
+        // Registrar callback para restaurar controles
+        this.dialogue.onCloseCallback = () => {
+            console.log('[HallDoHalliradoScene] Callback de close executado');
+            this.showVirtualControls();
+            this.dialogue.onCloseCallback = null;
+        };
+        
+        console.log('[HallDoHalliradoScene] Mostrando diálogo:', 'Cartaz de procurado de um homem  chamado Ariel da Silva Coutinho');
+        console.log('[HallDoHalliradoScene] dialogue objeto:', this.dialogue);
+        console.log('[HallDoHalliradoScene] dialogue.show existe?', !!this.dialogue.show);
         
         // Mostrar diálogo
         this.dialogue.show('Cartaz de procurado de um homem  chamado Ariel da Silva Coutinho', {
             disableSound: true
         });
         
-        // Sobrescrever close() para restaurar controles
-        const originalClose = this.dialogue.close.bind(this.dialogue);
-        this.dialogue.close = () => {
-            originalClose();
-            
-            console.log('[HallDoHalliradoScene] Restaurando controles');
-            
-            // Restaurar hotbar
-            if (this.hotbar) {
-                this.hotbar.unsuppress(false);
-            }
-            
-            // Restaurar joystick
-            if (this.virtualJoystick) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.disabled = false;
-            }
-            
-            // Restaurar botões
-            if (this.virtualButtons) {
-                this.virtualButtons.buttons.forEach(btn => {
-                    if (btn && btn.container) {
-                        btn.container.setVisible(true);
-                    }
-                });
-            }
-        };
+        console.log('[HallDoHalliradoScene] Diálogo mostrado, active:', this.dialogue.active);
     }
     
     /**
@@ -781,25 +721,8 @@ export class HallDoHalliradoScene extends BaseScene {
             this.mapIcon.hide();
         }
         
-        // Esconder e suprimir hotbar
-        if (this.hotbar) {
-            this.hotbar.suppress();
-        }
-        
-        // Esconder controles virtuais manualmente
-        if (this.virtualJoystick) {
-            this.virtualJoystick.base.setVisible(false);
-            this.virtualJoystick.stick.setVisible(false);
-            this.virtualJoystick.disabled = true;
-        }
-        
-        if (this.virtualButtons) {
-            this.virtualButtons.buttons.forEach(btn => {
-                if (btn && btn.container) {
-                    btn.container.setVisible(false);
-                }
-            });
-        }
+        // Esconder controles
+        this.hideVirtualControls();
         
         // Array de mensagens para o DialogueSystem
         const messages = [
@@ -810,111 +733,92 @@ export class HallDoHalliradoScene extends BaseScene {
             'O resto do mapa está velho demais para ler.'
         ];
         
+        // Registrar callback para restaurar controles
+        this.dialogue.onCloseCallback = () => {
+            this.showVirtualControls();
+            this.dialogue.onCloseCallback = null;
+        };
+        
         // Mostrar todas as mensagens em sequência
         this.dialogue.show(messages, {
             disableSound: true
         });
-        
-        // Sobrescrever close() para restaurar controles
-        const originalClose = this.dialogue.close.bind(this.dialogue);
-        this.dialogue.close = () => {
-            originalClose();
-            
-            console.log('[HallDoHalliradoScene] Restaurando controles');
-            
-            // Restaurar hotbar
-            if (this.hotbar) {
-                this.hotbar.unsuppress(false);
-            }
-            
-            // Restaurar joystick
-            if (this.virtualJoystick) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.disabled = false;
-            }
-            
-            // Restaurar botões
-            if (this.virtualButtons) {
-                this.virtualButtons.buttons.forEach(btn => {
-                    if (btn && btn.container) {
-                        btn.container.setVisible(true);
-                    }
-                });
-            }
-        };
     }
     
     /**
      * Mostra mensagem quando está muito escuro para ler
      */
     showDarkMessage() {
-        console.log('[HallDoHalliradoScene] Muito escuro para ler');
+        console.log('[HallDoHalliradoScene] === showDarkMessage CHAMADO ===');
+        console.log('[HallDoHalliradoScene] dialogue existe?', !!this.dialogue);
+        console.log('[HallDoHalliradoScene] dialogue.active?', this.dialogue?.active);
         
         // Esconder ícones
         if (this.posterIcon) {
             this.posterIcon.hide();
+            console.log('[HallDoHalliradoScene] posterIcon escondido');
         }
         if (this.listIcon) {
             this.listIcon.hide();
+            console.log('[HallDoHalliradoScene] listIcon escondido');
         }
         if (this.mapIcon) {
             this.mapIcon.hide();
+            console.log('[HallDoHalliradoScene] mapIcon escondido');
         }
         
-        // Esconder e suprimir hotbar
-        if (this.hotbar) {
-            this.hotbar.suppress();
-        }
+        // Esconder controles
+        this.hideVirtualControls();
+        console.log('[HallDoHalliradoScene] Controles virtuais escondidos');
         
-        // Esconder controles virtuais manualmente
-        if (this.virtualJoystick) {
-            this.virtualJoystick.base.setVisible(false);
-            this.virtualJoystick.stick.setVisible(false);
-            this.virtualJoystick.disabled = true;
-        }
+        // Registrar callback para restaurar controles
+        this.dialogue.onCloseCallback = () => {
+            console.log('[HallDoHalliradoScene] Callback: restaurando controles');
+            this.showVirtualControls();
+            this.dialogue.onCloseCallback = null;
+        };
         
-        if (this.virtualButtons) {
-            this.virtualButtons.buttons.forEach(btn => {
-                if (btn && btn.container) {
-                    btn.container.setVisible(false);
-                }
-            });
-        }
+        console.log('[HallDoHalliradoScene] Chamando dialogue.show()');
         
         // Mostrar diálogo
         this.dialogue.show('Está muito escuro, não consigo ler.', {
             disableSound: true
         });
         
-        // Sobrescrever close() para restaurar controles
-        const originalClose = this.dialogue.close.bind(this.dialogue);
-        this.dialogue.close = () => {
-            originalClose();
-            
-            console.log('[HallDoHalliradoScene] Restaurando controles');
-            
-            // Restaurar hotbar
-            if (this.hotbar) {
-                this.hotbar.unsuppress(false);
-            }
-            
-            // Restaurar joystick
-            if (this.virtualJoystick) {
-                this.virtualJoystick.base.setVisible(true);
-                this.virtualJoystick.stick.setVisible(true);
-                this.virtualJoystick.disabled = false;
-            }
-            
-            // Restaurar botões
-            if (this.virtualButtons) {
-                this.virtualButtons.buttons.forEach(btn => {
-                    if (btn && btn.container) {
-                        btn.container.setVisible(true);
-                    }
-                });
-            }
-        };
+        console.log('[HallDoHalliradoScene] dialogue.show() chamado, active agora:', this.dialogue.active);
+    }
+    
+    /**
+     * Volta para Intro2Scene pela porta especificada
+     * @param {string} exit - 'left' ou 'right'
+     */
+    exitToIntro2() {
+        // Evitar múltiplas transições
+        if (this.isTransitioning) {
+            console.log('[HallDoHalliradoScene] Já está em transição, ignorando');
+            return;
+        }
+        
+        this.isTransitioning = true;
+        
+        console.log('[HallDoHalliradoScene] === SAINDO PARA INTRO2SCENE ===');
+        
+        // Spawn no meio das portas da Intro2Scene
+        // Portas estão em tiles (14,3) e (15,3), spawn no meio entre elas
+        window._playerEntryPos = { x: 14.5 * 32 + 16, y: 4 * 32 + 16 }; // tile 14.5,4 (meio)
+        
+        console.log('[HallDoHalliradoScene] Definindo window._playerEntryPos (meio):', window._playerEntryPos);
+        
+        // Não iniciar cutscene ao voltar
+        window._startCutscene = false;
+        
+        // Fade out
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        
+        this.time.delayedCall(500, () => {
+            console.log('[HallDoHalliradoScene] Iniciando Intro2Scene');
+            this.scene.start('Intro2Scene');
+        });
     }
     
     // Métodos para controlar o CoordProbe

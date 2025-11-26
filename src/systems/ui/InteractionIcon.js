@@ -51,6 +51,7 @@ export class InteractionIcon {
         
         this.targetObject = object;
         this.icon.setVisible(true);
+        this.icon.setAlpha(1); // Garantir que alpha seja restaurado
         this.updatePosition();
         this.bobTween.resume();
     }

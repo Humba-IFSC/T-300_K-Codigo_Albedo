@@ -149,7 +149,9 @@ export class DialogueSystem {
         this.index = 0;
         this.active = true;
         this.box.setVisible(true);
+        this.box.setAlpha(0.6); // Restaurar alpha original do box
         this.text.setVisible(true);
+        this.text.setAlpha(1); // Garantir que o texto seja visível
         
         // Guardar opções (como desabilitar som)
         this.options = options;
@@ -201,7 +203,10 @@ export class DialogueSystem {
                 if (i === processedText.length) {
                     this.writing = false;
                     if (this.sound.isPlaying) this.sound.stop();
-                    if (this.index < this.messages.length - 1) this.nextIcon.setVisible(true);
+                    if (this.index < this.messages.length - 1) {
+                        this.nextIcon.setVisible(true);
+                        this.nextIcon.setAlpha(1); // Garantir alpha visível
+                    }
                 }
             }
         });
@@ -297,9 +302,6 @@ export class DialogueSystem {
         this.active = false;
         if (this.sound.isPlaying) this.sound.stop();
         
-        // Nota: O mostrar dos controles virtuais é gerenciado pela cena
-        // através do override deste método
-        
         // Reabrir hotbar se estava aberta antes do diálogo
         if (this.wasHotbarOpen && this.scene.hotbar) {
             this.scene.hotbar.openManually();
@@ -309,6 +311,12 @@ export class DialogueSystem {
         if (this.clickHandler) {
             this.scene.input.off('pointerdown', this.clickHandler);
             this.clickHandler = null;
+        }
+        
+        // Executar callback se existir (usado para restaurar controles virtuais)
+        if (this.onCloseCallback) {
+            this.onCloseCallback();
+            this.onCloseCallback = null;
         }
     }
 }
