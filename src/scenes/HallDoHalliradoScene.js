@@ -35,7 +35,9 @@ export class HallDoHalliradoScene extends BaseScene {
         
         // Inicializar variáveis de estado
         this.currentInteractable = null;
-        this.lightsOn = false;
+        // Restaurar estado das luzes salvo anteriormente (se existir)
+        this.lightsOn = window._hallLightsOn ?? false;
+        console.log('[HallDoHalliradoScene] Estado das luzes restaurado:', this.lightsOn);
         this.switchUsed = false;
         
         // Criar o mapa a partir do JSON
@@ -122,6 +124,12 @@ export class HallDoHalliradoScene extends BaseScene {
         this.divisionLayer = this.map.createLayer('divisória', tilesets, 0, 0);
         if (this.divisionLayer) {
             this.divisionLayer.setDepth(10000); // Depth alto para ficar acima do player
+        }
+        
+        // Aplicar estado das luzes (se já foram acesas antes, esconder sombra)
+        if (this.lightsOn && this.shadowLayer) {
+            this.shadowLayer.setVisible(false);
+            console.log('[HallDoHalliradoScene] Sombra escondida - luzes já estavam acesas');
         }
         
         // Adicionar colisões entre o jogador e as camadas
@@ -217,10 +225,22 @@ export class HallDoHalliradoScene extends BaseScene {
         this.switchIcon = new InteractionIcon(this, 'button_a', 0.05);
         this.switchIcon.offsetY = -24;
         
-        // Estado das luzes (começam desligadas - sombra visível)
-        this.lightsOn = false;
-        
         console.log('[HallDoHalliradoScene] Interruptor criado em tile (16, 8) -> pixel:', switchX, switchY);
+        
+        // Porta para TcheScene (tiles 13, 8-9)
+        const doorTcheX = 13 * tileSize + tileSize / 2;
+        const doorTcheY = 8.5 * tileSize + 16; // Meio entre tiles 8 e 9
+        
+        this.doorToTche = this.add.zone(doorTcheX, doorTcheY, 32, 64); // Altura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.doorToTche);
+        this.doorToTche.body.setImmovable(true);
+        this.doorToTche.body.moves = false;
+        
+        // Ícone de interação para a porta TcheScene
+        this.doorTcheIcon = new InteractionIcon(this, 'button_a', 0.05);
+        this.doorTcheIcon.offsetY = -40;
+        
+        console.log('[HallDoHalliradoScene] Porta para TcheScene criada em tiles (13, 8-9):', doorTcheX, doorTcheY);
         
         // Zonas de saída para voltar à Intro2Scene (portas no tile Y=19)
         // Criar uma zona no meio das duas portas
@@ -293,6 +313,10 @@ export class HallDoHalliradoScene extends BaseScene {
         if (this.mapIcon?.icon) mapIconObjects.push(this.mapIcon.icon);
         if (this.mapIcon?.pulse) mapIconObjects.push(this.mapIcon.pulse);
         
+        const doorTcheIconObjects = [];
+        if (this.doorTcheIcon?.icon) doorTcheIconObjects.push(this.doorTcheIcon.icon);
+        if (this.doorTcheIcon?.pulse) doorTcheIconObjects.push(this.doorTcheIcon.pulse);
+        
         const worldObjects = [
             this.player,
             this.shadowLayer,
@@ -307,7 +331,8 @@ export class HallDoHalliradoScene extends BaseScene {
             ...posterIconObjects,
             ...listIconObjects,
             ...switchIconObjects,
-            ...mapIconObjects
+            ...mapIconObjects,
+            ...doorTcheIconObjects
         ].filter(Boolean);
         
         this.worldObjects = worldObjects;
@@ -479,12 +504,48 @@ export class HallDoHalliradoScene extends BaseScene {
             this.mapIcon.updatePosition();
         }
         
+        // Interação com a porta para TcheScene
+        if (!this.dialogue?.active && this.doorToTche && this.player) {
+            const distanceToDoor = Phaser.Math.Distance.Between(
+                this.player.x, 
+                this.player.y, 
+                this.doorToTche.x, 
+                this.doorToTche.y
+            );
+            
+            let doorIconVisible = false;
+            if (distanceToDoor < 50) {
+                // Mostrar ícone quando próximo
+                doorIconVisible = true;
+                this.currentInteractable = 'doorTche';
+                
+                if (!this.doorTcheIcon.visible) {
+                    this.doorTcheIcon.showAbove(this.doorToTche);
+                    console.log('[HallDoHalliradoScene] Mostrado ícone da porta TcheScene');
+                }
+            }
+            
+            if (!doorIconVisible) {
+                if (this.doorTcheIcon.visible) {
+                    this.doorTcheIcon.hide();
+                    console.log('[HallDoHalliradoScene] Escondido ícone da porta TcheScene (longe)');
+                }
+                if (this.currentInteractable === 'doorTche') {
+                    this.currentInteractable = null;
+                }
+            }
+            
+            // Atualizar posição do ícone
+            this.doorTcheIcon.updatePosition();
+        }
+        
         // Durante diálogo, apenas esconder ícones (manter currentInteractable)
         if (this.dialogue?.active) {
             if (this.posterIcon) this.posterIcon.hide();
             if (this.listIcon) this.listIcon.hide();
             if (this.switchIcon) this.switchIcon.hide();
             if (this.mapIcon) this.mapIcon.hide();
+            if (this.doorTcheIcon) this.doorTcheIcon.hide();
         }
         
         // Lógica específica da cena pode ser adicionada aqui
@@ -523,6 +584,13 @@ export class HallDoHalliradoScene extends BaseScene {
         if (this.currentInteractable === 'map') {
             console.log('[HallDoHalliradoScene] Executando readFactoryMap');
             this.readFactoryMap();
+            return;
+        }
+        
+        // Interação com a porta para TcheScene
+        if (this.currentInteractable === 'doorTche') {
+            console.log('[HallDoHalliradoScene] Interagindo com a porta para TcheScene');
+            this.openDoorToTche();
             return;
         }
         
@@ -601,6 +669,8 @@ export class HallDoHalliradoScene extends BaseScene {
         
         // Ligar luzes (só pode ligar, não desligar)
         this.lightsOn = true;
+        window._hallLightsOn = true; // Salvar estado globalmente
+        console.log('[HallDoHalliradoScene] Estado das luzes salvo:', window._hallLightsOn);
         
         // Animar opacidade da camada de sombra
         if (this.shadowLayer) {
@@ -818,6 +888,68 @@ export class HallDoHalliradoScene extends BaseScene {
         this.time.delayedCall(500, () => {
             console.log('[HallDoHalliradoScene] Iniciando Intro2Scene');
             this.scene.start('Intro2Scene');
+        });
+    }
+    
+    /**
+     * Abrir porta para TcheScene
+     */
+    openDoorToTche() {
+        console.log('[HallDoHalliradoScene] openDoorToTche chamado');
+        console.log('[HallDoHalliradoScene] lightsOn:', this.lightsOn);
+        
+        // Esconder ícone de interação
+        if (this.doorTcheIcon) {
+            this.doorTcheIcon.hide();
+        }
+        
+        // Verificar se as luzes estão apagadas
+        if (!this.lightsOn) {
+            console.log('[HallDoHalliradoScene] Luzes apagadas - muito escuro');
+            
+            // Esconder controles
+            this.hideVirtualControls();
+            
+            // Registrar callback para restaurar controles
+            this.dialogue.onCloseCallback = () => {
+                this.showVirtualControls();
+                this.dialogue.onCloseCallback = null;
+            };
+            
+            // Mostrar mensagem
+            this.dialogue.show('Não consigo encontrar a fechadura, está muito escuro.', {
+                disableSound: true
+            });
+            return;
+        }
+        
+        // Luzes ligadas - permitir transição
+        console.log('[HallDoHalliradoScene] Luzes ligadas - abrindo porta para TcheScene');
+        
+        // Esconder controles antes da transição
+        this.hideVirtualControls();
+        
+        if (this.isTransitioning) {
+            console.log('[HallDoHalliradoScene] Já está em transição, ignorando');
+            return;
+        }
+        
+        this.isTransitioning = true;
+        
+        // Salvar posição de entrada na TcheScene (meio entre tiles 17 e 18, linha 24 - um tile à frente)
+        window._playerEntryPos = {
+            x: 17.5 * 32 + 16,
+            y: 24 * 32 + 16
+        };
+        
+        console.log('[HallDoHalliradoScene] Definindo window._playerEntryPos para TcheScene:', window._playerEntryPos);
+        
+        // Fade out
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        
+        this.time.delayedCall(500, () => {
+            console.log('[HallDoHalliradoScene] Iniciando TcheScene');
+            this.scene.start('TcheScene');
         });
     }
     

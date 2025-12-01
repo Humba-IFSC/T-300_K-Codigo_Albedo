@@ -33,6 +33,11 @@ export default class TcheScene extends BaseScene {
             frameWidth: 32, 
             frameHeight: 32 
         });
+        
+        // Carregar sprites de itens
+        this.load.image('privadacrowbar', 'assets/tilesets/privadacrowbar.png');
+        this.load.image('crowbar', 'assets/sprites/blackcrowbar.png');
+        this.load.image('blackcrowbar', 'assets/sprites/blackcrowbar.png');
     }
 
     create() {
@@ -40,6 +45,9 @@ export default class TcheScene extends BaseScene {
         
         // Inicializar variáveis de estado
         this.currentInteractable = null;
+        this.lightsOn = false; // Começar com luzes apagadas (muito escuro)
+        this.crowbarTaken = window._tcheCrowbarTaken || false;
+        this.hasCrowbar = false;
         
         // Criar mapa
         const map = this.make.tilemap({ key: 'tche_map' });
@@ -167,6 +175,20 @@ export default class TcheScene extends BaseScene {
         if (this.escadasLayer) {
             this.escadasLayer.setCollisionByExclusion([-1, 0]);
         }
+        if (this.salaLayer) {
+            this.salaLayer.setCollisionByExclusion([-1, 0]);
+        }
+        
+        // Configurar colisão nos objetos do banheiro (tiles específicos)
+        if (this.banheiroLayer) {
+            // Tiles do banheiro que precisam de colisão
+            // 6781-6789: objetos do banheiro (pia, vaso, etc)
+            // 6778-6780: acessórios
+            // 6784-6786: chuveiro/box
+            const bathroomTiles = [6781, 6782, 6783, 6784, 6785, 6786, 6787, 6788, 6789, 6778, 6779, 6780];
+            this.banheiroLayer.setCollision(bathroomTiles);
+            console.log('[TcheScene] Colisão configurada para tiles do banheiro:', bathroomTiles);
+        }
         
         // Configurar limites do mundo - começar 32 pixels (1 tile) para a direita
         // Isso evita o problema de colisão na borda esquerda
@@ -186,6 +208,9 @@ export default class TcheScene extends BaseScene {
         console.log('[TcheScene] Spawn do player:', { x: spawnX, y: spawnY, default: !entryPos });
         
         this.createCommonPlayer(spawnX, spawnY);
+        
+        // Definir depth do player como Y + 1
+        this.player.setDepth(this.player.y + 1);
         
         // Garantir que o player não ultrapasse os limites do mundo
         this.player.setCollideWorldBounds(true);
@@ -219,13 +244,74 @@ export default class TcheScene extends BaseScene {
         if (this.banheiroLayer) {
             this.physics.add.collider(this.player, this.banheiroLayer);
         }
+        if (this.salaLayer) {
+            this.physics.add.collider(this.player, this.salaLayer);
+        }
         
         // Criar sistemas de UI
         this.createDialogueSystem();
         this.createHotbar();
         
+        // Restaurar hotbar se já tinha itens
+        if (window._hotbarItems) {
+            window._hotbarItems.forEach((item, idx) => {
+                if (item) this.hotbar.setItem(idx, item);
+            });
+        }
+        
+        // Crowbar no tile (26, 13)
+        const tileSize = 32;
+        const crowbarTileX = 26;
+        const crowbarTileY = 13;
+        const crowbarX = crowbarTileX * tileSize + tileSize / 2;
+        const crowbarY = crowbarTileY * tileSize + tileSize / 2;
+        
+        // Criar sprite da crowbar apenas se não foi pega ainda
+        if (!this.crowbarTaken) {
+            this.crowbarSprite = this.physics.add.sprite(crowbarX, crowbarY, 'privadacrowbar')
+                .setImmovable(true)
+                .setDepth(crowbarY); // Depth baseado no Y (player tem Y + 1)
+            this.physics.add.collider(this.player, this.crowbarSprite);
+            
+            // Ícone de interação para a crowbar
+            this.crowbarIcon = new InteractionIcon(this, 'button_a', 0.05);
+            this.crowbarIcon.offsetY = -40;
+            
+            console.log('[TcheScene] Crowbar criada em tile (26, 13):', crowbarX, crowbarY);
+        } else {
+            console.log('[TcheScene] Crowbar já foi pega anteriormente');
+        }
+        
         // Probe de coordenadas (debug)
         this.coordProbe = new CoordProbe(this, this.map);
+        
+        // Zona de transição para HallDoHalliradoScene (tiles 17,23 ao 18,23)
+        const exitTileX = 17.5; // Meio entre tiles 17 e 18
+        const exitTileY = 23;
+        const exitX = exitTileX * tileSize + 16;
+        const exitY = exitTileY * tileSize + tileSize / 2;
+        
+        this.exitZoneHall = this.add.zone(exitX, exitY, 64, 32); // Largura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.exitZoneHall);
+        this.exitZoneHall.body.setImmovable(true);
+        this.exitZoneHall.body.moves = false;
+        
+        console.log('[TcheScene] Zona de saída para Hall criada em tiles (17-18, 23):', exitX, exitY);
+        
+        // Flag para transição
+        this.canTransition = false;
+        this.time.delayedCall(1000, () => {
+            this.canTransition = true;
+        });
+        
+        // Overlap para detectar saída para Hall
+        this.physics.add.overlap(
+            this.player,
+            this.exitZoneHall,
+            this.onEnterExitZoneHall,
+            null,
+            this
+        );
         
         // Câmera
         const worldCam = this.cameras.main;
@@ -243,6 +329,11 @@ export default class TcheScene extends BaseScene {
         this.uiCamManager = new UICameraManager(this, { zoom: 1 });
         const uiElems = this.getUIElements();
         
+        // Adicionar ícone da crowbar aos worldObjects se existir
+        const crowbarIconObjects = [];
+        if (this.crowbarIcon?.icon) crowbarIconObjects.push(this.crowbarIcon.icon);
+        if (this.crowbarIcon?.pulse) crowbarIconObjects.push(this.crowbarIcon.pulse);
+        
         const worldObjects = [
             this.player,
             this.pisoLayer,
@@ -258,7 +349,8 @@ export default class TcheScene extends BaseScene {
             this.propsLayer,
             this.teiasLayer,
             this.portatheoLayer,
-            this.adornoLayer
+            this.adornoLayer,
+            ...crowbarIconObjects
         ].filter(Boolean);
         
         this.worldObjects = worldObjects;
@@ -281,6 +373,232 @@ export default class TcheScene extends BaseScene {
         if (this.dialogue?.active) return;
         
         this.coordProbe.update();
+        
+        // Interação com crowbar
+        if (!this.crowbarTaken && this.crowbarSprite && this.player) {
+            const distanceToCrowbar = Phaser.Math.Distance.Between(
+                this.player.x,
+                this.player.y,
+                this.crowbarSprite.x,
+                this.crowbarSprite.y
+            );
+            
+            if (distanceToCrowbar < 50) {
+                this.crowbarIcon.showAbove(this.crowbarSprite);
+                this.currentInteractable = 'crowbar';
+            } else {
+                if (this.currentInteractable === 'crowbar') {
+                    this.crowbarIcon.hide();
+                    this.currentInteractable = null;
+                }
+            }
+            
+            this.crowbarIcon.updatePosition();
+        }
+    }
+    
+    /**
+     * Método de interação com objetos
+     */
+    handleInteraction() {
+        super.handleInteraction();
+        
+        console.log('[TcheScene] handleInteraction chamado');
+        console.log('[TcheScene] - currentInteractable:', this.currentInteractable);
+        
+        // Interação com crowbar
+        if (this.currentInteractable === 'crowbar') {
+            console.log('[TcheScene] Pegando crowbar');
+            this.pickupCrowbar();
+            return;
+        }
+    }
+    
+    /**
+     * Pegar crowbar com animação estilo Zelda
+     */
+    pickupCrowbar() {
+        if (this.crowbarTaken || !this.crowbarSprite) return;
+        
+        console.log('[TcheScene] PEGANDO CROWBAR - Estado inicial:', {
+            hotbarExists: !!this.hotbar,
+            hasCrowbar: this.hasCrowbar
+        });
+        
+        // Marcar como pega
+        this.crowbarTaken = true;
+        window._tcheCrowbarTaken = true;
+        
+        // Esconder ícone
+        if (this.crowbarIcon) {
+            this.crowbarIcon.hide();
+        }
+        
+        // Limpar currentInteractable para não bloquear a hotbar
+        this.currentInteractable = null;
+        
+        // Animação Zelda ao pegar crowbar
+        this.playCrowbarPickupAnimation(() => {
+            this.hasCrowbar = true;
+            console.log('[TcheScene] Crowbar obtida!');
+            
+            // Adicionar à hotbar
+            if (this.hotbar) {
+                const nextSlot = this.hotbar.items.findIndex(i => i === null);
+                this.hotbar.setItem(nextSlot !== -1 ? nextSlot : 0, 'crowbar');
+                
+                // Salvar hotbar
+                window._hotbarItems = [...this.hotbar.items];
+                
+                // Garantir que o diálogo não está ativo
+                if (this.dialogue) {
+                    this.dialogue.active = false;
+                }
+                
+                // Mostrar hotbar com animação
+                this.hotbar.showAnimated();
+                
+                // Animar seta subindo (toggleButton é a seta da hotbar)
+                if (this.hotbar.toggleButton) {
+                    const originalY = this.hotbar.toggleButton.y;
+                    this.tweens.add({
+                        targets: this.hotbar.toggleButton,
+                        y: originalY - 15,
+                        duration: 250,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: 'Sine.easeInOut'
+                    });
+                }
+                
+                console.log('[TcheScene] Hotbar atualizada, estado:', {
+                    items: this.hotbar.items,
+                    visible: this.hotbar.container?.visible,
+                    suppressed: this.hotbar.isSuppressed
+                });
+            }
+        });
+    }
+    
+    /**
+     * Animação estilo Zelda ao pegar crowbar
+     */
+    playCrowbarPickupAnimation(onComplete) {
+        console.log('[TcheScene] INICIANDO animação pickup');
+        let completed = false;
+        const finish = () => {
+            if (!completed) {
+                completed = true;
+                console.log('[TcheScene] FINALIZANDO animação, chamando callback');
+                onComplete && onComplete();
+            }
+        };
+        
+        try {
+            const startX = this.crowbarSprite.x;
+            const startY = this.crowbarSprite.y - 8;
+            console.log('[TcheScene] Criando sprite temporário em:', { x: startX, y: startY });
+            
+            // Esconder sprite original
+            this.crowbarSprite.setVisible(false);
+            
+            const temp = this.add.image(startX, startY, 'blackcrowbar')
+                .setDepth(startY + 200);
+            temp.setScale(1.2).setAlpha(0);
+            
+            this.tweens.add({
+                targets: temp,
+                alpha: 1,
+                y: startY - 40,
+                duration: 300,
+                ease: 'Sine.easeOut',
+                onComplete: () => {
+                    this.tweens.add({
+                        targets: temp,
+                        x: this.player.x,
+                        y: this.player.y - 50,
+                        scale: 0.8,
+                        duration: 320,
+                        ease: 'Sine.easeInOut',
+                        onComplete: () => {
+                            this.tweens.add({
+                                targets: temp,
+                                alpha: 0,
+                                scaleX: 0.2,
+                                scaleY: 0.2,
+                                duration: 220,
+                                ease: 'Quad.easeIn',
+                                onComplete: () => {
+                                    console.log('[TcheScene] Destruindo sprites');
+                                    temp.destroy();
+                                    if (this.crowbarSprite) {
+                                        this.crowbarSprite.destroy();
+                                        this.crowbarSprite = null;
+                                    }
+                                    finish();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
+            this.time.delayedCall(1500, finish);
+        } catch (e) {
+            console.error('[TcheScene] Erro na animação:', e);
+            finish();
+        }
+    }
+    
+    /**
+     * Callback quando player entra na zona de saída para HallDoHalliradoScene
+     */
+    onEnterExitZoneHall() {
+        if (!this.canTransition) return;
+        
+        console.log('[TcheScene] Player entrou na zona de saída para Hall');
+        this.canTransition = false;
+        
+        // Salvar posição de entrada no Hall (tile 13, 10)
+        window._playerEntryPos = {
+            x: 13 * 32 + 16,
+            y: 10 * 32 + 16
+        };
+        
+        // Fade out e transição
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.time.delayedCall(500, () => {
+            this.scene.start('HallDoHalliradoScene');
+        });
+    }
+    
+    /**
+     * Interagir com objetos (porta)
+     */
+    interact() {
+        if (this.currentInteractable === this.interactiveDoor) {
+            console.log('[TcheScene] Interagindo com a porta');
+            
+            // Verificar se as luzes estão ligadas
+            if (this.lightsOn) {
+                console.log('[TcheScene] Luzes ligadas - transição permitida');
+                
+                // Salvar posição de entrada no Hall (tile 13, 10)
+                window._playerEntryPos = {
+                    x: 13 * 32 + 16,
+                    y: 10 * 32 + 16
+                };
+                
+                // Fade out e transição
+                this.cameras.main.fadeOut(500, 0, 0, 0);
+                this.time.delayedCall(500, () => {
+                    this.scene.start('HallDoHalliradoScene');
+                });
+            } else {
+                console.log('[TcheScene] Luzes apagadas - muito escuro');
+                this.dialogue.showMessage('Não consigo encontrar a fechadura, está muito escuro.');
+            }
+        }
     }
 
     // Métodos para controlar o CoordProbe

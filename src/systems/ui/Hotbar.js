@@ -443,6 +443,9 @@ export class Hotbar {
                 .setDepth(15100) // Acima da hotbar para ficar visível
                 .setVisible(true);
             
+            // Ignorar pela câmera principal (mundo) - apenas na UI
+            this.scene.cameras.main.ignore(sprite);
+            
             // Escala para caber no slot
             if (sprite.width && sprite.height) {
                 const maxSize = this.slotSize - 16;
