@@ -150,6 +150,31 @@ export class HallDoHalliradoScene extends BaseScene {
         this.createDialogueSystem();
         this.createHotbar();
         
+        // Restaurar hotbar se já tinha itens (sem mostrar)
+        if (window._hotbarItems) {
+            window._hotbarItems.forEach((item, idx) => {
+                if (item) this.hotbar.setItem(idx, item);
+            });
+        }
+        
+        // Forçar hotbar a começar fechada (offscreen)
+        if (this.hotbar) {
+            this.hotbar.isOpen = false;
+            // Mover slots e highlight para posição offscreen
+            this.hotbar.slots.forEach(slot => slot.y = this.hotbar.offscreenY);
+            this.hotbar.highlight.y = this.hotbar.offscreenY;
+            if (this.hotbar.toggleButton) {
+                this.hotbar.toggleButton.y = this.hotbar.offscreenY + this.hotbar.slotSize + 10;
+            }
+            // Atualizar posição dos sprites de itens
+            this.hotbar.itemSprites.forEach((sprite, idx) => {
+                if (sprite) {
+                    const slot = this.hotbar.slots[idx];
+                    sprite.y = slot.y + slot.height / 2;
+                }
+            });
+        }
+        
         // Probe de coordenadas (debug)
         this.coordProbe = new CoordProbe(this, this.map);
         

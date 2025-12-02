@@ -252,10 +252,28 @@ export default class TcheScene extends BaseScene {
         this.createDialogueSystem();
         this.createHotbar();
         
-        // Restaurar hotbar se já tinha itens
+        // Restaurar hotbar se já tinha itens (sem mostrar)
         if (window._hotbarItems) {
             window._hotbarItems.forEach((item, idx) => {
                 if (item) this.hotbar.setItem(idx, item);
+            });
+        }
+        
+        // Forçar hotbar a começar fechada (offscreen)
+        if (this.hotbar) {
+            this.hotbar.isOpen = false;
+            // Mover slots e highlight para posição offscreen
+            this.hotbar.slots.forEach(slot => slot.y = this.hotbar.offscreenY);
+            this.hotbar.highlight.y = this.hotbar.offscreenY;
+            if (this.hotbar.toggleButton) {
+                this.hotbar.toggleButton.y = this.hotbar.offscreenY + this.hotbar.slotSize + 10;
+            }
+            // Atualizar posição dos sprites de itens
+            this.hotbar.itemSprites.forEach((sprite, idx) => {
+                if (sprite) {
+                    const slot = this.hotbar.slots[idx];
+                    sprite.y = slot.y + slot.height / 2;
+                }
             });
         }
         
@@ -370,6 +388,11 @@ export default class TcheScene extends BaseScene {
     update() {
         this.updateBase();
         
+        // Atualizar depth do player baseado no Y
+        if (this.player) {
+            this.player.setDepth(this.player.y + 1);
+        }
+        
         if (this.dialogue?.active) return;
         
         this.coordProbe.update();
@@ -455,19 +478,28 @@ export default class TcheScene extends BaseScene {
                     this.dialogue.active = false;
                 }
                 
-                // Mostrar hotbar com animação
-                this.hotbar.showAnimated();
-                
-                // Animar seta subindo (toggleButton é a seta da hotbar)
+                // Fazer a seta aparecer e dar um pulinho para chamar atenção
                 if (this.hotbar.toggleButton) {
-                    const originalY = this.hotbar.toggleButton.y;
+                    // Posição normal da seta (quando hotbar está fechada/offscreen)
+                    const normalY = this.scene.scale.height - 30;
+                    
+                    // Animar seta aparecendo de baixo para cima e depois pulando
                     this.tweens.add({
                         targets: this.hotbar.toggleButton,
-                        y: originalY - 15,
-                        duration: 250,
-                        yoyo: true,
-                        repeat: 1,
-                        ease: 'Sine.easeInOut'
+                        y: normalY,
+                        duration: 300,
+                        ease: 'Back.easeOut',
+                        onComplete: () => {
+                            // Depois de aparecer, fazer pulinho
+                            this.tweens.add({
+                                targets: this.hotbar.toggleButton,
+                                y: normalY - 15,
+                                duration: 250,
+                                yoyo: true,
+                                repeat: 1,
+                                ease: 'Sine.easeInOut'
+                            });
+                        }
                     });
                 }
                 
