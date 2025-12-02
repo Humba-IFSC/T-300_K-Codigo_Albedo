@@ -180,6 +180,38 @@ export default class QuartoTheoScene extends BaseScene {
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
         
+        // Zona de transição de volta para HallDoHalliradoScene (tiles 14,29 15,29 16,29)
+        const tileSize = 32;
+        const hallTileX = 15; // Tile central
+        const hallTileY = 29;
+        const hallX = hallTileX * tileSize + 16;
+        const hallY = hallTileY * tileSize + tileSize / 2;
+        
+        this.hallZone = this.add.zone(hallX, hallY, 96, 32); // Largura 96 para cobrir 3 tiles
+        this.physics.world.enable(this.hallZone);
+        this.hallZone.body.setImmovable(true);
+        this.hallZone.body.moves = false;
+        
+        console.log('[QuartoTheoScene] Zona de volta para Hall criada em:', hallX, hallY);
+        
+        // DEBUG: Visualizar a zona
+        const debugGraphics = this.add.graphics();
+        debugGraphics.lineStyle(2, 0xff0000, 1);
+        debugGraphics.strokeRect(hallX - 48, hallY - 16, 96, 32);
+        debugGraphics.setDepth(10000);
+        
+        // Overlap para voltar ao Hall
+        this.physics.add.overlap(
+            this.player,
+            this.hallZone,
+            () => this.exitToHall(),
+            null,
+            this
+        );
+        
+        // Flag para evitar múltiplas transições
+        this.isTransitioning = false;
+        
         // Tecla ESC para voltar ao menu
         this.input.keyboard.on('keydown-ESC', () => {
             console.log('[QuartoTheoScene] Voltando ao menu');
@@ -188,6 +220,35 @@ export default class QuartoTheoScene extends BaseScene {
         
         // Fade in
         this.cameras.main.fadeIn(500, 0, 0, 0);
+    }
+
+    /**
+     * Volta para HallDoHalliradoScene
+     */
+    exitToHall() {
+        if (this.isTransitioning) {
+            console.log('[QuartoTheoScene] Já está em transição, ignorando');
+            return;
+        }
+        
+        this.isTransitioning = true;
+        console.log('[QuartoTheoScene] === SAINDO PARA HALL ===');
+        
+        // Definir posição de spawn no Hall (tile 28,5 - um pouco para esquerda do tile 29,5)
+        window._playerEntryPos = {
+            x: 28.5 * 32 + 16,
+            y: 5 * 32 + 16
+        };
+        
+        console.log('[QuartoTheoScene] Definindo window._playerEntryPos:', window._playerEntryPos);
+        
+        // Fade out
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        
+        this.time.delayedCall(500, () => {
+            console.log('[QuartoTheoScene] Iniciando HallDoHalliradoScene');
+            this.scene.start('HallDoHalliradoScene');
+        });
     }
 
     update() {

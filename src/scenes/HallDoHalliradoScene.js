@@ -281,11 +281,39 @@ export class HallDoHalliradoScene extends BaseScene {
         
         console.log('[HallDoHalliradoScene] Zona de saída criada no meio em:', exitX, exitY);
         
+        // Zona de transição para QuartoTheoScene (tiles 29,5 e 29,6)
+        const quartoTheoTileX = 29;
+        const quartoTheoTileY = 5.5; // Meio entre tiles 5 e 6
+        const quartoTheoX = quartoTheoTileX * tileSize + tileSize / 2;
+        const quartoTheoY = quartoTheoTileY * tileSize + 16;
+        
+        this.quartoTheoZone = this.add.zone(quartoTheoX, quartoTheoY, 32, 64); // Altura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.quartoTheoZone);
+        this.quartoTheoZone.body.setImmovable(true);
+        this.quartoTheoZone.body.moves = false;
+        
+        console.log('[HallDoHalliradoScene] Zona para Quarto do Theo criada em:', quartoTheoX, quartoTheoY);
+        
+        // DEBUG: Visualizar a zona
+        const debugGraphics = this.add.graphics();
+        debugGraphics.lineStyle(2, 0x00ff00, 1);
+        debugGraphics.strokeRect(quartoTheoX - 16, quartoTheoY - 32, 32, 64);
+        debugGraphics.setDepth(10000);
+        
         // Overlap para detectar saída
         this.physics.add.overlap(
             this.player,
             this.exitZone,
             () => this.exitToIntro2(),
+            null,
+            this
+        );
+        
+        // Overlap para ir ao Quarto do Theo
+        this.physics.add.overlap(
+            this.player,
+            this.quartoTheoZone,
+            () => this.exitToQuartoTheo(),
             null,
             this
         );
@@ -913,6 +941,35 @@ export class HallDoHalliradoScene extends BaseScene {
         this.time.delayedCall(500, () => {
             console.log('[HallDoHalliradoScene] Iniciando Intro2Scene');
             this.scene.start('Intro2Scene');
+        });
+    }
+    
+    /**
+     * Vai para QuartoTheoScene
+     */
+    exitToQuartoTheo() {
+        if (this.isTransitioning) {
+            console.log('[HallDoHalliradoScene] Já está em transição, ignorando');
+            return;
+        }
+        
+        this.isTransitioning = true;
+        console.log('[HallDoHalliradoScene] === SAINDO PARA QUARTOTHEO ===');
+        
+        // Definir posição de spawn no QuartoTheoScene (tile 15, 28)
+        window._playerEntryPos = {
+            x: 15 * 32 + 16,
+            y: 28 * 32 + 16
+        };
+        
+        console.log('[HallDoHalliradoScene] Definindo window._playerEntryPos:', window._playerEntryPos);
+        
+        // Fade out
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        
+        this.time.delayedCall(500, () => {
+            console.log('[HallDoHalliradoScene] Iniciando QuartoTheoScene');
+            this.scene.start('QuartoTheoScene');
         });
     }
     
