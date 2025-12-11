@@ -316,6 +316,32 @@ export default class TcheScene extends BaseScene {
         
         console.log('[TcheScene] Zona de saída para Hall criada em tiles (17-18, 23):', exitX, exitY);
         
+        // Zona de transição para QuartoTheoScene (tiles 29,5 e 29,6)
+        const quartoTheoTileX = 29;
+        const quartoTheoTileY = 5.5; // Meio entre tiles 5 e 6
+        const quartoTheoX = quartoTheoTileX * tileSize + tileSize / 2;
+        const quartoTheoY = quartoTheoTileY * tileSize + 16;
+        
+        this.exitZoneQuartoTheo = this.add.zone(quartoTheoX, quartoTheoY, 32, 64); // Altura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.exitZoneQuartoTheo);
+        this.exitZoneQuartoTheo.body.setImmovable(true);
+        this.exitZoneQuartoTheo.body.moves = false;
+        
+        console.log('[TcheScene] Zona de saída para Quarto Theo criada em tiles (29, 5-6):', quartoTheoX, quartoTheoY);
+        
+        // Zona de entrada da DanteScene (tiles 1, 12-13)
+        const danteTileX = 1;
+        const danteTileY = 12.5; // Meio entre tiles 12 e 13
+        const danteX = danteTileX * tileSize + tileSize / 2;
+        const danteY = danteTileY * tileSize + 16;
+        
+        this.exitZoneDante = this.add.zone(danteX, danteY, 32, 64); // Altura 64 para cobrir 2 tiles
+        this.physics.world.enable(this.exitZoneDante);
+        this.exitZoneDante.body.setImmovable(true);
+        this.exitZoneDante.body.moves = false;
+        
+        console.log('[TcheScene] Zona de saída para DanteScene criada em tiles (1, 12-13):', danteX, danteY);
+        
         // Flag para transição
         this.canTransition = false;
         this.time.delayedCall(1000, () => {
@@ -327,6 +353,24 @@ export default class TcheScene extends BaseScene {
             this.player,
             this.exitZoneHall,
             this.onEnterExitZoneHall,
+            null,
+            this
+        );
+        
+        // Overlap para detectar saída para Quarto Theo
+        this.physics.add.overlap(
+            this.player,
+            this.exitZoneQuartoTheo,
+            this.onEnterExitZoneQuartoTheo,
+            null,
+            this
+        );
+        
+        // Overlap para detectar saída para DanteScene
+        this.physics.add.overlap(
+            this.player,
+            this.exitZoneDante,
+            this.onEnterExitZoneDante,
             null,
             this
         );
@@ -601,6 +645,50 @@ export default class TcheScene extends BaseScene {
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
             this.scene.start('HallDoHalliradoScene');
+        });
+    }
+    
+    /**
+     * Callback quando player entra na zona de saída para QuartoTheoScene
+     */
+    onEnterExitZoneQuartoTheo() {
+        if (!this.canTransition) return;
+        
+        console.log('[TcheScene] Player entrou na zona de saída para Quarto Theo');
+        this.canTransition = false;
+        
+        // Salvar posição de entrada no Quarto Theo (tile 15, 27)
+        window._playerEntryPos = {
+            x: 15 * 32 + 16,
+            y: 27 * 32 + 16
+        };
+        
+        // Fade out e transição
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.time.delayedCall(500, () => {
+            this.scene.start('QuartoTheoScene');
+        });
+    }
+    
+    /**
+     * Callback quando player entra na zona de saída para DanteScene
+     */
+    onEnterExitZoneDante() {
+        if (!this.canTransition) return;
+        
+        console.log('[TcheScene] Player entrou na zona de saída para DanteScene');
+        this.canTransition = false;
+        
+        // Salvar posição de entrada na DanteScene (tile 15, 23)
+        window._playerEntryPos = {
+            x: 15 * 32 + 16,
+            y: 23 * 32 + 16
+        };
+        
+        // Fade out e transição
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.time.delayedCall(500, () => {
+            this.scene.start('DanteScene');
         });
     }
     

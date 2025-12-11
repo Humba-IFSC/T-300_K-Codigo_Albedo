@@ -6,6 +6,7 @@ import SecondScene from './scenes/SecondScene.js';
 import { HallDoHalliradoScene } from './scenes/HallDoHalliradoScene.js';
 import TcheScene from './scenes/TcheScene.js';
 import QuartoTheoScene from './scenes/QuartoTheoScene.js';
+import DanteScene from './scenes/DanteScene.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -34,7 +35,7 @@ const config = {
             capture: true
         }
     },
-    scene: [TitleScene, IntroScene, Intro2Scene, GameScene, SecondScene, HallDoHalliradoScene, TcheScene, QuartoTheoScene] // TitleScene é a primeira
+    scene: [TitleScene, IntroScene, Intro2Scene, GameScene, SecondScene, HallDoHalliradoScene, TcheScene, QuartoTheoScene, DanteScene] // TitleScene é a primeira
 };
 
 const game = new Phaser.Game(config);

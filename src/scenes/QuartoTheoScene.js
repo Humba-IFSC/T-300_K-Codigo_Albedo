@@ -180,10 +180,10 @@ export default class QuartoTheoScene extends BaseScene {
         this.uiCamManager.applyIgnores(worldCam, uiElems, worldObjects);
         if (this.coordProbe?.highlight) this.uiCamManager.ignore(this.coordProbe.highlight);
         
-        // Zona de transição de volta para HallDoHalliradoScene (tiles 14,29 15,29 16,29)
+        // Zona de transição de volta para HallDoHalliradoScene (tiles 14,28 15,28 16,28) - movida 1 tile para cima
         const tileSize = 32;
         const hallTileX = 15; // Tile central
-        const hallTileY = 29;
+        const hallTileY = 28; // subiu 1 tile
         const hallX = hallTileX * tileSize + 16;
         const hallY = hallTileY * tileSize + tileSize / 2;
         
@@ -192,13 +192,7 @@ export default class QuartoTheoScene extends BaseScene {
         this.hallZone.body.setImmovable(true);
         this.hallZone.body.moves = false;
         
-        console.log('[QuartoTheoScene] Zona de volta para Hall criada em:', hallX, hallY);
-        
-        // DEBUG: Visualizar a zona
-        const debugGraphics = this.add.graphics();
-        debugGraphics.lineStyle(2, 0xff0000, 1);
-        debugGraphics.strokeRect(hallX - 48, hallY - 16, 96, 32);
-        debugGraphics.setDepth(10000);
+        console.log('[QuartoTheoScene] Zona de volta para Tche criada em:', hallX, hallY);
         
         // Overlap para voltar ao Hall
         this.physics.add.overlap(
@@ -223,7 +217,7 @@ export default class QuartoTheoScene extends BaseScene {
     }
 
     /**
-     * Volta para HallDoHalliradoScene
+     * Volta para TcheScene
      */
     exitToHall() {
         if (this.isTransitioning) {
@@ -232,11 +226,11 @@ export default class QuartoTheoScene extends BaseScene {
         }
         
         this.isTransitioning = true;
-        console.log('[QuartoTheoScene] === SAINDO PARA HALL ===');
+        console.log('[QuartoTheoScene] === SAINDO PARA TCHESCENE ===');
         
-        // Definir posição de spawn no Hall (tile 28,5 - um pouco para esquerda do tile 29,5)
+        // Definir posição de spawn na TcheScene (tile 28, 5)
         window._playerEntryPos = {
-            x: 28.5 * 32 + 16,
+            x: 28 * 32 + 16,
             y: 5 * 32 + 16
         };
         
@@ -246,8 +240,8 @@ export default class QuartoTheoScene extends BaseScene {
         this.cameras.main.fadeOut(500, 0, 0, 0);
         
         this.time.delayedCall(500, () => {
-            console.log('[QuartoTheoScene] Iniciando HallDoHalliradoScene');
-            this.scene.start('HallDoHalliradoScene');
+            console.log('[QuartoTheoScene] Iniciando TcheScene');
+            this.scene.start('TcheScene');
         });
     }
 
