@@ -1,0 +1,163 @@
+{ "frames": {
+   "0": {
+    "frame": { "x": 40, "y": 1, "w": 6, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 4, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "1": {
+    "frame": { "x": 10, "y": 21, "w": 7, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 5, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "2": {
+    "frame": { "x": 31, "y": 1, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "3": {
+    "frame": { "x": 18, "y": 21, "w": 7, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 5, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "4": {
+    "frame": { "x": 1, "y": 11, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "5": {
+    "frame": { "x": 10, "y": 11, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "6": {
+    "frame": { "x": 19, "y": 11, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "7": {
+    "frame": { "x": 28, "y": 11, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "8": {
+    "frame": { "x": 37, "y": 11, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "9": {
+    "frame": { "x": 1, "y": 21, "w": 8, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 6, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "10": {
+    "frame": { "x": 1, "y": 1, "w": 9, "h": 9 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 7, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "11": {
+    "frame": { "x": 34, "y": 21, "w": 5, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 2, "y": 0, "w": 3, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "12": {
+    "frame": { "x": 11, "y": 1, "w": 9, "h": 9 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 7, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "13": {
+    "frame": { "x": 26, "y": 21, "w": 7, "h": 9 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 5, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "14": {
+    "frame": { "x": 21, "y": 1, "w": 9, "h": 9 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 7, "h": 7 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   },
+   "15": {
+    "frame": { "x": 40, "y": 21, "w": 3, "h": 3 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 1, "h": 1 },
+    "sourceSize": { "w": 7, "h": 7 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "heart_and_hud_numbers.png",
+  "format": "RGBA8888",
+  "size": { "w": 47, "h": 31 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "0", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "1", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" },
+   { "name": "2", "from": 2, "to": 2, "direction": "forward", "color": "#000000ff" },
+   { "name": "3", "from": 3, "to": 3, "direction": "forward", "color": "#000000ff" },
+   { "name": "4", "from": 4, "to": 4, "direction": "forward", "color": "#000000ff" },
+   { "name": "5", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
+   { "name": "6", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
+   { "name": "7", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
+   { "name": "8", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" },
+   { "name": "9", "from": 9, "to": 9, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_lose_full", "from": 10, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_lost_first_half", "from": 10, "to": 12, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_full", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_lose_last_half", "from": 12, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_half", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_empty", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "heart_none", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "hud_numbers_and_hearts", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

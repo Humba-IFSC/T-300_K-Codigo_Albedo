@@ -1,0 +1,164 @@
+[
+  {
+    "path": "assets/fonts",
+    "files": [
+      {
+        "type": "font",
+        "key": "FONT_PRESS_START_2P",
+        "url": "Press_Start_2P/PressStart2P-Regular.ttf",
+        "format": "truetype"
+      }
+    ]
+  },
+  {
+    "path": "assets/images/hud",
+    "files": [
+      {
+        "type": "aseprite",
+        "key": "HUD_NUMBERS",
+        "textureURL": "heart_and_hud_numbers.png",
+        "atlasURL": "heart_and_hud_numbers.json"
+      }
+    ]
+  },
+  {
+    "path": "assets/images/ui",
+    "files": [
+      {
+        "type": "image",
+        "key": "UI_DIALOG",
+        "url": "dialog_ui.png"
+      },
+      {
+        "type": "image",
+        "key": "UI_CURSOR",
+        "url": "cursor_white.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "UI_ICONS",
+        "url": "icons.png",
+        "frameConfig": { "frameWidth": 16, "frameHeight": 16 }
+      }
+    ]
+  },
+  {
+    "path": "assets/images/player",
+    "files": [
+      {
+        "type": "aseprite",
+        "key": "PLAYER",
+        "textureURL": "main_green.png",
+        "atlasURL": "main_green.json"
+      },
+      {
+        "type": "spritesheet",
+        "key": "DAGGER",
+        "url": "dagger.png",
+        "frameConfig": { "frameWidth": 16, "frameHeight": 16 }
+      }
+    ]
+  },
+  {
+    "path": "assets/images/levels/common",
+    "files": [
+      {
+        "type": "image",
+        "key": "COLLISION",
+        "url": "collision.png"
+      },
+      {
+        "type": "atlas",
+        "key": "DUNGEON_OBJECTS",
+        "textureURL": "dungeon_objects.png",
+        "atlasURL": "dungeon_objects.json"
+      },
+      {
+        "type": "image",
+        "key": "POT",
+        "url": "pot.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "POT_BREAK",
+        "url": "pot_break.png",
+        "frameConfig": { "frameWidth": 32, "frameHeight": 32 }
+      }
+    ]
+  },
+  {
+    "path": "assets/images/enemies",
+    "files": [
+      {
+        "type": "aseprite",
+        "key": "SPIDER",
+        "textureURL": "spider.png",
+        "atlasURL": "spider.json"
+      },
+      {
+        "type": "spritesheet",
+        "key": "ZOMBIE",
+        "url": "Zombie.png",
+        "frameConfig": { "frameWidth": 32, "frameHeight": 32 }
+      },
+      {
+        "type": "aseprite",
+        "key": "WISP",
+        "textureURL": "wisp.png",
+        "atlasURL": "wisp.json"
+      },
+      {
+        "type": "spritesheet",
+        "key": "ENEMY_DEATH",
+        "url": "enemy_death.png",
+        "frameConfig": { "frameWidth": 16, "frameHeight": 16 }
+      },
+      {
+        "type": "aseprite",
+        "key": "DROW",
+        "textureURL": "drow.png",
+        "atlasURL": "drow.json"
+      }
+    ]
+  },
+  {
+    "path": "assets/images/levels/dungeon_1",
+    "files": [
+      {
+        "type": "image",
+        "key": "DUNGEON_1_BACKGROUND",
+        "url": "dungeon_1_background.png"
+      },
+      {
+        "type": "image",
+        "key": "DUNGEON_1_FOREGROUND",
+        "url": "dungeon_1_foreground.png"
+      },
+      {
+        "type": "tilemapTiledJSON",
+        "key": "DUNGEON_1_LEVEL",
+        "url": "dungeon_1.json"
+      }
+    ]
+  },
+  {
+    "path": "assets/images/levels/world",
+    "files": [
+      {
+        "type": "image",
+        "key": "WORLD_BACKGROUND",
+        "url": "world_background.png"
+      },
+      {
+        "type": "image",
+        "key": "WORLD_FOREGROUND",
+        "url": "world_foreground.png"
+      },
+      {
+        "type": "tilemapTiledJSON",
+        "key": "WORLD_LEVEL",
+        "url": "world.json"
+      }
+    ]
+  }
+]
