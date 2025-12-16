@@ -54,8 +54,32 @@
 
 ## → Roteiro (Organizado)
 
- Nosso protagonista chega na vila, localizada em Jan Majenas, de barco. Ele caminha até a entrada, porém o local é cercado, de modo que parece impossível entrar sem permissão. Felizmente, alguém **(Dante)** enxerga o protagonista e o para, questionando sua chegada no local “esquecido por tantos”. Com a vila sendo composta principalmente por cientistas, para ter sua entrada permitida, é necessário que o protagonista responda uma pergunta de conhecimento da física, e, após a resposta correta, o protagonista é permitido entrar na vila. **(Música: nome \- autor (link))**  
- Entrando na vila, o protagonista fala e acompanha a pessoa que autorizou sua entrada pelos lugares 
+
+ Nosso protagonista chega na vila, localizada em Jan Majenas, de barco. Ele caminha até a entrada, porém o local é cercado, de modo que parece impossível entrar sem permissão. Felizmente, alguém (Dante) enxerga o protagonista e o para, questionando sua chegada no local “esquecido por tantos”. Com a vila sendo composta principalmente por cientistas, para ter sua entrada permitida, é necessário que o protagonista responda uma pergunta de conhecimento da física. (Cutscene)
+Diálogo:
+(Cutscene)
+Dante - (a gameplay precisa deixar claro que ele queimou a mão.) “AIII! Que dor! Minha mão queimou quando toquei no portão!”
+Jogador - (o personagem se aproxima e é necessário que seja claro que o Dante perceba o protagonista nesse momento.)
+Dante - “Ei! Você! É um cientista, certo?”
+Dante - “Você veio atrás da nossa vila? Para quê?”
+(Tela preta dizendo “Após explicar sua jornada…”)
+Dante - “Se é assim… Precisa provar que é realmente um cientista e que entende o que está fazendo.”
+Dante - “Você viu que queimei minha mão nesse portão, certo? Eu não lembro ao certo, mas o que pode ter causado isso?”
+(Puzzle inicial - espaço para resposta)
+(Resposta correta: Resfriamento)
+Dante - (Em caso de resposta correta) “Isso parece estar certo… Você parece ser bom com isso, pode entrar.”
+Dante - (Em caso de resposta errada) “Acho que isso não responde minha pergunta, você tem certeza de sua resposta?” (Jogador ganha segunda chance)
+ Após responder corretamente, o protagonista tem sua entrada na vila permitida, e (Dante) decide o guiar para conhecer os outros e o local em si. Logo, ambos os personagens caminham até o meio da vila (segundo mapa). 
+Diálogo:
+Dante - “Acho que tem umas 4 pessoas que posso te apresentar e que vão te ajudar.”
+Dante - “Mas já aviso que todos aqui são bem ocupados, provavelmente você terá que ajudá-los antes de conseguir alguma informação.”
+Dante - “Faremos o seguinte… Eu vou na frente, chamo a pessoa e explico sua situação. Você se apresentar… Vemos no que dá.”
+Dante - “Então… Onde vamos primeiro?”
+(Opção do jogador - 4 opções, apresentadas por nome “Gabriel Conforto”, “Campos Neto”, “Aurora” e “Lumi”)
+(OBS: PUZZLES A PARTIR DESTE PONTO VÃO EM ORDEM DA DECISÃO DO JOGADOR!)
+(Puzzle - Gabriel Conforto)
+ Dante e o jogador caminham até a segunda casa na parte de cima (da esquerda para a direita). O jogador para e Dante vai até a porta, logo depois, o Gabriel aparece e eles param na frente da porta um pouco (Diálogos aparecem na tela trocando entre Gabriel e Dante com coisas tipo *fala fala fala*, sem conversa concreta). Após isso, eles andam em direção do jogador. (OBS: é muito importante que o personagem do Gabriel Conforto esteja segurando algum tipo de máquina)
+
 
 # → NPCs:
 
